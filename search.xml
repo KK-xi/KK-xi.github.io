@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>单目深度估计总结</title>
-    <url>/2020/03/29/ytorch%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</url>
+    <url>/2020/03/29/%E6%B7%B1%E5%BA%A6%E4%BC%B0%E8%AE%A1/</url>
     <content><![CDATA[<hr>
 <center> tag: paper conclusion|
 categories: 深度估计|工作：paper reading </center>
@@ -44,41 +44,5 @@ categories: 深度估计|工作：paper reading </center>
       <tags>
         <tag>paper conclusion</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>my new post</title>
-    <url>/2020/03/29/my-new-post/</url>
-    <content><![CDATA[<hr>
-<p>title: new post<br>
-date: 2019-06-28 22:36:00<br>
-categories: 工作</p>
-<hr>
-]]></content>
-      <tags>
-        <tag>test</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2020/03/29/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start">Quick Start</h2>
-<h3 id="Create-a-new-post">Create a new post</h3>
-<pre><code class="language-bash">$ hexo new &quot;My New Post&quot;
-</code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server">Run server</h3>
-<pre><code class="language-bash">$ hexo server
-</code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files">Generate static files</h3>
-<pre><code class="language-bash">$ hexo generate
-</code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre><code class="language-bash">$ hexo deploy
-</code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-]]></content>
   </entry>
 </search>
