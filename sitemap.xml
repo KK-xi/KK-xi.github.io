@@ -2,9 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/work/index.html</loc>
+    
+    <lastmod>2020-03-29T13:36:55.745Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/about/index.html</loc>
+    
+    <lastmod>2020-03-29T13:31:08.102Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/03/29/ytorch%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</loc>
     
-    <lastmod>2020-03-29T13:21:19.497Z</lastmod>
+    <lastmod>2020-03-29T13:28:46.639Z</lastmod>
     
   </url>
   
@@ -12,13 +26,6 @@
     <loc>http://yoursite.com/tags/index.html</loc>
     
     <lastmod>2020-03-29T13:20:26.478Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/about/index.html</loc>
-    
-    <lastmod>2020-03-29T13:14:58.282Z</lastmod>
     
   </url>
   
@@ -47,13 +54,6 @@
     <loc>http://yoursite.com/work/my-new-post.html</loc>
     
     <lastmod>2020-03-29T12:41:03.780Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/work/index.html</loc>
-    
-    <lastmod>2020-03-29T10:27:14.678Z</lastmod>
     
   </url>
   
