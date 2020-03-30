@@ -4,6 +4,60 @@
   
   
   <entry>
+    <title>图像处理注意力机制</title>
+    <link href="/2020/03/30/%E5%83%8F%E5%A4%84%E7%90%86%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/"/>
+    <url>/2020/03/30/%E5%83%8F%E5%A4%84%E7%90%86%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/</url>
+    
+    <content type="html"><![CDATA[<h3 id="记录最近所看的注意力机制">记录最近所看的注意力机制</h3>]]></content>
+    
+    
+    <categories>
+      
+      <category>work</category>
+      
+      <category>attention mechanism</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>attention mechanism</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>视觉SLAM十四讲</title>
+    <link href="/2020/03/30/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/"/>
+    <url>/2020/03/30/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/</url>
+    
+    <content type="html"><![CDATA[<p>第一章</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>work</category>
+      
+      <category>SLAM</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>视觉SLAM</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>seu</title>
     <link href="/2020/03/30/eu/"/>
     <url>/2020/03/30/eu/</url>
@@ -33,6 +87,8 @@
     <categories>
       
       <category>work</category>
+      
+      <category>深度估计</category>
       
     </categories>
     
