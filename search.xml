@@ -35,8 +35,7 @@
 2、文章所提的改进空间挺多的，比如用在嵌入式设备上，这个网络存在局限性，以及更清楚地确定不同编码器、数据增强和学习策略对性能和贡献的影响，都是未来工作中值得关注的内容。</p>
 ]]></content>
       <categories>
-        <category>深度估计</category>
-        <category>工作</category>
+        <category>work</category>
       </categories>
       <tags>
         <tag>paper conclusion</tag>
