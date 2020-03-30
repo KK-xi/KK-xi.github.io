@@ -33,7 +33,7 @@ img[srcset] {
 #board {
   position: relative;
   margin-top: -2rem;
-  background-color: #FFFFF3;
+  background-color: #C5E99B;
   border-radius: 0.5rem;
   z-index: 3;
 }
