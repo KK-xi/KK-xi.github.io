@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>seu</title>
+    <url>/2020/03/30/eu/</url>
+    <content><![CDATA[<ul>
+<li>2019.10.06 东大一角</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/20200330115513856.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_10" srcset="/img/loading.gif" alt="seu"></p>
+]]></content>
+      <categories>
+        <category>life</category>
+      </categories>
+  </entry>
+  <entry>
     <title>单目深度估计总结</title>
     <url>/2020/03/29/%E6%B7%B1%E5%BA%A6%E4%BC%B0%E8%AE%A1/</url>
     <content><![CDATA[<p>《High Quality Monocular Depth Estimation via Transfer Learning》<br>
