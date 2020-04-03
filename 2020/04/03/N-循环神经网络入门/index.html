@@ -185,47 +185,25 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="循环神经网络入门（pytorch实现）">循环神经网络入门（pytorch实现）</h2>
-<p>参考书目：《深度学习算法原理与编程实战》 |   蒋子阳著<br>
-<br>
-参考视频：<a href="https://www.bilibili.com/video/BV134411w76S" target="_blank" rel="noopener">微软人工智能公开课—循环神经网络RNN</a></p>
-<p><strong>一、回顾前馈神经网络</strong> <br><br>
-　　RNN是在前馈式神经网络基础上的，所以先回顾一下前馈神经网络。 <br><br>
-　　前馈式神经网络（FNN, Feedforward Neural Network）一般的结构如下图：<br>
-　　<img src="https://img-blog.csdnimg.cn/20200403141749146.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="前馈式神经网络"><br>
-图中神经元的输出表示为：$O_t=f(\sum_{i=1}^n a_iw_i+b)$假设某一层的输出为$h_n$，则下一层的输出为$f_{out}(h_n)$，这样重复迭代网络的输出为$y=f_{out}(f_n(f_{n-1}(…)))$，如此一来神经网络就成了巨大的复合函数，但实际我们并不会用到这个函数来计算，而使用计算图来表示，这样方便得出每一个节点的输入输出数据的梯度。对于RNN，就从这样的简单的前馈神经网络的传递方式说起。</p>
-<p><strong>二、RNN网络简介</strong> <br><br>
-　　循环神经网络（ Recurrent Neural Network, RNN ）雏形见于美国物理学家 J.J.Hopfield 于 1982 年提出的可用作联想存储器的互联网络——Hopfield 神经网络模型，如下图，每个节点都有输入，两两节点之间有双相连接：<br>
-　　<img src="https://img-blog.csdnimg.cn/20200403144156566.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="Hopfiled Network"><br>
-　　基于传统的机器学习算法十分依赖人工特征的提取致使模型一直无法提高正确率，而之前的全连神经网络以及卷积神经网络中，信息只在层与层之间存在运算关系，而没有连接节点之间的信息流动，这样在每一个时间都会有一个单独的参数，<font color="red">因此不能在时间上共享不同序列长度或序列不同位置的统计强度，所以无法对训练时没有见过的序列长度进行泛化</font>。 所以发展RNN对具有时间序列特性的数据非常有效，它能挖掘数据中的时序信息以及语义信息，在模型的不同部分共享参数解决了这个问题，并使得模型能够扩展到对不同形式的样本（这里指不同长度的样本）进行泛化。 <strong>循环神经网络会在几个时间步内共享相同的权重以刻画一个序列当前的输出与之前信息的关系，这体现在结构上是循环神经网络的隐藏层之间存在连接，隐藏层的输入来自于输入层的数据以及上一时刻隐藏层的输出</strong>。这样的结构使得循环神经网络会对之前的信息有所记忆， 同时利用之前的信息影响后面节点的输出。 <br><br>
-　　RNN网络主要用于处理离散序列数据：离散线性、长度可变的序列，例如时域语音信号，金融市场走势等。网络可用于序列数据的分析（市场趋势预测）、序列数据的生产（基于图片的文字描述）、序列数据的转换（语音识别以及机器翻译）。</p>
-<p><strong>三、循环网络结构</strong> <br><br>
-　 　循环神经网络典型结构及其按时间先后展开结构如图所示：　<br>
-　 　<img src="https://img-blog.csdnimg.cn/20200403160334980.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="RNN"><br>
-对于主体结构$A$，一般可认为是循环神经网络的一个隐藏单元。在$t$时刻，主体结构$A$会读取输入层的输入$x_t$以及上一时刻的输出，并输出当前时刻的$o_t$值（图中未给出）。此后$A$结构在$t$时刻的状态值表达式：$h<sup>t=f(h</sup>{t-1},x_t;\theta)$，其中$\theta$可以是网络中的其它参数比如权重或偏置等，循环的过程就是$A$不断被执行的过程。但是循环神经网络目前无法做到无限循环，因为循环过多会出现梯度消失的问题。 <br><br>
-　　假设隐藏单元的激活函数是tanh函数，则循环体结构$A$如下：　　<img src="https://img-blog.csdnimg.cn/20200403155812724.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="循环体"><br>
-则隐藏单元状态值表示为：$h<sup>t=tanh(Wh</sup>{t-1}+Ux_t+b<sup>h)$，$b</sup>h$是由$x_t$得到$h<sup>t$的偏置，$W$是相邻时刻隐藏单元间的权重矩阵，$U$是从$x_t$计算得到这个隐藏单元时用到的权重矩阵。从当前的状态值$h</sup>t$都得到输出还需要一个全连接神经网络来完成这个过程，表达式为：$o<sup>t=b_o+Vh</sup>t$，$V$是由$h<sup>t$得到$o</sup>t$的权重矩阵。如果输出是离散的，则可以用softmax处理$o<sup>t$得到标准化的概率向量$y$：$y</sup>t=softmax(o^t)$，向量的值对应离散变量可能值的概率。</p>
-<p><strong>四、网络的训练</strong> <br><br>
-　　要对网络进行训练，需要有一个与$x$序列配对的$o$的所有时间步内的总loss。 <br><br>
-　　RNN的反向传播算法称为时间反向传播 (Back-Propagation Through Time, BPTT)。基本原理和 BP 算法是一样的，三步走：前向计算每个神经元的输出值；反向计算误差项值；计算每个权重的梯度；最后再用随机梯度下降算法更新权重。详细的计算公式参考<a href="https://zhuanlan.zhihu.com/p/85776566" target="_blank" rel="noopener">知乎</a>。在反向传播过程中，当输入序列过长的时候，在求取一个比较远的时刻的梯度时，需要回溯到前面的所有时刻的信息，由于连乘项的存在，导致前面时刻的信息会缺失，这就是RNN中的梯度消失问题，还有就是当连乘出现大于1时的梯度爆炸，后者采用clip的方式即可，前者将会用到LSTM来缓解。</p>
-<p><strong>五、LSTM</strong> <br><br>
-　　LSTM 结构由 Sepp Hochreiter教授和 Jurgen Schrnidhuber教授于 1997 年 提出，它本身就是一种特殊的循环体结构 。在一个整体的循环神经网络中，除了外部的RNN大循环（<strong>循环体是 LSTM</strong>）外，还需要考虑 LSTM 本身单元“细胞”之间的自循环。LSTM单元结构如下图：<br>
-　　<img src="https://img-blog.csdnimg.cn/20200403173928627.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM单元"><br>
-LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输入的信息进行控制，让信息有选择性的影响RNN中每个时刻的状态。遗忘门（Forget Gate）是让网络“忘记”之前没用的信息，上一时刻的状态值通过与自循环权重 (该权重就是遗忘门的输出) 进行位乘可得到当前时刻状态值的一个加数。遗忘门输出表达式：</p>
-<p>$$f_i<sup>t=sigmoid(b_i</sup>f+\sum U_{i,j}<sup>fx_j</sup>t+\sum W_{i,j}<sup>fh_j</sup>{t-1})$$</p>
-<p>其中，$h<sup>{t-1}$是包含一个LSTM细胞上一时刻的所有输出，可以被看作是当前隐藏层向量，数量为$j$，$W$是循环权重。要保存长期的记忆，还需要输入门，同样是根据$x</sup>t$、$b<sup>g$和$h</sup>{t-1}$来决定哪些部分将进入当前时刻的状态，输入门的值表示为：</p>
-<p>$$g_i<sup>t=sigmoid(b_i</sup>g+\sum U_{i,j}<sup>gx_j</sup>t+\sum W_{i,j}<sup>gh_j</sup>{t-1})$$</p>
+              <h2 id="循环神经网络入门pytorch实现">循环神经网络入门（pytorch实现）</h2>
+<p>参考书目：《深度学习算法原理与编程实战》 | 蒋子阳著  参考视频：<a href="https://www.bilibili.com/video/BV134411w76S" target="_blank" rel="noopener">微软人工智能公开课—循环神经网络RNN</a></p>
+<p><strong>一、回顾前馈神经网络</strong> <br> 　　RNN是在前馈式神经网络基础上的，所以先回顾一下前馈神经网络。 <br> 　　前馈式神经网络（FNN, Feedforward Neural Network）一般的结构如下图： 　　<img src="https://img-blog.csdnimg.cn/20200403141749146.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="前馈式神经网络"> 图中神经元的输出表示为：<span class="math inline">\(O_t=f(\sum_{i=1}^n a_iw_i+b)\)</span>假设某一层的输出为<span class="math inline">\(h_n\)</span>，则下一层的输出为<span class="math inline">\(f_{out}(h_n)\)</span>，这样重复迭代网络的输出为<span class="math inline">\(y=f_{out}(f_n(f_{n-1}(...)))\)</span>，如此一来神经网络就成了巨大的复合函数，但实际我们并不会用到这个函数来计算，而使用计算图来表示，这样方便得出每一个节点的输入输出数据的梯度。对于RNN，就从这样的简单的前馈神经网络的传递方式说起。</p>
+<p><strong>二、RNN网络简介</strong> <br> 　　循环神经网络（ Recurrent Neural Network, RNN ）雏形见于美国物理学家 J.J.Hopfield 于 1982 年提出的可用作联想存储器的互联网络——Hopfield 神经网络模型，如下图，每个节点都有输入，两两节点之间有双相连接： 　　<img src="https://img-blog.csdnimg.cn/20200403144156566.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="Hopfiled Network"> 　　基于传统的机器学习算法十分依赖人工特征的提取致使模型一直无法提高正确率，而之前的全连神经网络以及卷积神经网络中，信息只在层与层之间存在运算关系，而没有连接节点之间的信息流动，这样在每一个时间都会有一个单独的参数，<font color="red">因此不能在时间上共享不同序列长度或序列不同位置的统计强度，所以无法对训练时没有见过的序列长度进行泛化</font>。 所以发展RNN对具有时间序列特性的数据非常有效，它能挖掘数据中的时序信息以及语义信息，在模型的不同部分共享参数解决了这个问题，并使得模型能够扩展到对不同形式的样本（这里指不同长度的样本）进行泛化。 <strong>循环神经网络会在几个时间步内共享相同的权重以刻画一个序列当前的输出与之前信息的关系，这体现在结构上是循环神经网络的隐藏层之间存在连接，隐藏层的输入来自于输入层的数据以及上一时刻隐藏层的输出</strong>。这样的结构使得循环神经网络会对之前的信息有所记忆， 同时利用之前的信息影响后面节点的输出。 <br> 　　RNN网络主要用于处理离散序列数据：离散线性、长度可变的序列，例如时域语音信号，金融市场走势等。网络可用于序列数据的分析（市场趋势预测）、序列数据的生产（基于图片的文字描述）、序列数据的转换（语音识别以及机器翻译）。</p>
+<p><strong>三、循环网络结构</strong> <br> 　 　循环神经网络典型结构及其按时间先后展开结构如图所示：　 　 　<img src="https://img-blog.csdnimg.cn/20200403160334980.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="RNN"> 对于主体结构<span class="math inline">\(A\)</span>，一般可认为是循环神经网络的一个隐藏单元。在<span class="math inline">\(t\)</span>时刻，主体结构<span class="math inline">\(A\)</span>会读取输入层的输入<span class="math inline">\(x_t\)</span>以及上一时刻的输出，并输出当前时刻的<span class="math inline">\(o_t\)</span>值（图中未给出）。此后<span class="math inline">\(A\)</span>结构在<span class="math inline">\(t\)</span>时刻的状态值表达式：<span class="math inline">\(h^t=f(h^{t-1},x_t;\theta)\)</span>，其中<span class="math inline">\(\theta\)</span>可以是网络中的其它参数比如权重或偏置等，循环的过程就是<span class="math inline">\(A\)</span>不断被执行的过程。但是循环神经网络目前无法做到无限循环，因为循环过多会出现梯度消失的问题。 <br> 　　假设隐藏单元的激活函数是tanh函数，则循环体结构<span class="math inline">\(A\)</span>如下：　　<img src="https://img-blog.csdnimg.cn/20200403155812724.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="循环体"> 则隐藏单元状态值表示为：<span class="math inline">\(h^t=tanh(Wh^{t-1}+Ux_t+b^h)\)</span>，<span class="math inline">\(b^h\)</span>是由<span class="math inline">\(x_t\)</span>得到<span class="math inline">\(h^t\)</span>的偏置，<span class="math inline">\(W\)</span>是相邻时刻隐藏单元间的权重矩阵，<span class="math inline">\(U\)</span>是从<span class="math inline">\(x_t\)</span>计算得到这个隐藏单元时用到的权重矩阵。从当前的状态值<span class="math inline">\(h^t\)</span>都得到输出还需要一个全连接神经网络来完成这个过程，表达式为：<span class="math inline">\(o^t=b_o+Vh^t\)</span>，<span class="math inline">\(V\)</span>是由<span class="math inline">\(h^t\)</span>得到<span class="math inline">\(o^t\)</span>的权重矩阵。如果输出是离散的，则可以用softmax处理<span class="math inline">\(o^t\)</span>得到标准化的概率向量<span class="math inline">\(y\)</span>：<span class="math inline">\(y^t=softmax(o^t)\)</span>，向量的值对应离散变量可能值的概率。</p>
+<p><strong>四、网络的训练</strong> <br> 　　要对网络进行训练，需要有一个与<span class="math inline">\(x\)</span>序列配对的<span class="math inline">\(o\)</span>的所有时间步内的总loss。 <br> 　　RNN的反向传播算法称为时间反向传播 (Back-Propagation Through Time, BPTT)。基本原理和 BP 算法是一样的，三步走：前向计算每个神经元的输出值；反向计算误差项值；计算每个权重的梯度；最后再用随机梯度下降算法更新权重。详细的计算公式参考<a href="https://zhuanlan.zhihu.com/p/85776566" target="_blank" rel="noopener">知乎</a>。在反向传播过程中，当输入序列过长的时候，在求取一个比较远的时刻的梯度时，需要回溯到前面的所有时刻的信息，由于连乘项的存在，导致前面时刻的信息会缺失，这就是RNN中的梯度消失问题，还有就是当连乘出现大于1时的梯度爆炸，后者采用clip的方式即可，前者将会用到LSTM来缓解。</p>
+<p><strong>五、LSTM</strong> <br> 　　LSTM 结构由 Sepp Hochreiter教授和 Jurgen Schrnidhuber教授于 1997 年 提出，它本身就是一种特殊的循环体结构 。在一个整体的循环神经网络中，除了外部的RNN大循环（<strong>循环体是 LSTM</strong>）外，还需要考虑 LSTM 本身单元“细胞”之间的自循环。LSTM单元结构如下图： 　　<img src="https://img-blog.csdnimg.cn/20200403173928627.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM单元"> LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输入的信息进行控制，让信息有选择性的影响RNN中每个时刻的状态。遗忘门（Forget Gate）是让网络“忘记”之前没用的信息，上一时刻的状态值通过与自循环权重 (该权重就是遗忘门的输出) 进行位乘可得到当前时刻状态值的一个加数。遗忘门输出表达式：</p>
+<p><span class="math display">\[f_i^t=sigmoid(b_i^f+\sum U_{i,j}^fx_j^t+\sum W_{i,j}^fh_j^{t-1})\]</span></p>
+<p>其中，<span class="math inline">\(h^{t-1}\)</span>是包含一个LSTM细胞上一时刻的所有输出，可以被看作是当前隐藏层向量，数量为<span class="math inline">\(j\)</span>，<span class="math inline">\(W\)</span>是循环权重。要保存长期的记忆，还需要输入门，同样是根据<span class="math inline">\(x^t\)</span>、<span class="math inline">\(b^g\)</span>和<span class="math inline">\(h^{t-1}\)</span>来决定哪些部分将进入当前时刻的状态，输入门的值表示为：</p>
+<p><span class="math display">\[g_i^t=sigmoid(b_i^g+\sum U_{i,j}^gx_j^t+\sum W_{i,j}^gh_j^{t-1})\]</span></p>
 <p>进一步计算LSTM结构当前时刻的状态值：</p>
-<p>$$C_i<sup>t=f_i</sup>tC_i<sup>{t-1}+g_i</sup>ttanh(b_i+\sum U_{i,j}x_j^t+\sum W_{i,j}h_j^{t-1})$$</p>
-<p>其中，$W$值为遗忘门的循环权重。然后得出结构当前时刻的输出值：</p>
-<p>$$h<sup>t=tanh(C_i</sup>t)q_i^t$$</p>
-<p>$$q_i<sup>t=sigmoid(b_i</sup>q+\sum U_{i,j}<sup>qx_j</sup>t+\sum W_{i,j}<sup>qh_j</sup>{t-1})$$</p>
-<p>其中，$W<sup>q$为遗忘门的循环权重，$q_i</sup>t$为输出们的输出值。用LSTM作为循环体的RNN网络如下图所示：<br>
-<img src="https://img-blog.csdnimg.cn/20200403192938761.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM-RNN"></p>
-<p>循环神经网络的变种还有：双向循环神经网络和深层循环神经网络。</p>
+<p><span class="math display">\[C_i^t=f_i^tC_i^{t-1}+g_i^ttanh(b_i+\sum U_{i,j}x_j^t+\sum W_{i,j}h_j^{t-1})\]</span></p>
+<p>其中，<span class="math inline">\(W\)</span>值为遗忘门的循环权重。然后得出结构当前时刻的输出值：</p>
+<p><span class="math display">\[h^t=tanh(C_i^t)q_i^t\]</span></p>
+<p><span class="math display">\[q_i^t=sigmoid(b_i^q+\sum U_{i,j}^qx_j^t+\sum W_{i,j}^qh_j^{t-1})\]</span></p>
+<p>其中，<span class="math inline">\(W^q\)</span>为遗忘门的循环权重，<span class="math inline">\(q_i^t\)</span>为输出们的输出值。用LSTM作为循环体的RNN网络如下图所示： <img src="https://img-blog.csdnimg.cn/20200403192938761.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM-RNN"></p>
+<p>　　循环神经网络的变种还有：双向循环神经网络和深层循环神经网络。</p>
 <ul>
-<li>至此，关于RNN和LSTM的学习就结束啦~<br>
-用pytorch实现LSTM的RNN对MNIST数据集分类，以及RNN实现一元二次曲线的回归的代码地址：<a href="https://gitee.com/sparklekk/RNN" target="_blank" rel="noopener">sparklekk</a></li>
+<li>至此，关于RNN和LSTM的学习就结束啦~ 用pytorch实现LSTM的RNN对MNIST数据集分类，以及RNN实现一元二次曲线的回归的代码地址：<a href="https://gitee.com/sparklekk/RNN" target="_blank" rel="noopener">sparklekk</a></li>
 </ul>
 
             </div>
@@ -260,6 +238,12 @@ LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输
                 <div class="post-prevnext row">
                   <div class="post-prev col-6">
                     
+                    
+                      <a href="/2020/04/03/ytorch%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">pytorch学习记录</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </div>
                   <div class="post-next col-6">
