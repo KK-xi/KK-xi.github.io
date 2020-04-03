@@ -185,41 +185,20 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <bar>
- <bar>
+              <p><bar><br> <bar></bar></bar></p>
+<p><bar></bar></p>
 <bar>
-<bar>
-<p>《High Quality Monocular Depth Estimation via Transfer Learning》<br>
-作者：Ibraheem Alhashim and Peter Wonka</p>
+
+<p>《High Quality Monocular Depth Estimation via Transfer Learning》<br>作者：Ibraheem Alhashim and Peter Wonka</p>
 <p>备注：只是一篇总结，不是解读哒~</p>
-<h2 id="一、为什么要看这篇文章？">一、为什么要看这篇文章？</h2>
-<p>1、因为最近萌生了一个想法，觉得可以用用深度图；<br>
-2、多了解一样是一样。</p>
-<h2 id="二、文章提出的出发点">二、文章提出的出发点</h2>
-<p>1、首先，一张图片2D到3D的深度估计是很多场景理解或者是重建工作中的基础；<br>
-2、其次，这篇文章希望提出的深度估计方法能获得高分辨率的深度估计结果。</p>
-<h2 id="三、Framework">三、Framework</h2>
-<p>文章中给出的简化架构：<img src="https://img-blog.csdnimg.cn/20200314154230721.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="看似很简单的网络架构"><br>
-<strong>1、Encoder</strong><br>
-这里用到的编码器是另一篇文章《Densely Connected Convolutional Networks》里的DenseNet-169（这篇文章就看了一下架构，还没细看，有时间去仔细看看，看了回来补充）。下图是生长率k=4的5层的Dense-block结构图，对这里的k的一种解释是，每个层都可以访问这个块中的所有前面的特征映射，因此也可以访问网络的集体特征。可以将特征图视为网络的全局状态，每层将其自身的k个特征映射添加到该状态，增长率决定了每一层对全局状态贡献多少新信息。一旦写入全局状态，就可以从网络中的任何地方访问全局状态，并且与传统的网络架构不同，不需要从一层复制到另一层。<br>
-<img src="https://img-blog.csdnimg.cn/20200314160111493.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="5-layer dense block with growth rate of k=4"><br>
-然后，为了在网络中进行下采样（改变图像大小），将多个Dense-block连接起来，就形成了下图的样子：<br>
-<img src="https://img-blog.csdnimg.cn/20200314161447623.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="Dense Net with three dense blocks "><br>
-两个相邻块之间的层称为过渡层，并通过卷积和池化来改变特征图的大小，但是本文中是删除了最后的top-layer，因为文章是做depth estimation而不是Classification task。但是呢，深度估计这篇文章用的DensNet-169有4个blocks，网络结构参数如下：<br>
-<img src="https://img-blog.csdnimg.cn/20200314162029675.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="DenseNet architectures for ImageNet"></p>
-<p><strong>2、Decoder</strong><br>
-对于decoder，从一个1×1的卷积层开始，其输出通道的数量与去掉top-layer的编码器的输出相同。然后依次添加2×2的双线性upsampling块和串接池化层POOL（框架图中并未画出），其后跟两个并列的3×3卷积层，这样的构造重复3次，然后就是2×2的双线性upsampling块和串接卷积层CONV，然后是两个并列的3×3的卷积层，最后经过一个3×3卷积层最终输出通道数为1的图像。</p>
-<p>这个encoder-decoder带有跳过连接，感觉就是把两部分硬生生连在一起了，整个网络构架不太紧凑，大概的结构就这样啦~~</p>
-<h2 id="四、文章的亮点">四、文章的亮点</h2>
-<p>1、第一点大概就是用了这么一个简单的网络来做深度估计，网络复杂不等于结果好；<br>
-2、定义了一个损失函数，通过最小化深度值的差异来平衡重建深度图像之间的关系，同时惩罚深度图的图像域中高频细节的失真：<br>
-<img src="https://img-blog.csdnimg.cn/20200314165259760.png" srcset="/img/loading.gif" alt="损失函数L"><br>
-3、运用数据增强策略，文章只用了镜像翻转，以及改变颜色通道排列，后者还可以做一个further work；<br>
-4、提出了一个新的test dataset（用不上，所以没看）。</p>
-<h2 id="五、结果以及改进空间">五、结果以及改进空间</h2>
-<p>1、在室外场景中没别人的方法表现好，猜想是因为提供的深度图的性质；<br>
-2、文章所提的改进空间挺多的，比如用在嵌入式设备上，这个网络存在局限性，以及更清楚地确定不同编码器、数据增强和学习策略对性能和贡献的影响，都是未来工作中值得关注的内容。</p>
-</bar></bar></bar></bar>
+<h2 id="一、为什么要看这篇文章？"><a href="#一、为什么要看这篇文章？" class="headerlink" title="一、为什么要看这篇文章？"></a>一、为什么要看这篇文章？</h2><p>   1、因为最近萌生了一个想法，觉得可以用用深度图；<br>   2、多了解一样是一样。</p>
+<h2 id="二、文章提出的出发点"><a href="#二、文章提出的出发点" class="headerlink" title="二、文章提出的出发点"></a>二、文章提出的出发点</h2><p>   1、首先，一张图片2D到3D的深度估计是很多场景理解或者是重建工作中的基础；<br>   2、其次，这篇文章希望提出的深度估计方法能获得高分辨率的深度估计结果。</p>
+<h2 id="三、Framework"><a href="#三、Framework" class="headerlink" title="三、Framework"></a>三、Framework</h2><p>   文章中给出的简化架构：<img src="https://img-blog.csdnimg.cn/20200314154230721.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="看似很简单的网络架构"><br>  <strong>1、Encoder</strong><br>   这里用到的编码器是另一篇文章《Densely Connected Convolutional Networks》里的DenseNet-169（这篇文章就看了一下架构，还没细看，有时间去仔细看看，看了回来补充）。下图是生长率k=4的5层的Dense-block结构图，对这里的k的一种解释是，每个层都可以访问这个块中的所有前面的特征映射，因此也可以访问网络的集体特征。可以将特征图视为网络的全局状态，每层将其自身的k个特征映射添加到该状态，增长率决定了每一层对全局状态贡献多少新信息。一旦写入全局状态，就可以从网络中的任何地方访问全局状态，并且与传统的网络架构不同，不需要从一层复制到另一层。<br> <img src="https://img-blog.csdnimg.cn/20200314160111493.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="5-layer dense block with growth rate of k=4"><br> 然后，为了在网络中进行下采样（改变图像大小），将多个Dense-block连接起来，就形成了下图的样子：<br> <img src="https://img-blog.csdnimg.cn/20200314161447623.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="Dense Net with three dense blocks "><br> 两个相邻块之间的层称为过渡层，并通过卷积和池化来改变特征图的大小，但是本文中是删除了最后的top-layer，因为文章是做depth estimation而不是Classification task。但是呢，深度估计这篇文章用的DensNet-169有4个blocks，网络结构参数如下：<br> <img src="https://img-blog.csdnimg.cn/20200314162029675.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="DenseNet architectures for ImageNet"></p>
+<p>   <strong>2、Decoder</strong><br>   对于decoder，从一个1×1的卷积层开始，其输出通道的数量与去掉top-layer的编码器的输出相同。然后依次添加2×2的双线性upsampling块和串接池化层POOL（框架图中并未画出），其后跟两个并列的3×3卷积层，这样的构造重复3次，然后就是2×2的双线性upsampling块和串接卷积层CONV，然后是两个并列的3×3的卷积层，最后经过一个3×3卷积层最终输出通道数为1的图像。</p>
+<p>   这个encoder-decoder带有跳过连接，感觉就是把两部分硬生生连在一起了，整个网络构架不太紧凑，大概的结构就这样啦~~</p>
+<h2 id="四、文章的亮点"><a href="#四、文章的亮点" class="headerlink" title="四、文章的亮点"></a>四、文章的亮点</h2><p>   1、第一点大概就是用了这么一个简单的网络来做深度估计，网络复杂不等于结果好；<br>   2、定义了一个损失函数，通过最小化深度值的差异来平衡重建深度图像之间的关系，同时惩罚深度图的图像域中高频细节的失真：<br><img src="https://img-blog.csdnimg.cn/20200314165259760.png" srcset="/img/loading.gif" alt="损失函数L"><br>3、运用数据增强策略，文章只用了镜像翻转，以及改变颜色通道排列，后者还可以做一个further work；<br>4、提出了一个新的test dataset（用不上，所以没看）。</p>
+<h2 id="五、结果以及改进空间"><a href="#五、结果以及改进空间" class="headerlink" title="五、结果以及改进空间"></a>五、结果以及改进空间</h2><p>   1、在室外场景中没别人的方法表现好，猜想是因为提供的深度图的性质；<br>   2、文章所提的改进空间挺多的，比如用在嵌入式设备上，这个网络存在局限性，以及更清楚地确定不同编码器、数据增强和学习策略对性能和贡献的影响，都是未来工作中值得关注的内容。</p>
+</bar>
             </div>
             <hr>
             <div>
