@@ -211,7 +211,16 @@
 <p><strong>五、LSTM</strong> <br><br>
 　　LSTM 结构由 Sepp Hochreiter教授和 Jurgen Schrnidhuber教授于 1997 年 提出，它本身就是一种特殊的循环体结构 。在一个整体的循环神经网络中，除了外部的RNN大循环（<strong>循环体是 LSTM</strong>）外，还需要考虑 LSTM 本身单元“细胞”之间的自循环。LSTM单元结构如下图：<br>
 　　<img src="https://img-blog.csdnimg.cn/20200403173928627.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM单元"><br>
-LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输入的信息进行控制，让信息有选择性的影响RNN中每个时刻的状态。遗忘门（Forget Gate）是让网络“忘记”之前没用的信息，上一时刻的状态值通过与自循环权重 (该权重就是遗忘门的输出) 进行位乘可得到当前时刻状态值的一个加数。遗忘门输出表达式：$$f_i<sup>t=sigmoid(b_i</sup>f+\sum U_{i,j}<sup>fx_j</sup>t+\sum W_{i,j}<sup>fh_j</sup>{t-1})$$其中，$h<sup>{t-1}$是包含一个LSTM细胞上一时刻的所有输出，可以被看作是当前隐藏层向量，数量为j，$W$是循环权重。要保存长期的记忆，还需要输入门，同样是根据$x</sup>t$、$b<sup>g$和$h</sup>{t-1}$来决定哪些部分将进入当前时刻的状态，输入门的值表示为：$$g_i<sup>t=sigmoid(b_i</sup>g+\sum U_{i,j}<sup>gx_j</sup>t+\sum W_{i,j}<sup>gh_j</sup>{t-1})$$进一步计算LSTM结构当前时刻的状态值：$$C_i<sup>t=f_i</sup>tC_i<sup>{t-1}+g_i</sup>ttanh(b_i+\sum U_{i,j}x_j^t+\sum W_{i,j}h_j<sup>{t-1})$$其中，$W$值为遗忘门的循环权重。然后得出结构当前时刻的输出值：$$h</sup>t=tanh(C_i<sup>t)q_i</sup>t$$ $$q_i<sup>t=sigmoid(b_i</sup>q+\sum U_{i,j}<sup>qx_j</sup>t+\sum W_{i,j}<sup>qh_j</sup>{t-1})$$其中，$W<sup>q$为遗忘门的循环权重，$q_i</sup>t$为输出们的输出值。用LSTM作为循环体的RNN网络如下图所示：<br>
+LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输入的信息进行控制，让信息有选择性的影响RNN中每个时刻的状态。遗忘门（Forget Gate）是让网络“忘记”之前没用的信息，上一时刻的状态值通过与自循环权重 (该权重就是遗忘门的输出) 进行位乘可得到当前时刻状态值的一个加数。遗忘门输出表达式：<br>
+$$f_i<sup>t=sigmoid(b_i</sup>f+\sum U_{i,j}<sup>fx_j</sup>t+\sum W_{i,j}<sup>fh_j</sup>{t-1})$$<br>
+其中，$h<sup>{t-1}$是包含一个LSTM细胞上一时刻的所有输出，可以被看作是当前隐藏层向量，数量为j，$W$是循环权重。要保存长期的记忆，还需要输入门，同样是根据$x</sup>t$、$b<sup>g$和$h</sup>{t-1}$来决定哪些部分将进入当前时刻的状态，输入门的值表示为：<br>
+$$g_i<sup>t=sigmoid(b_i</sup>g+\sum U_{i,j}<sup>gx_j</sup>t+\sum W_{i,j}<sup>gh_j</sup>{t-1})$$<br>
+进一步计算LSTM结构当前时刻的状态值：<br>
+$$C_i<sup>t=f_i</sup>tC_i<sup>{t-1}+g_i</sup>ttanh(b_i+\sum U_{i,j}x_j^t+\sum W_{i,j}h_j^{t-1})$$<br>
+其中，$W$值为遗忘门的循环权重。然后得出结构当前时刻的输出值：<br>
+$$h<sup>t=tanh(C_i</sup>t)q_i^t$$<br>
+$$q_i<sup>t=sigmoid(b_i</sup>q+\sum U_{i,j}<sup>qx_j</sup>t+\sum W_{i,j}<sup>qh_j</sup>{t-1})$$<br>
+其中，$W<sup>q$为遗忘门的循环权重，$q_i</sup>t$为输出们的输出值。用LSTM作为循环体的RNN网络如下图所示：<br>
 <img src="https://img-blog.csdnimg.cn/20200403192938761.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM-RNN"></p>
 <p>循环神经网络的变种还有：双向循环神经网络和深层循环神经网络。</p>
 <ul>
