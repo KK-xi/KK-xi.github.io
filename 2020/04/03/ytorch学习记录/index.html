@@ -255,12 +255,16 @@
 <p>直接放莫老师教的代码过来：</p>
 <ul>
 <li><p>Layer图搭建以及计算流程</p>
-<p>```python class Net(torch.nn.Module): # torch.nn.Module是Net的主模块 def <strong>init</strong>(self, n_feature, n_hidden, n_output): # 搭建层所需要的信息 super(Net, self).__init__() # 继承Net的模块功能 self.hidden = torch.nn.Linear(n_feature, n_hidden) # hidden layer self.predict = torch.nn.Linear(n_hidden, n_output) # output layer</p>
-<pre><code>  def forward(self, x): # 前向传递的过程，搭流程图
-         x = F.relu(self.hidden(x))      # activation function for hidden layer
-         x = self.predict(x)             # linear output
-   return x
-  ```</code></pre></li>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">class</span> Net(torch.nn.Module):   <span class="co"># torch.nn.Module是Net的主模块</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_feature, n_hidden, n_output): <span class="co"># 搭建层所需要的信息</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">        <span class="bu">super</span>(Net, <span class="va">self</span>).<span class="fu">__init__</span>()  <span class="co"># 继承Net的模块功能</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">        <span class="va">self</span>.hidden <span class="op">=</span> torch.nn.Linear(n_feature, n_hidden)   <span class="co"># hidden layer</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">        <span class="va">self</span>.predict <span class="op">=</span> torch.nn.Linear(n_hidden, n_output)   <span class="co"># output layer</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">    <span class="kw">def</span> forward(<span class="va">self</span>, x): <span class="co"># 前向传递的过程，搭流程图</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">           x <span class="op">=</span> F.relu(<span class="va">self</span>.hidden(x))      <span class="co"># activation function for hidden layer</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">           x <span class="op">=</span> <span class="va">self</span>.predict(x)             <span class="co"># linear output</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">     <span class="cf">return</span> x</a></code></pre></div></li>
 <li><p>定义Net</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb5-1" data-line-number="1">net <span class="op">=</span> Net(n_feature<span class="op">=</span><span class="dv">1</span>, n_hidden<span class="op">=</span><span class="dv">10</span>, n_output<span class="op">=</span><span class="dv">1</span>)     <span class="co"># define</span></a></code></pre></div></li>
 <li><p>优化神经网络(torch.optim.),以及loss function定义</p>
