@@ -252,20 +252,15 @@
 <li><p>结果 <img src="https://img-blog.csdnimg.cn/2020032211361126.png?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p></li>
 </ul>
 <h3 id="二regression回归">二、Regression回归</h3>
-<p>直接放莫老师教的代码过来： * Layer图搭建以及计算流程</p>
-<pre><code>  ```python
-  class Net(torch.nn.Module):   # torch.nn.Module是Net的主模块
-      def __init__(self, n_feature, n_hidden, n_output): # 搭建层所需要的信息
-          super(Net, self).__init__()  # 继承Net的模块功能
-          self.hidden = torch.nn.Linear(n_feature, n_hidden)   # hidden layer
-          self.predict = torch.nn.Linear(n_hidden, n_output)   # output layer
-
-      def forward(self, x): # 前向传递的过程，搭流程图
-             x = F.relu(self.hidden(x))      # activation function for hidden layer
-             x = self.predict(x)             # linear output
-       return x
-      ```</code></pre>
+<p>直接放莫老师教的代码过来：</p>
 <ul>
+<li><p>Layer图搭建以及计算流程</p>
+<p>```python class Net(torch.nn.Module): # torch.nn.Module是Net的主模块 def <strong>init</strong>(self, n_feature, n_hidden, n_output): # 搭建层所需要的信息 super(Net, self).__init__() # 继承Net的模块功能 self.hidden = torch.nn.Linear(n_feature, n_hidden) # hidden layer self.predict = torch.nn.Linear(n_hidden, n_output) # output layer</p>
+<pre><code>  def forward(self, x): # 前向传递的过程，搭流程图
+         x = F.relu(self.hidden(x))      # activation function for hidden layer
+         x = self.predict(x)             # linear output
+   return x
+  ```</code></pre></li>
 <li><p>定义Net</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb5-1" data-line-number="1">net <span class="op">=</span> Net(n_feature<span class="op">=</span><span class="dv">1</span>, n_hidden<span class="op">=</span><span class="dv">10</span>, n_output<span class="op">=</span><span class="dv">1</span>)     <span class="co"># define</span></a></code></pre></div></li>
 <li><p>优化神经网络(torch.optim.),以及loss function定义</p>
