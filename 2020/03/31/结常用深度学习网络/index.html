@@ -189,7 +189,7 @@
 <p>参考书目：《深度学习算法原理与编程实战》 | 蒋子阳著</p>
 <h3 id="一lenet-5">一、LeNet-5</h3>
 <p><strong>1、LeNet-5网络简介</strong></p>
-<p>　　LeNet-5是一个专为手写数字识别而设计的最经典的卷积神经网络，被誉为早期卷积神经网络中最有代表性的实验系统之一。LeNet-5 模型由Yann LeCun教授于1998年提出， 在MNIST数据集上，LeNet-5模型可以达到大约99.4%的准确率。与近几年的卷积神经网络比较，LeNet-5的网络规模比较小，但却包含了构成现代CNN网络的基本组件——卷积层、 Pooling层、全连接层。 <br> <strong>2、模型结构</strong> <br> 　　网络一共有8层(包含输入和输出在内)，基本网络架构如下： <img src="https://img-blog.csdnimg.cn/20200401163708326.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="ＬｅＮｅｔ－５"> 备注：图中C表示卷积层 ，S表示池化层。 　 - <font color="red"><strong>Layer1</strong></font>：Input层，输入图片大小32×32×1，MNIST数据集大小是28×28，所以输入reshape为32×32是希望高层特征监测感受野的中心能够收集更多潜在的明显特征。</p>
+<p>　　LeNet-5是一个专为手写数字识别而设计的最经典的卷积神经网络，被誉为早期卷积神经网络中最有代表性的实验系统之一。LeNet-5 模型由Yann LeCun教授于1998年提出， 在MNIST数据集上，LeNet-5模型可以达到大约99.4%的准确率。与近几年的卷积神经网络比较，LeNet-5的网络规模比较小，但却包含了构成现代CNN网络的基本组件——卷积层、 Pooling层、全连接层。 <br> <strong>2、模型结构</strong> <br> 　　网络一共有8层(包含输入和输出在内)，基本网络架构如下： <img src="https://img-blog.csdnimg.cn/20200401163708326.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="ＬｅＮｅｔ－５"> 备注：图中C表示卷积层 ，S表示池化层。　 　 - <font color="red"><strong>Layer1</strong></font>：Input层，输入图片大小32×32×1，MNIST数据集大小是28×28，所以输入reshape为32×32是希望高层特征监测感受野的中心能够收集更多潜在的明显特征。</p>
 <ul>
 <li><p><font color="red"><strong>Layer2</strong></font>：Conv1层——卷积层，有6个Feature Map，即Convolutions操作时的卷积核的个数为6，卷积核大小为5×5，该层每个单元和输入层的25个单元连接，padding没有使用，stride为1。</p></li>
 <li><p><font color="red"><strong>Layer3</strong></font>：S2为下采样层(Subsampling)，6个14×14的特征图，是上一层的每个特征图经过2×2的最大池化操作得到的，且长宽步长都为2，S2层每个特征图的每一个单元与C3对应特征图中2×2大小的区域连接。</p></li>
