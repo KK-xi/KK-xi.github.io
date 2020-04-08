@@ -198,7 +198,7 @@
 <li><strong>非线性优化</strong>：梯度下降；牛顿法；高斯牛顿法；LM算法；Bundle Adjustment。</li>
 <li><strong>微积分</strong>：求(偏)导、泰勒展开等。</li>
 </ul>
-<p><strong>3、专业知识</strong> - <strong>计算机视觉</strong> <br> 　<strong>①</strong> 传感器类型： <br> 　　　激光雷达 <br> 　　　视觉传感器：单目相机、双目相机、RGB-D相机、全景相机、Event相机。 <br> 　　　IMU (Inertial measurement unit，测量物体三轴姿态角及加速度的装置) <br> 　<strong>②</strong> 相机： <br> 　　　针孔相机模型、双目相机模型、RGB-D相机模型、相机标定、 去畸变。 <br> 　<strong>③</strong> 特征点 <br> 　　　特征点检测、特征点描述子、特征点匹配、特征点筛选。 <br> 　<strong>④</strong> 多视角几何 <br> 　　　对极约束、本质矩阵、单应矩阵、三角化。 　　　 - <strong>书籍文献</strong> <br> 　《视觉SLAM十四讲》、《Multiple View Geometry》、《机器人状态估计》</p>
+<p><strong>3、专业知识</strong> <br> - <strong>计算机视觉</strong> <br> 　<strong>①</strong> 传感器类型： <br> 　　　激光雷达 <br> 　　　视觉传感器：单目相机、双目相机、RGB-D相机、全景相机、Event相机。 <br> 　　　IMU (Inertial measurement unit，测量物体三轴姿态角及加速度的装置) <br> 　<strong>②</strong> 相机： <br> 　　　针孔相机模型、双目相机模型、RGB-D相机模型、相机标定、 去畸变。 <br> 　<strong>③</strong> 特征点 <br> 　　　特征点检测、特征点描述子、特征点匹配、特征点筛选。 <br> 　<strong>④</strong> 多视角几何 <br> 　　　对极约束、本质矩阵、单应矩阵、三角化。 <br> 　　　 - <strong>书籍文献</strong> <br> 　《视觉SLAM十四讲》、《Multiple View Geometry》、《机器人状态估计》</p>
 <p><strong>4、编程环境</strong></p>
 <ul>
 <li>Linux系统操作：推荐Ubuntu16.04 <br> 　　　　　　　　书《鸟哥的Linux私房菜》 　　　　　　　　</li>
@@ -214,7 +214,7 @@
 <li><p>机器人：无人机定位、建立地图（大疆）；服务机器人室内定位及导航（思岚）；工业机器人定位导航（阿里、京东AGV仓库运输）</p></li>
 <li><p>三维重建：物体重建（3D打印、3D虚拟试衣）；大场景重建（虚拟全景漫游）</p></li>
 </ul>
-<p><strong>6、公开数据集</strong> <br> TUM RGB-D SLAM Dataset、KITTI Vision Benchmark Suite、EuRoC MAV Dataset.</p>
+<p><strong>6、公开数据集</strong> <br> 　　TUM RGB-D SLAM Dataset、KITTI Vision Benchmark Suite、EuRoC MAV Dataset.</p>
 <p><strong>7、典型开源方案</strong></p>
 <ul>
 <li>稀疏法：ORB-SLAM2（单目、双目、RGB-D）</li>
@@ -225,7 +225,12 @@
 <h4 id="二slam学习资源总结">二、SLAM学习资源总结</h4>
 <p><strong>1、公众号</strong> <br> 　　泡泡机器人SLAM、计算机视觉life、3D视觉工坊、小白学视觉、计算机视觉之路、AI算法修炼营、PCL点云。 　</p>
 <p><strong>2、视频公开课</strong> <br> 　　① <a href="https://space.bilibili.com/38737757" target="_blank" rel="noopener">泡泡机器人公开课</a> <br> 　　② <a href="https://space.bilibili.com/45189691" target="_blank" rel="noopener">计算机视觉life SLAM研习社直播公开课</a> <br> 　　③ <a href="https://www.dis.uniroma1.it/~labrococo/tutorial_icra_2016/" target="_blank" rel="noopener">SLAM Totorial@ICRA 2016</a> <br> 　　④ <a href="https://www.coursera.org/specializations/robotics" target="_blank" rel="noopener">Robotics-UPenn on Coursera by Vijay Kumar(2016)</a> <br> 　　⑤ <a href="https://vision.in.tum.de/teaching/ss2016/mvg2016" target="_blank" rel="noopener">Computer Vision Ⅱ：Multiple View Geometry-TUM by Daniel Cremers (Spring 2016)</a> <br> 　　⑥ <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa15/" target="_blank" rel="noopener">Advanced Robotics-UCBerkeley by Pieter Abbeel (Fall 2015)</a> <br> 　　⑦ <a href="https://ylatif.github.io/movingsensors/" target="_blank" rel="noopener">The Problem of Mobile Sensors</a> <br></p>
-<p><strong>3、主要研究方向</strong> <br> 　　视觉里程计：线特征；点线特征融合；点面特征融合；点线面多特征融合；多鱼眼VO；特征点发直接法结合；抗光照变化。 <br> 　　 　　语义SLAM：3D语义地图重定位；语义建图互相促进。 <br> 　　 　　多传感器融合：VIO（松耦合、紧耦合）；多传感器在线标定；camera，lidar融合定位；lidar，天花板摄像头融合；lidar，imu融合；TOF辅助双目密集匹配；事件相机SLAM；多机协同SLAM。 <br> 　　 　　优化方法：非线性增量优化；BA改进；离散连续图模型优化；边缘的约束图优化。 <br> 　　 　　三维重建：大尺度场景下的实时重建；RGBD室内稠密重建；地图数据关联；MVS；3D物体分类，提升重建质量；多子图融合。 <br> 　　 　　结合深度学习：基于深度学习的特征点；结合深度学习的深度估计；深度学习做闭环检测；深度学习估计关键帧深度。</p>
+<p><strong>3、主要研究方向</strong> <br> 　　视觉里程计：线特征；点线特征融合；点面特征融合；点线面多特征融合；多鱼眼VO；特征点发直接法结合；抗光照变化。 <br></p>
+<p>　　语义SLAM：3D语义地图重定位；语义建图互相促进。 <br></p>
+<p>　　多传感器融合：VIO（松耦合、紧耦合）；多传感器在线标定；camera，lidar融合定位；lidar，天花板摄像头融合；lidar，imu融合；TOF辅助双目密集匹配；事件相机SLAM；多机协同SLAM。 <br></p>
+<p>优化方法：非线性增量优化；BA改进；离散连续图模型优化；边缘的约束图优化。 <br></p>
+<p>　　三维重建：大尺度场景下的实时重建；RGBD室内稠密重建；地图数据关联；MVS；3D物体分类，提升重建质量；多子图融合。 <br></p>
+<p>　　结合深度学习：基于深度学习的特征点；结合深度学习的深度估计；深度学习做闭环检测；深度学习估计关键帧深度。</p>
 <p><strong>4、会议期刊</strong></p>
 <ul>
 <li><p>英文期刊 <br> ICRA（IEEE International Conference on Robotics and Automation） <br> IROS（IEEE International Conference on Intelligent Robots and Systems） <br> CVPR（IEEE International Conference on Computer Vision and Pattern Recognition） <br> RSS（Robotics：Science and Systems） <br> ECCV（European Conference on Computer Vision） <br> ISMAR（IEEE and ACM International Symposium on Mixed and Augmented Reality.IEEE） <br> JFR（Journal of Field Robotics） <br> IEEE Transactions on Robotics <br> ACRA（Australian Conference on Robotics and Automation） <br> ICARCV（International Conference on Cotrol，Automation，Robotics and Vision） <br> ISR（International Symposium on Robotics） <br> IEEE Transactions On Pattern Analysis And achine Intelligence <br></p></li>
@@ -252,7 +257,7 @@
 <li><p>激光雷达 <br> 禾赛（上海）、镭神智能（深圳）、速腾聚创（深圳）</p></li>
 <li><p>事件相机 <br> 芯仑（上海）</p></li>
 </ul>
-<p><strong>3、无人机</strong> <br> 大疆（深圳、上海）、亿航（广州）、臻迪（北京）</p>
+<p><strong>3、无人机</strong> <br> 　　大疆（深圳、上海）、亿航（广州）、臻迪（北京）</p>
 <p><font color="red"><strong>4、智能驾驶</strong></font></p>
 <ul>
 <li><p>无人驾驶 <br> 百度（北京）、阿里菜鸟/达摩院（杭州）、腾讯（北京）、驭势（北京、上海）、momenta（北京）、滴滴（北京）、图森（北京）、飞步科技（杭州）、纽励科技（上海）、小马智行（广州）、Aptiv（上海）、文远知行（广州）</p></li>
