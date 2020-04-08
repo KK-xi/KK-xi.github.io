@@ -23,7 +23,7 @@
 <p><strong>2、Feature Context-Based Attention Module</strong><br>
 - <strong>Channel attention submodule</strong> <br> 　　通道注意力机制是用来强调信息相对丰富的通道。网络框架如下图所示，采用了卷积块注意模块(<a href="https://arxiv.org/pdf/1807.06521.pdf" target="_blank" rel="noopener">CBAM</a>)，输入特征图U(W×H×C)，应用max-pooling <span class="math inline">\(f_{max}\)</span>和 average-pooling <span class="math inline">\(f_{avg}\)</span> 作用于U产生一维的全局通道描述符<span class="math inline">\(v^1\)</span>和<span class="math inline">\(v^2\)</span>。然后，两个描述符经由 Multi-Layer Perceptron (MLP) <span class="math inline">\(f_{ext}(^.,^.)\)</span> 激活，分析通道之间的依赖关系。最后，用Sigmoid函数激活两个描述符的总和得到<span class="math inline">\(Z^C(U)\)</span>。输出channel attention map <span class="math inline">\(U&#39;\)</span>是通过<span class="math inline">\(Z^C(U)\)</span>和U之间的元素级乘法生成的。 <img src="https://img-blog.csdnimg.cn/20200318172206762.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p>
 <ul>
-<li><p><strong>Spatial attention submodule</strong> <br> 空间注意力用于突出有意义的特征单元，网络构架如图所示。受 <a href="https://www.researchgate.net/publication/319535111_Learned_Contextual_Feature_Reweighting_for_Image_Geo-Localization" target="_blank" rel="noopener">Contextual Reweighting Network (CRN)</a> 启发，文章将特征上下文感知学习(特征reweighting strategy)集成到CBAM的基本控件注意子模块中。来自通道注意力的特征图<span class="math inline">\(U&#39;\)</span>作为输入，然后连接两个特征掩码<span class="math inline">\(f^c_{max}\)</span>和<span class="math inline">\(f^c_{avg}\)</span>(沿着通道轴线的最大池化和平均池化)生成S(W×H×2)。然后，为了利用特征元的上下文信息，使用了不同感受野的卷积（3×3，5×5和7×7）来生成中间特征掩码，再将masks连接起来生成特征掩码P(W×H×3)，再用1×1的卷积学习和积累权重生成<span class="math inline">\(Z^S(U&#39;)\)</span>。最后，spatial attention map<span class="math inline">\(U&#39;&#39;\)</span>是通过<span class="math inline">\(Z^S(U)\)</span>和<span class="math inline">\(U&#39;\)</span>之间的元素级乘法生成的。 <img src="https://img-blog.csdnimg.cn/20200318172347324.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p></li>
+<li><p><strong>Spatial attention submodule</strong> <br> 空间注意力用于突出有意义的特征单元，网络构架如图所示。受 <a href="https://www.researchgate.net/publication/319535111_Learned_Contextual_Feature_Reweighting_for_Image_Geo-Localization" target="_blank" rel="noopener">Contextual Reweighting Network (CRN)</a> 启发，文章将特征上下文感知学习(特征reweighting strategy)集成到CBAM的基本控件注意子模块中。来自通道注意力的特征图<span class="math inline">\(U&#39;\)</span>作为输入，然后连接两个特征掩码<span class="math inline">\(f_{max}^c\)</span>和<span class="math inline">\(f_{avg}^c\)</span>(沿着通道轴线的最大池化和平均池化)生成S(W×H×2)。然后，为了利用特征元的上下文信息，使用了不同感受野的卷积（3×3，5×5和7×7）来生成中间特征掩码，再将masks连接起来生成特征掩码P(W×H×3)，再用1×1的卷积学习和积累权重生成<span class="math inline">\(Z^S(U&#39;)\)</span>。最后，spatial attention map <span class="math inline">\(U&#39;&#39;\)</span>是通过<span class="math inline">\(Z^S(U)\)</span>和<span class="math inline">\(U&#39;\)</span>之间的元素级乘法生成的。 <img src="https://img-blog.csdnimg.cn/20200318172347324.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p></li>
 <li><p><strong>Building block</strong> <br> 集合FCAM到基本ResNet的每一个building block中就形成了CNN特征提取网络，如下图： <img src="https://img-blog.csdnimg.cn/2020031817270364.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p></li>
 <li><strong>Hard Exemplar Reweighting Triplet Loss</strong> <br> 将基于triplet reweighting的在线困难样本挖掘策略集合到soft-margin triplet loss中，Loss定义如下： <span class="math display">\[L_{hard}(A_i,P_i,N_{i,k})= w_{hard}(A_i,P_i,N_{i,k})*log(1+exp(d_p(i)-d_n(i,k)))\]</span> 其中<span class="math inline">\(A_i\)</span>，<span class="math inline">\(P_i\)</span>和<span class="math inline">\(N_{i,k}\)</span>分别表示anchor，positive exemplar和 k-th negative exemplar。运用距离修正逻辑回归估计当前三元组的难度，根据<span class="math inline">\(gap(i,k)=d_n(i,k)-d_p(i)\)</span>的大小计算<span class="math inline">\(w_{hard}(A_i,P_i,N_{i,k})\)</span>，最终定义式如下： <img src="https://img-blog.csdnimg.cn/20200318160521251.png" srcset="/img/loading.gif" alt="困难样本权重"></li>
 <li><p><strong>Orientation regression</strong> <br> 在现有的跨视图地理定位基准数据集中，锚点的方向及其对应的正样本在训练集中固定，而在测试集中打乱。所以文章随机旋转航空图像得到的不同角度可以作为训练的标签。为了解决方向未知的问题，在框架中增加一个方向回归，本文将重新分配权值的方向回归损失定义为： <span class="math display">\[L_{OR}(A_i,P_i,N_{i,k})= w_{hard}(A_i,P_i,N_{i,k})*(d^1_R(i)+d^2_R(i))\]</span> 其中<span class="math inline">\(d^1_R(i)\)</span>和<span class="math inline">\(d^2_R(i)\)</span> 分别表示sin和cosine值的回归误差。</p>
@@ -536,6 +536,98 @@ autoencoder = AutoEncoder()
       </categories>
       <tags>
         <tag>深度学习网络</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>总结SLAM相关知识点资源库以及企业</title>
+    <url>/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<h3 id="视觉slam的知识资源以及相关企业总结">视觉SLAM的知识资源以及相关企业总结</h3>
+<pre><code>先在这儿记录一下，SLAM涉及的太多了，现在接触的只是冰山一角。</code></pre>
+<p>声名：我只是微信公众号<font color="red">计算机视觉life</font>的搬运工。 <bar> <bar> <bar> #### 一、SLAM知识库 <strong>1、SLAM框架/算法流程</strong></bar></bar></bar></p>
+<p><a href="img-Nb7dyKIQ-1586231125936"></a><img src="https://img-blog.csdnimg.cn/20200407114420210.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" width="50%"></p>
+<p><strong>2、应掌握的数学知识</strong></p>
+<ul>
+<li><strong>矩阵</strong>：四则运算、求逆、反对称矩阵；矩阵分解（SVD、QR、Cholesky）。</li>
+<li><strong>李群与李代数</strong>：指数对数映射；李代数求导；扰动模型。</li>
+<li><strong>非线性优化</strong>：梯度下降；牛顿法；高斯牛顿法；LM算法；Bundle Adjustment。</li>
+<li><strong>微积分</strong>：求(偏)导、泰勒展开等。</li>
+</ul>
+<p><strong>3、专业知识</strong> - <strong>计算机视觉</strong> 　<strong>①</strong> 传感器类型： 　　　激光雷达 　　　视觉传感器：单目相机、双目相机、RGB-D相机、 　　　　　　　　　全景相机、Event相机。 　　　IMU (Inertial measurement unit，测量物体三轴姿态角及加速度的装置) 　　　 　<strong>②</strong> 相机： 　　　针孔相机模型、双目相机模型、RGB-D相机模型、相机标定、 　　　去畸变。 　　　 　<strong>③</strong> 特征点 　　　特征点检测、特征点描述子、特征点匹配、特征点筛选。 　　　 　<strong>④</strong> 多视角几何 　　　对极约束、本质矩阵、单应矩阵、三角化。 　　　 - <strong>书籍文献</strong> 　《视觉SLAM十四讲》、《Multiple View Geometry》、 　《机器人状态估计》</p>
+<p><strong>4、编程环境</strong></p>
+<ul>
+<li>Linux系统操作：推荐Ubuntu16.04 　　　　　　　　书《鸟哥的Linux私房菜》 　　　　　　　　</li>
+<li>开发环境：Clion（ JetBrains 推出的全新的 C/C++ 跨平台集成开发环境） 　　　　　　Kdevelop（免费的） 　　　　　　</li>
+<li>编译工具：学习跨平台编译器cmake、电子书《Cmake Practice》</li>
+<li></li>
+<li>第三方库：Opencv(计算机视觉)、Eigen(几何变换)、Sophus(李代数)、 　　　　　　Ceres(非线性优化)、G2o(图优化)、OpenGL(计算机图形学) 　　　　　　</li>
+<li>文档编辑：Gedit、Vim、Nano</li>
+</ul>
+<p><strong>5、应用场景</strong></p>
+<ul>
+<li>自动驾驶：作为激光传感器的辅助（百度、腾讯、驭势、图森）</li>
+<li>增强现实：手机、智能眼镜上结合IMU用于定位（微软、三星、华为、虹软、悉见）</li>
+<li>机器人：无人机定位、建立地图（大疆）；服务机器人室内定位及导航（思岚）； 　　　　工业机器人定位导航（阿里、京东AGV仓库运输）</li>
+<li>三维重建：物体重建（3D打印、3D虚拟试衣）；大场景重建（虚拟全景漫游）</li>
+</ul>
+<p><strong>6、公开数据集</strong> TUM RGB-D SLAM Dataset、KITTI Vision Benchmark Suite、EuRoC MAV Dataset.</p>
+<p><strong>7、典型开源方案</strong></p>
+<ul>
+<li>稀疏法：ORB-SLAM2（单目、双目、RGB-D）</li>
+<li>半稠密法：LSD-SLAM（单目、双目、RGB-D）、DSO（单目）</li>
+<li>稠密法：Elastic Fusion（RGB-D）、Bundle Fusion（RGB-D）、 　　　　　RGB-D SLAM V2（RGB-D）</li>
+<li>多传感器融合：VINS（单目+IMU）、OKVIS（单目、双目、四目+IMU）</li>
+</ul>
+<h4 id="二slam学习资源总结">二、SLAM学习资源总结</h4>
+<p><strong>1、公众号</strong> 　　泡泡机器人SLAM、计算机视觉life、3D视觉工坊、小白学视觉、计算机视觉之路、AI算法修炼营、PCL点云。 　　 <strong>2、视频公开课</strong> 　　① <a href="https://space.bilibili.com/38737757" target="_blank" rel="noopener">泡泡机器人公开课</a> 　　② <a href="https://space.bilibili.com/45189691" target="_blank" rel="noopener">计算机视觉life SLAM研习社直播公开课</a> 　　③ <a href="https://www.dis.uniroma1.it/~labrococo/tutorial_icra_2016/" target="_blank" rel="noopener">SLAM Totorial@ICRA 2016</a> 　　④ <a href="https://www.coursera.org/specializations/robotics" target="_blank" rel="noopener">Robotics-UPenn on Coursera by Vijay Kumar(2016)</a> 　　⑤ <a href="https://vision.in.tum.de/teaching/ss2016/mvg2016" target="_blank" rel="noopener">Computer Vision Ⅱ：Multiple View Geometry-TUM by Daniel Cremers (Spring 2016)</a> 　　⑥ <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa15/" target="_blank" rel="noopener">Advanced Robotics-UCBerkeley by Pieter Abbeel (Fall 2015)</a> 　　⑦ <a href="https://ylatif.github.io/movingsensors/" target="_blank" rel="noopener">The Problem of Mobile Sensors</a></p>
+<p><strong>3、主要研究方向</strong> 　　视觉里程计：线特征；点线特征融合；点面特征融合；点线面多特征融合；多鱼眼VO；特征点发直接法结合；抗光照变化。 　　 　　语义SLAM：3D语义地图重定位；语义建图互相促进。 　　 　　多传感器融合：VIO（松耦合、紧耦合）；多传感器在线标定；camera，lidar融合定位；lidar，天花板摄像头融合；lidar，imu融合；TOF辅助双目密集匹配；事件相机SLAM；多机协同SLAM。 　　 　　优化方法：非线性增量优化；BA改进；离散连续图模型优化；边缘的约束图优化。 　　 　　三维重建：大尺度场景下的实时重建；RGBD室内稠密重建；地图数据关联；MVS；3D物体分类，提升重建质量；多子图融合。 　　 　　结合深度学习：基于深度学习的特征点；结合深度学习的深度估计；深度学习做闭环检测；深度学习估计关键帧深度。</p>
+<p><strong>4、会议期刊</strong></p>
+<ul>
+<li><p>英文期刊 ICRA（IEEE International Conference on Robotics and Automation） IROS（IEEE International Conference on Intelligent Robots and Systems） CVPR（IEEE International Conference on Computer Vision and Pattern Recognition） RSS（Robotics：Science and Systems） ECCV（European Conference on Computer Vision） ISMAR（IEEE and ACM International Symposium on Mixed and Augmented Reality.IEEE） JFR（Journal of Field Robotics） IEEE Transactions on Robotics ACRA（Australian Conference on Robotics and Automation） ICARCV（International Conference on Cotrol，Automation，Robotics and Vision） ISR（International Symposium on Robotics） IEEE Transactions On Pattern Analysis And achine Intelligence</p></li>
+<li><p>中文期刊 计算机辅助设计与图形学学报 机器人 计算机应用研究 中国科学：信息科学</p></li>
+</ul>
+<p><strong>5、知名研究实验室</strong></p>
+<ul>
+<li><p>欧洲 苏黎世联邦理工学院的Autonomous System Lab 苏黎世大学Robotics and Perception Group 慕尼黑工业大学The Computer Vision Group 英国伦敦大学帝国理工学院 Dyson 机器人实验室 英国牛津大学Active Vision Laboratory 德国弗莱堡大学Autonomous Intelligent Systems 西班牙萨拉戈萨大学SLAM实验室</p></li>
+<li><p>北美 麻省理工计算机科学与人工智能实验室（CSAIL）海洋机器人组 明尼苏达大学Multiple Autonomous Robotics Systems Laboratory 宾夕法尼亚大学GRASP实验室 华盛顿大学UW Robotics and Estimation Lab 哥伦比亚大学计算机视觉与机器人组 加拿大谢布鲁克大学IntRoLab 斯坦福大学人工智能实验室自动驾驶团队 卡内基梅隆大学Robot Perception Lab 特拉华大学Robot Perception and Navigation Group</p></li>
+<li><p>亚洲 香港科技大学Aerial Robotics Group 浙江大学CAD&amp;CG国家重点实验室Computer Vision Group 清华大学自动化系宽带网络与数字媒体实验室BBNC 中科院自动化研究所国家模式识别实验室Robot Vision Group 上海交通大学感知与导航研究所 武汉大学Computer Vision &amp; Remote Sensing Lab 日本先进工业科技研究所 筑波大学智能机器人研究室 新加坡南洋理工大学HESL实验室 韩国科学技术研究院</p></li>
+<li><p>澳洲 澳大利亚悉尼科技大数学CAS实验室 澳大利亚机器学习研究所机器人视觉中心</p></li>
+</ul>
+<h4 id="三slam相关企业">三、SLAM相关企业</h4>
+<p><strong>1、移动机器人</strong></p>
+<ul>
+<li><p>扫地机器人 科沃斯（苏州）、石头（北京）、追觅（上海）、银星智能（深圳）</p></li>
+<li><p>服务机器人 优必选（深圳）、达闼（北京）、思岚（上海）、高仙（上海）、猎户星空（北京）、速感（北京）、普渡（深圳）、美团（北京）</p></li>
+<li><p>仓储机器人 旷视（北京、上海）、京东（北京）、顺丰（深圳）、海康威视（杭州）、极智嘉（北京）</p></li>
+</ul>
+<p><strong>2、相机传感器</strong></p>
+<ul>
+<li><p>双目相机 小觅（无锡）、Indemind（北京）、爱观（上海）、中科慧眼（北京）</p></li>
+<li><p>RGBD相机 Intel（北京、上海）、奥比中光（深圳）、Pico（青岛、北京）、图漾（上海）、云从（重庆）</p></li>
+<li><p>激光雷达 禾赛（上海）、镭神智能（深圳）、速腾聚创（深圳）</p></li>
+<li><p>事件相机 芯仑（上海）</p></li>
+</ul>
+<p><strong>3、无人机</strong> 大疆（深圳、上海）、亿航（广州）、臻迪（北京）</p>
+<p><font color="red"><strong>4、智能驾驶</strong></font></p>
+<ul>
+<li><p>无人驾驶 百度（北京）、阿里菜鸟/达摩院（杭州）、腾讯（北京）、驭势（北京、上海）、momenta（北京）、滴滴（北京）、图森（北京）、飞步科技（杭州）、纽励科技（上海）、小马智行（广州）、Aptiv（上海）、文远知行（广州）</p></li>
+<li><p>辅助驾驶 纵目科技（上海）、魔视智能（上海）、极目智能（武汉）、虹软（杭州）、商汤（北京）</p></li>
+<li><p>芯片 NVIDIA（上海）、地平线（北京、南京）</p></li>
+<li><p>高精地图 高德（北京）、四维图新（北京）</p></li>
+<li><p>汽车厂商 上汽研究院（上海）、蔚来汽车（上海）、小鹏汽车（广州）、宇通客车（郑州）</p></li>
+</ul>
+<p><strong>5、增强现实</strong></p>
+<ul>
+<li><p>智能眼镜 联想（上海）、视辰（上海）、肇观电子（上海）、悉见（北京）</p></li>
+<li><p>手机 华为（上海）、虹软（杭州、上海）、商汤（杭州）、亮风台（上海）、今日头条（北京）</p></li>
+</ul>
+<p>　　</p>
+]]></content>
+      <categories>
+        <category>work</category>
+        <category>视觉SLAM</category>
+      </categories>
+      <tags>
+        <tag>SLAM</tag>
       </tags>
   </entry>
   <entry>
