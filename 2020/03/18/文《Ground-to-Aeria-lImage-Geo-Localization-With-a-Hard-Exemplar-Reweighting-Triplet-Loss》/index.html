@@ -17,7 +17,7 @@
   <meta name="description" content="记录生活">
   <meta name="author" content="kiki">
   <meta name="keywords" content="CV">
-  <title>单目深度估计总结 - KK&#39;s Blog</title>
+  <title>论文《Ground-to-Aeria lImage Geo-Localization With a Hard Exemplar Reweighting Triplet Loss》 - KK&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
 <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
@@ -140,7 +140,7 @@
               
                 <p class="mt-3 post-meta">
                   <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期日, 三月 29日 2020, 8:50 晚上
+                  星期三, 三月 18日 2020, 2:55 下午
                 </p>
               
 
@@ -149,7 +149,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    1.1k 字
+                    1.8k 字
                   </span>
                 
 
@@ -157,7 +157,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      3 分钟
+                      7 分钟
                   </span>
                 
 
@@ -185,44 +185,105 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <bar>
- <bar>
-<bar>
-<bar>
-<p>《High Quality Monocular Depth Estimation via Transfer Learning》<br>
-作者：Ibraheem Alhashim and Peter Wonka</p>
-<p>备注：只是一篇总结，不是解读哒~</p>
-<h2 id="一、为什么要看这篇文章？">一、为什么要看这篇文章？</h2>
-<p>1、因为最近萌生了一个想法，觉得可以用用深度图；</p>
-<p>2、这篇文章相比其他的文章，模型结构更简单，深度图分辨率更高。</p>
-<h2 id="二、文章提出的出发点">二、文章提出的出发点</h2>
-<p>1、首先，一张图片2D到3D的深度估计是很多场景理解或者是重建工作中的基础；</p>
-<p>2、其次，这篇文章希望提出的深度估计方法能获得高分辨率的深度估计结果。</p>
-<p>3、一些任务（例如图像增强的或用到3D重建等的）要求更快的计算速度。</p>
-<p>所以设计出一个更简单的模块化的网络构架，使得获得的深度图分辨率更高、质量更高，训练更容易，并且更方便的将以后在其他任务中表现较好的模型迁移到深度估计问题。</p>
-<h2 id="三、Framework">三、Framework</h2>
-<p>文章中给出的简化架构：<img src="https://img-blog.csdnimg.cn/20200314154230721.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="看似很简单的网络架构"><br>
-<strong>1、Encoder</strong></p>
-<p>这里用到的编码器是另一篇文章《Densely Connected Convolutional Networks》里的DenseNet-169。下图是生长率k=4的5层的Dense-block结构图，对这里的k的一种解释是，每个层都可以访问这个块中的所有前面的特征映射，因此也可以访问网络的集体特征。可以将特征图视为网络的全局状态，每层将其自身的k个特征映射添加到该状态，增长率决定了每一层对全局状态贡献多少新信息。一旦写入全局状态，就可以从网络中的任何地方访问全局状态，并且与传统的网络架构不同，不需要从一层复制到另一层。<br>
-<img src="https://img-blog.csdnimg.cn/20200314160111493.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="5-layer dense block with growth rate of k=4"><br>
-然后，为了在网络中进行下采样（改变图像大小），将多个Dense-block连接起来，就形成了下图的样子：<br>
-<img src="https://img-blog.csdnimg.cn/20200314161447623.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="Dense Net with three dense blocks "><br>
-两个相邻块之间的层称为过渡层，并通过卷积和池化来改变特征图的大小，但是本文中是删除了最后的top-layer，因为文章是做depth estimation而不是Classification task。但是呢，深度估计这篇文章用的DensNet-169有4个blocks，网络结构参数如下：<br>
-<img src="https://img-blog.csdnimg.cn/20200314162029675.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="DenseNet architectures for ImageNet"></p>
-<p><strong>2、Decoder</strong></p>
-<p>对于decoder，从一个1×1的卷积层开始，其输出通道的数量与去掉top-layer的编码器的输出相同。然后依次添加2×2的双线性upsampling块和串接到encoder的池化层POOL，其后跟两个并列的3×3卷积层，这样的构造重复3次（不同之处在于串接到的池化层分别是Pool3，Pool2，Pool1），然后就是2×2的双线性upsampling块和串接到encoder的卷积层CONV1，然后是两个并列的3×3的卷积层（为了使该块的输出为输入通道数的一半），最后经过一个3×3卷积层最终输出通道数为1的图像。</p>
-<p>这个encoder-decoder带有跳过连接，encoder构架不太紧凑，大概的结构就这样啦~~</p>
-<h2 id="四、文章的亮点">四、文章的亮点</h2>
-<p>1、第一点大概就是用了这么一个简单的网络来做深度估计，网络复杂不等于结果好；　<br><br>
-2、定义了一个损失函数，通过最小化深度值的差异来平衡重建深度图像之间的关系，同时惩罚深度图的图像域中高频细节的失真：<br>
-<img src="https://img-blog.csdnimg.cn/20200314165259760.png" srcset="/img/loading.gif" alt="损失函数L"><br>
-3、运用数据增强策略，文章只用了镜像翻转，以及改变颜色通道排列，后者还可以做一个further work； <br><br>
-4、提出了一个新的test dataset。</p>
-<h2 id="五、结果以及改进空间">五、结果以及改进空间</h2>
-<p>1、在室外场景中没别人的方法表现好，猜想是因为提供的深度图的性质（由于损失函数不仅要考虑逐点差异，而且还要通过查看每个点周围的区域来优化边缘和外观保留，因此对于非常稀疏的深度图像，学习过程不能很好地收敛）；　<br><br>
-　　2、文章用到的方法仍然需要label； <br><br>
-　　3、文章所提的改进空间挺多的，比如用在嵌入式设备上，这个网络存在局限性，以及更清楚地确定不同编码器、数据增强和学习策略对性能和贡献的影响，都是未来工作中值得关注的内容。</p>
-</bar></bar></bar></bar>
+              <h3 id="《Ground-to-Aeria-lImage-Geo-Localization-With-a-Hard-Exemplar-Reweighting-Triplet-Loss》（2019-ICCV）">《Ground-to-Aeria lImage Geo-Localization With a Hard Exemplar Reweighting Triplet Loss》（2019-ICCV）</h3>
+<p>Author：Sudong Cai， Yulan Guo，Salman Khan Jiwei Hu， Gongjian Wen</p>
+<pre><code>中心思想：基于Siamese network提出了FCANet，在basic ResNet中加入空间注意力和通道注意力机制(FCAM)，且给出一种新的在线困难样本重新分配权值三元组损失，并在其他文献的成就基础上，加入方向回归损失作为辅助损失。
+</code></pre>
+<p><font color="red"><strong>补充</strong></font><strong>:</strong>　<br><br>
+<strong>1、什么是Hard  example (困难样本)?</strong> <br><br>
+　　困难负样本是指哪些容易被网络预测为正样本的proposal，即假阳性(false positive,FP)，训练hard negative对提升网络的分类性能具有极大帮助。Hard example mining的核心思想就是用分类器对样本进行分类，把其中错误分类的样本(hard negative)放入负样本集合再继续训练分类器。</p>
+<p><strong>2、Triplet loss原理</strong> <br><br>
+　　Triplet Loss是深度学习中的一种损失函数，用于训练差异性较小的样本，通过优化锚示例(a)与正示例§的距离小于锚示例(a)与负示例(n)的距离，实现样本的相似性计算。</p>
+<ul>
+<li>
+<p>输入一个三元组 &lt;a, p, n&gt;<br>
+a： anchor<br>
+p： positive, 与 a 是同一类别的样本<br>
+n： negative, 与 a 是不同类别的样本</p>
+</li>
+<li>
+<p>公式<br>
+$$L= max(d(a,p)-d(a,n)+margin,0)$$</p>
+<p>优化目标就是拉近 a, p 的距离， 拉远 a, n 的距离。其中hard triplets是:  $d(a,n)&lt;d(a,p)$,  即a, p的距离远；easy triplets:  $L=0$ 即 $d(a,p)+margin&lt;d(a,n)$，这种情况不需要优化，a, p的距离本来就很近， a, n的距离远。</p>
+</li>
+</ul>
+<h4 id="一、Background＆Highlight">一、Background＆Highlight</h4>
+<ul>
+<li>
+<p><strong>Background</strong> <br><br>
+1、ground-to-ground image geo-localization没有可用的参考图像数据集； <br><br>
+2、cross-view图像匹配的弊端：视点的剧烈变化、方向信息的不定性、光照变化等； <br><br>
+3、 handcrafted features用于计算相似度，导致结果准确率低； <br><br>
+4、已有的hard example mining仍然很难找出困难样本。</p>
+</li>
+<li>
+<p><strong>Highlight</strong> <br><br>
+1、提出了一个新的triplet loss(<font color="red">online exemplar reweighting triplet loss </font>)提高训练，可以实现online hard example mining； <br><br>
+2、提出了lightweight attention module (FCAM)。</p>
+</li>
+</ul>
+<h4 id="二、Framework">二、Framework</h4>
+<p><strong>1、 Overview</strong> <br><br>
+文章提出的构架概览如图，网络是基于Siamese network设计的:<br>
+<img src="https://img-blog.csdnimg.cn/20200318172040954.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p>
+<p>主要组成部分：① baseline是两个CNN，用于提取图像的特征，网络分支之间没有共享权重(因为在其他文献中已经说明共享权重的效果并没它好，有一个说法就是这两个分支本来就是各自训练的)。② Dual Attention，就是文中提出的FCAM模型，是在两个CNN网络中都加入了包括通道注意力和空间维度注意力的机制，用于加大特征的区别。③ Main Loss，即文章所提的困难样本重加权triplet loss，把大的权重分配给有用的hard triplets，而把小的权重分配给信息较少的easy triplets。④ Auxiliary Loss，即Orientation regression (OR) 学习分支的损失。</p>
+<p><strong>2、Feature Context-Based Attention Module</strong></p>
+<ul>
+<li>
+<p><strong>Channel attention submodule</strong> <br><br>
+　　通道注意力机制是用来强调信息相对丰富的通道。网络框架如下图所示，采用了卷积块注意模块(<a href="https://arxiv.org/pdf/1807.06521.pdf" target="_blank" rel="noopener">CBAM</a>)，输入特征图U(W×H×C)，应用max-pooling $f_{max}$和 average-pooling $f_{avg}$ 作用于U产生一维的全局通道描述符$v<sup>1$和$v</sup>2$。然后，两个描述符经由 Multi-Layer Perceptron (MLP)  $f_{ext}(<sup>.,</sup>.)$ 激活，分析通道之间的依赖关系。最后，用Sigmoid函数激活两个描述符的总和得到$Z^C(U)$。输出channel attention map $U’$是通过$Z^C(U)$和U之间的元素级乘法生成的。<br>
+<img src="https://img-blog.csdnimg.cn/20200318172206762.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p>
+</li>
+<li>
+<p><strong>Spatial attention submodule</strong> <br><br>
+空间注意力用于突出有意义的特征单元，网络构架如图所示。受 <a href="https://www.researchgate.net/publication/319535111_Learned_Contextual_Feature_Reweighting_for_Image_Geo-Localization" target="_blank" rel="noopener">Contextual Reweighting Network (CRN)</a> 启发，文章将特征上下文感知学习(特征reweighting strategy)集成到CBAM的基本控件注意子模块中。来自通道注意力的特征图$U’$作为输入，然后连接两个特征掩码$f_{max}<sup>c$和$f_{avg}</sup>c$(沿着通道轴线的最大池化和平均池化)生成S(W×H×2)。然后，为了利用特征元的上下文信息，使用了不同感受野的卷积（3×3，5×5和7×7）来生成中间特征掩码，再将masks连接起来生成特征掩码P(W×H×3)，再用1×1的卷积学习和积累权重生成$Z^S(U’)$。最后，spatial attention map $U’’$是通过$Z^S(U)$和$U’$之间的元素级乘法生成的。<br>
+<img src="https://img-blog.csdnimg.cn/20200318172347324.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p>
+</li>
+<li>
+<p><strong>Building block</strong> <br><br>
+集合FCAM到基本ResNet的每一个building block中就形成了CNN特征提取网络，如下图：<br>
+<img src="https://img-blog.csdnimg.cn/2020031817270364.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"></p>
+</li>
+<li>
+<p><strong>Hard Exemplar Reweighting Triplet Loss</strong> <br><br>
+将基于triplet reweighting的在线困难样本挖掘策略集合到soft-margin triplet loss中，Loss定义如下：<br>
+$$L_{hard}(A_i,P_i,N_{i,k})= w_{hard}(A_i,P_i,N_{i,k})*log(1+exp(d_p(i)-d_n(i,k)))$$<br>
+其中$A_i$，$P_i$和$N_{i,k}$分别表示anchor，positive exemplar和 k-th negative exemplar。运用距离修正逻辑回归估计当前三元组的难度，根据$gap(i,k)=d_n(i,k)-d_p(i)$的大小计算$w_{hard}(A_i,P_i,N_{i,k})$，最终定义式如下：<br>
+<img src="https://img-blog.csdnimg.cn/20200318160521251.png" srcset="/img/loading.gif" alt="困难样本权重"></p>
+</li>
+<li>
+<p><strong>Orientation regression</strong>  <br>                         在现有的跨视图地理定位基准数据集中，锚点的方向及其对应的正样本在训练集中固定，而在测试集中打乱。所以文章随机旋转航空图像得到的不同角度可以作为训练的标签。为了解决方向未知的问题，在框架中增加一个方向回归，本文将重新分配权值的方向回归损失定义为：<br>
+$$L_{OR}(A_i,P_i,N_{i,k})= w_{hard}(A_i,P_i,N_{i,k})*(d<sup>1_R(i)+d</sup>2_R(i))$$<br>
+其中$d<sup>1_R(i)$和$d</sup>2_R(i)$ 分别表示sin和cosine值的回归误差。</p>
+<p><font color="red"><strong>总的误差定义式如下：</strong></font><br>
+$$L_{HER}(A_i,P_i,N_{i,k})= \lambda_1<em>L_{hard}(A_i,P_i,N_{i,k})+\lambda_2</em>L_{OR}(A_i,P_i,N_{i,k})$$</p>
+</li>
+</ul>
+<h4 id="三、Dataset">三、Dataset</h4>
+<ul>
+<li><strong>CVUSA dataset</strong>  <br><br>
+包含35532个用于训练的地空图像对和8884个用于测试的图像对。地面图像为全景图像，并且地空图均为高分辨率。</li>
+<li><strong>Vo and Hays’ (VH) dataset</strong>  <br><br>
+包含超过100万张由美国11个不同城市的谷歌地图收集的交叉视图图像对。使用8个子集作为训练集，并使用从Denver, Detroit, 和 Seattle捕获的其余3个子集进行评估，所有街道视图查询图像裁剪为固定大小230×230。另外，训练集中的方位角是固定的，测试集中是未知的。<br>
+<img src="https://img-blog.csdnimg.cn/20200318165049147.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="datasets"></li>
+</ul>
+<h4 id="四、总结">四、总结</h4>
+<ul>
+<li>
+<p><strong>Results</strong> <br><br>
+1、匹配结果中top1%的recall达到了98.3%，但是top10左右的只有70%~80%；</p>
+<p>2、性能排序：this approach&gt;add soft-margin ranking loss&gt; add additional OR&gt;pasitive pairs Euclidean loss;</p>
+<p>3、CVUSA dataset&gt;VH dataset，因为前者是全景图像且分辨率高，包含的信息多；</p>
+<p>4、直接学习方向的不变性作为辅助，比把所有图像特征聚集起来要好。</p>
+</li>
+<li>
+<p><strong>Problems</strong> <br><br>
+1、数据集的问题，放在正视图像上效果不太好；</p>
+<p>2、网络有点复杂；</p>
+<p>3、总的损失中权重$\lambda$如何取值，对结果的影响。</p>
+</li>
+</ul>
+
             </div>
             <hr>
             <div>
@@ -234,7 +295,10 @@
                       <a class="hover-with-bg" href="/categories/work/">work</a>
                       &nbsp;
                     
-                      <a class="hover-with-bg" href="/categories/work/%E6%B7%B1%E5%BA%A6%E4%BC%B0%E8%AE%A1/">深度估计</a>
+                      <a class="hover-with-bg" href="/categories/work/%E5%8D%B3%E4%BD%BF%E5%AE%9A%E4%BD%8D%E8%AE%BA%E6%96%87/">即使定位论文</a>
+                      &nbsp;
+                    
+                      <a class="hover-with-bg" href="/categories/work/%E5%8D%B3%E4%BD%BF%E5%AE%9A%E4%BD%8D%E8%AE%BA%E6%96%87/%E6%B7%BB%E5%8A%A0%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/">添加注意力机制</a>
                       &nbsp;
                     
                   </span>&nbsp;&nbsp;
@@ -243,7 +307,7 @@
                   <span>
                 <i class="iconfont icon-tag"></i>
                     
-                      <a class="hover-with-bg" href="/tags/paper-conclusion/">paper conclusion</a>
+                      <a class="hover-with-bg" href="/tags/%E5%8D%B3%E4%BD%BF%E5%AE%9A%E4%BD%8D/">即使定位</a>
                     
                   </span>
                 
@@ -256,15 +320,21 @@
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/03/30/eu/">
+                      <a href="/2020/03/24/ytorch%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/">
                         <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">seu</span>
+                        <span class="hidden-mobile">pytorch学习记录</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </div>
                   <div class="post-next col-6">
                     
+                    
+                      <a href="/2020/03/15/%E6%B7%B1%E5%BA%A6%E4%BC%B0%E8%AE%A1/">
+                        <span class="hidden-mobile">单目深度估计总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
                     
                   </div>
                 </div>
@@ -446,7 +516,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "单目深度估计总结&nbsp;",
+        "论文《Ground-to-Aeria lImage Geo-Localization With a Hard Exemplar Reweighting Triplet Loss》&nbsp;",
       ],
       cursorChar: "|",
       typeSpeed: 80,
@@ -503,6 +573,37 @@
   </script>
 
 
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
 
 
 
