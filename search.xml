@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title> 视觉SLAM十四讲 第二章</title>
+    <url>/2020/04/28/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E4%BA%8C%E7%AB%A0/</url>
+    <content><![CDATA[<h2 id="视觉slam十四讲">视觉SLAM十四讲</h2>
+<p>作者：高翔 | 张涛<br>
+最后更新于：2017.03.31 ### 第二章 初识SLAM #### 2. 1 小萝卜例子 <img src="https://img-blog.csdnimg.cn/20200428103415425.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<p>小萝卜是一个组装机器人，设备有相机、轮子、笔记本，我们希望小萝卜有自主运动能力，它至少要知道两件事： 1. 我在什么地方——定位。 2. 周围环境是什么样——建图。 　　</p>
+<p>　　有些传感器可以解决定位问题了，而有些不能，分为两种：一类是在机器人人体上的（轮式编码器、相机、激光、惯性测量单元IMU等，所测得数据是间接物理量，例如轮子转动角度、角速度和加速度等）；另一类是安装于环境中的（导轨、二维码标志等）可直接测量机器人位置信息，即解决定位问题，<font color="red">但不能在所有环境中都安装</font>。所以没有GPS的地方定位就是接下来要解决的问题。下面说说视觉SLAM中的视觉，即小萝卜的眼睛——相机。 <br> 　　SLAM的相机与昂贵的单反不同。按工作方式，分为：单目(Monocular)、双目(Stereo)、深度相机(RGB-D)。从图中来看，小萝卜用的是双目相机。这几类相机用来做SLAM时各有特点： <br> <strong>单目相机</strong> 单目相机的数据：照片，它以二维的形式反映了三维的世界，它少了场景的一个维度：深度（或距离）。我们的眼睛在多数情况下可以判断出物体的远近，当然也有时效的时候，由于单目相机是二维的，所以想要恢复三维结构，就必须移动相机的视角，通过视差定量地判断物体的远近，但这只是一个相对的距离，无法确定物体的具体尺度，称之为<strong>尺度不确定性</strong>。 <br> <strong>双目相机和深度相机</strong> 双目相机和深度相机的目的，在于通过某种手段测量物体离我们的距离，克服单目无法知道距离的缺点。双目相机由两个单目相机组成，但这两个相机之间的距离（称为基线 Baseline）是已知的，通过这个基线来估计每个像素的空间位置——这和人眼非常相似。双目相机的距离估计是比较左右眼的图像获得的，并不依赖其他传感设备，所以它既可以应用在室内，亦可应用于室外。<font color="red">但是其缺点是配置与标定均较为复杂，其深度量程和精度受双目的基线与分辨率限制，而且视差的计算非常消耗计算资源，需要使用 GPU 和 FPGA 设备加速后，才能实时输出整张图像的距离信息，因此在现有的条件下，计算量是双目的主要问题之一。</font> 深度相机（又称 RGB-D 相机），它最大的特点是可以通过红外结构光或 Time-of-Flight（ToF）原理，像激光传感器那样，通过主动向物体发射光并接收返回的光，测出物体离相机的距离。其计算量小于双目，但现在多数 RGB-D 相机还存在<strong>测量范围窄、噪声大、视野小、易受日光干扰、无法测量透射材质</strong>等诸多问题，在 SLAM 方面，主要用于室内 SLAM，室外则较难应用。</p>
+<h4 id="经典视觉slam框架">2.2 经典视觉SLAM框架</h4>
+<p>下图是SLAM的框架： <img src="https://img-blog.csdnimg.cn/20200429111630228.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<p>其流程主要分为以下几步： * <font color="red">传感器信息读取</font>。在视觉 SLAM 中主要为<strong>相机图像信息的读取和预处理</strong>。 * <font color="red">视觉里程计</font> (Visual Odometry, VO，又称为前端（Front End）)。视觉里程计任务是<strong>估算相邻图像间相机的运动</strong>， <strong>以及局部地图的样子</strong>。 * <font color="red">后端优化</font>（Optimization，在VO之后又称为后端（Back End））。后端接受不同时刻视觉里程计测量的相机位姿，以及回环检测的信息，对它们进行<strong>优化</strong>，得到全局一致的<strong>轨迹和地图</strong>。 * <font color="red">回环检测</font>（Loop Closing）。回环检测<strong>判断机器人是否曾经到达过先前的位置</strong>，如果检测到回环，它会把信息提供给后端进行处理。 * <font color="red">建图</font>（Mapping）。它根据估计的轨迹，<strong>建立与任务要求对应的地图</strong>。</p>
+<p>下面针对一些模块做简要介绍：</p>
+<h5 id="视觉里程计">2.2.1 视觉里程计</h5>
+<p><strong>VO知识铺垫</strong>：VO 能够通过相邻帧间的图像估计相机运动，并恢复场景的空间结构。叫它为“里程计”是因为它和实际的里程计一样，只计算相邻时刻的运动，而和再往前的过去的信息没有关联。 <br> 　　这里要解决的问题是：计算机是如何通过图像确定相机的运动呢？在视觉SLAM中，计算机中只有像素点，知道它们是某些空间点在相机的成像平面上投影的结果。要定量估计相机的运动就必须先知道相机与空间点的几何关系。 <br> 　　假设VO已经估计了两张图像间的相机运动，所以只要将每两个相邻时刻的运动串起来，就构成机器人的运动轨迹，即解决了定位问题。另一方面根据每个时刻相机的定位，计算出各像素点对应的空间位置，就得到了地图。但是由于运动估计误差的积累，将出现<font color="red">累计漂移（Accumulating Drift）</font>，它将导致我们无法建立一致的地图，为了解决漂移问题，我们还需要两种技术：后端优化和回环检测。 　 ##### 2.2.2 后端优化 　后端优化主要处理SLAM过程中的噪声问题。后端优化要考虑的问题， 就是如何从这些带有噪声的数据中，估计整个系统的状态，以及这个状态估计的不确定性有多大——<font color="red">这称为最大后验概率估计（Maximum-a-Posteriori，MAP）</font>。这里的状态既包括机器人自身的轨迹，也包含地图。为解决SLAM对运动主体自身和周围环境空间不确定性的估计，我们需要状态估计理论，把定位和建图的不确定性表达出来，然后采用滤波器或非线性优化，去估计状态的均值和不确定性（方差）。</p>
+<h5 id="回环检测">2.2.3 回环检测</h5>
+<p>　　回环检测，又称闭环检测（Loop Closure Detection），主要解决位置估计随时间漂移 的问题。通俗一点来解释：就是通过某种方法，让机器人知道“回到原点”这件事，或是把原点识别出来，再把位置的估计值“拉”过去，就可以消除漂移了，即所谓的回环检测。为了实现回环检测，我们需要让机器人具有识别曾到达过的场景的能力。可以在环境中安装传感器，类似在环境中的一种标志，只要看到了标志就知道自己回到了原点，但更希望机器人自身携带传感器——图像。可以判断图像间的相似性（图像匹配）完成闭环检测。</p>
+<h5 id="建图">2.2.4 建图</h5>
+<p>　　建图（Mapping）是指构建地图的过程。地图是对环境的描述，但这个描述并不是固定的，需要视 SLAM 的应用而定。地图类型如下： <img src="https://img-blog.csdnimg.cn/20200429130401375.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"> 大体上讲，它们可以分为度量地图（Metric Map）与拓扑地图（Topological Map）两种： * <strong>度量地图</strong> 度量地图强调精确地表示地图中物体的位置关系，通常用稀疏（Sparse）与稠密 （Dense）对它们进行分类。稀疏地图进行了一定程度的抽象，并不需要表达所有的物体，例如，只选择一部分具有代表意义的东西，称之为路标（Landmark），那么一张稀疏地图就是由路标组成的地图，而不是路标的部分就可以忽略掉。相对的，稠密地图着重于建模所有看到的东西。对于定位来说，稀疏路标地图就足够了，导航时则需要稠密地图。其中稠密地图有许多小块组成，小块的状态有占据、空闲和未知来表达格子（Grid）内是否有物体，通过查询告知的方式判断是否可以通过该格。但这样需要大量存储空间，并且大规模的度量地图易出现一致性问题，很小的一点转向误差，可能会导致两间屋子的墙出现重叠，使得地图失效。 * <strong>拓扑地图</strong> 相比于度量地图的精确性，拓扑地图则更强调地图元素之间的关系。拓扑地图是一个图（Graph），由节点和边组成，只考虑节点间的连通性。它不注重地图对精确位置的需要，去掉地图的细节问题， 是一种更为紧凑的表达方式。然而，拓扑地图不擅长表达具有复杂结构的地图，如何对地图进行分割形成结点与边，又如何使用拓扑地图进行导航与路径规划，仍是有待研究的问题。</p>
+<h4 id="slam问题的数学表述">2.3 SLAM问题的数学表述</h4>
+<p>　　假设小萝卜携带着某种传感器在未知环境里运动。 首先，由于相机通常是在某些时刻采集数据的，所以我们也只关心这些时刻的位置和地图。 因此把一段连续时间的运动变成了离散时刻 <span class="math inline">\(t = 1,...,K\)</span> 当中发生的事情，各时刻的位置就记为 <span class="math inline">\(x_1,...,x_K\)</span>，它们构成了小萝卜的轨迹。地图方面，设地图是由许多个路标（Landmark）组成的，而每个时刻，传感器 会得到一部分路标点的观测数据，设路标点一共有 N 个，用<span class="math inline">\(y_1,...,y_N\)</span>表示它们。 小萝卜的运动由运动和观测来描述：一是从k-1时刻到k时刻位置x的变化；二是在k时刻的<span class="math inline">\(x_k\)</span>处探测出路标<span class="math inline">\(y_j\)</span>，这一事情用数学语言来描述。因此可以描述为两个方程：<span class="math display">\[x_k=f(x_{k-1},u_k,w_k)\]</span> <span class="math display">\[z_{k,j}=h(y_j,x_k,v_{k,j})\]</span>第一个是运动方程，其中<span class="math inline">\(u_k\)</span>是运动传感器的读数（有时也叫输入)，<span class="math inline">\(w_k\)</span>为噪声。用一个一 般函数 f 来描述这个过程，整个函数可以指代任意的运动传感器。第二个是观测方程，程描述的是当小萝卜在<span class="math inline">\(x_k\)</span>位置上 看到某个路标点<span class="math inline">\(y_j\)</span>，产生了一个观测数据<span class="math inline">\(z_{k,j}\)</span>，这里<span class="math inline">\(v_{k,j}\)</span>是这次观测里的噪声。由于观测所用的传感器形式更多，这里的观测数据 z 以及观测方程 h 也许多不同的形式。考虑视觉 SLAM 时，传感器是相机，那么观测方程就是<font color="blue">“对路标点拍摄后，得到了图 像中的像素”</font>的过程。 <br> 　 　需要说明一点，针对不同的传感器，两个方程都有不同的参数化形式，涉及到<span class="math inline">\(x,y,z\)</span>的参数化，这里不赘述了。但是这两个方程描述了最基本的 SLAM 问题：当知道运动传感器的读数 u，以及观测传感器的读数 z 后，把 SLAM 问题建模成了一个<strong>状态估计问题</strong>：如何通过带有噪声的测量数据估计内部的、隐藏着的状态变量？更具体的估计的求解与噪声性质 (线性/非线性和高斯/非高斯)有关，并且涉及三维空间中六自由度位姿的表达和优化，以及观测方程如何参数化 (即空间中的路标点是如何投影到一张照片上)。</p>
+<h4 id="实践编程基础">2.4 实践：编程基础</h4>
+<p>这本书的所有变成都是在Linux操作系统上完成的，程序将主要以 Linux 上的 C++ 程序为主。作为windows用户，我在电脑上装了一个Ubuntu的子系统。编程部分就自己悄悄地完成了~</p>
+]]></content>
+      <categories>
+        <category>work</category>
+        <category>视觉SLAM</category>
+        <category>第二章</category>
+      </categories>
+      <tags>
+        <tag>视觉SLAM</tag>
+      </tags>
+  </entry>
+  <entry>
     <title> 学习规划</title>
     <url>/2020/04/27/%E4%B9%A0%E8%A7%84%E5%88%92/</url>
     <content><![CDATA[<h5 id="迷茫的我接下来该干什么">迷茫的我接下来该干什么</h5>
@@ -727,63 +759,6 @@ autoencoder = AutoEncoder()
       </tags>
   </entry>
   <entry>
-    <title>总结经典深度学习网络（pytorch、tensorflow实现）</title>
-    <url>/2020/03/31/%E7%BB%93%E5%B8%B8%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%BB%9C/</url>
-    <content><![CDATA[<h2 id="总结经典的深度学习模型">总结经典的深度学习模型</h2>
-<p>参考书目：《深度学习算法原理与编程实战》 | 蒋子阳著</p>
-<h3 id="一lenet-5">一、LeNet-5</h3>
-<p><strong>1、LeNet-5网络简介</strong></p>
-<p>　　LeNet-5是一个专为手写数字识别而设计的最经典的卷积神经网络，被誉为早期卷积神经网络中最有代表性的实验系统之一。LeNet-5 模型由Yann LeCun教授于1998年提出， 在MNIST数据集上，LeNet-5模型可以达到大约99.4%的准确率。与近几年的卷积神经网络比较，LeNet-5的网络规模比较小，但却包含了构成现代CNN网络的基本组件——卷积层、 Pooling层、全连接层。 <br> <strong>2、模型结构</strong> <br> 　　网络一共有8层(包含输入和输出在内)，基本网络架构如下： <img src="https://img-blog.csdnimg.cn/20200401163708326.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="ＬｅＮｅｔ－５"> 备注：图中C表示卷积层 ，S表示池化层。　<br></p>
-<ul>
-<li><p><font color="red"><strong>Layer1</strong></font>：Input层，输入图片大小32×32×1，MNIST数据集大小是28×28，所以输入reshape为32×32是希望高层特征监测感受野的中心能够收集更多潜在的明显特征。</p></li>
-<li><p><font color="red"><strong>Layer2</strong></font>：Conv1层——卷积层，有6个Feature Map，即Convolutions操作时的卷积核的个数为6，卷积核大小为5×5，该层每个单元和输入层的25个单元连接，padding没有使用，stride为1。</p></li>
-<li><p><font color="red"><strong>Layer3</strong></font>：S2为下采样层(Subsampling)，6个14×14的特征图，是上一层的每个特征图经过2×2的最大池化操作得到的，且长宽步长都为2，S2层每个特征图的每一个单元与C3对应特征图中2×2大小的区域连接。</p></li>
-<li><p><font color="red"><strong>Layer4</strong></font>：Conv3层，由上一层的特征图经过卷积操作得到，卷积核大小为5×5，卷积核个数为16，即该层有16个特征图，但并不是与上一层的6个特征图一一对应，而是有固定的连接关系，例如第一个特征图只与Layer3的第1、2、3个特征图的有卷积关系。</p></li>
-<li><p><font color="red"><strong>Layer5</strong></font>：S4层，16个5×5的特征图，每个特征图都是由第四层经过一个2×2的最大池化操作得到的，意义同Layer3。</p></li>
-<li><p><font color="red"><strong>Layer6</strong></font>：Conv5，120个特征图，是由上一层输出经过120个大小为5×5的卷积核得到的，没有padding，stride为1，上一层的16个特征图都连接到该层的每一个单元，所以这里相当于一个全连接层。</p></li>
-<li><p><font color="red"><strong>Layer7</strong></font>：F6是全连接层，有84个神经元，与上一层构成全连接的关系，再经由Sigmoid激活函数传到输出层。</p></li>
-<li><p><font color="red"><strong>Layer8</strong></font>：Output层也是一个全连接层，共有10个单元，对应0~9十个数字。本层单元计算的是径向基函数：<span class="math inline">\(y_i =\sum_{j}(x-w_{i,j})^2\)</span>,RBF的计算与第i个数字的比特图编码有关，对于第i个单元，yi的值越接近0，则表示越接近第i个数字的比特编码，即识别当前输入的结果为第i个数字。</p></li>
-</ul>
-<p><strong>3、pytorch和tensorflow实现LeNet-5网络的MNIST手写数字识别</strong> <br> 　　代码地址：<a href="https://github.com/KK-xi/LeNet-5" target="_blank" rel="noopener">GitHub</a> <br> 　　LeNet-5网络规模比较小，所以它无法很好的处理类似ImageNet的比较大的图像数据集。</p>
-<h3 id="二alexnet">二、AlexNet</h3>
-<p>1、<strong>AlexNet网络简介</strong> <br> 　　2012年， Hinton的学生Alex Krizhevsky借助深度学习的相关理论提出了深度卷积神经网络模型AlexNet。卷积层的数量有5个，池化层的数量有3个，也就是说，并不是所有的卷积层后面都连接有池化层。在这些卷积与池化层之后是3个全连层，最后一个全连层的单元数量为1000个，用于完成对ImageNet数据集中的图片完成1000分类（具体分类通过Softmax层实现)。</p>
-<p>2、<strong>模型结构</strong> <br>　　 　　网络结构如下图所示，有两个子网络，可以用<font color="red">GPU分别进行训练</font>(特点1)，两个GPU之间存在通信： 　　<img src="https://img-blog.csdnimg.cn/20200401164504200.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="AlexNet"></p>
-<ul>
-<li><p><font color="red"><strong>第一段卷积</strong></font>: 使用了96个11×11卷积核对输入的224×224×3的RGB图像进行卷积操作，长宽移动步长均为4，得到的结果是96个55x55的特征图；得到基本的卷积数据后，第二个操作是<font color="red">ReLU去线性化</font>(这是AlexNet的特点2)；第三个操作是<font color="red">LRN局部归一化</font>（AlexNet首次提出,特点3)；第四个操作是3×3的max pooling，步长为2。</p></li>
-<li><p><font color="red"><strong>第二段卷积</strong></font>：流程类似第一阶段，用到的核大小不同，256个深度为3(因为是三通道图像)的5×5的卷积核，stride为1×1，然后ReLU去线性化，再是LRN局部归一化，最后是3×3的最大池化操作，步长为2。</p></li>
-<li><p><font color="red"><strong>第三段卷积</strong></font>：输入上一阶段的特征图，首先经过384个3×3的卷积核，步长参数为1，然后再经过ReLU去线性化，这一阶段没有LRN和池化。</p></li>
-<li><p><font color="red"><strong>第四段卷积</strong></font>：首先经过384个3×3的卷积核，步长参数为1，然后再经过ReLU去线性化。</p></li>
-<li><p><font color="red"><strong>第五段卷积</strong></font>：首先经过256个3×3的卷积核，步长参数为1，然后再经过ReLU去线性化，最后是3×3的最大池化操作，步长为2。</p></li>
-<li><p><font color="red"><strong>第六段全连接(FC)</strong></font>：以上过程完了以后经过三层全连接层，前两层有4096个单元，与前一层构成全连接关系，然后都经过一个ReLU函数，左后一层是1000个单元的全连接层(Softmax层)，训练时这几个<font color="red">全连接层使用了Dropout</font>(特点4)。</p></li>
-</ul>
-<p>备注：<font color="red">数据增强的运用</font>(特点5)，在训练的时候模型随机从大小为256×256的原始图像中截取224×224大小的区域，同时还得到图像水平翻转的镜像图，用以增加样本的数量。在测试时，模型会首先截取一张图片的四个角加中间的位置，并进行左右翻转，这样会获得10张图片，将这10张图片作为预测的输入并对得到的10个预测结果求均值，就是这张图片最终的预测结果。</p>
-<p><strong>3、pytorch和tensorflow实现</strong> <br> 　　代码地址：<a href="https://github.com/KK-xi/AlexNet" target="_blank" rel="noopener">Github</a></p>
-<h3 id="三vggnet">三、VGGNet</h3>
-<p><strong>1、VGGNet网络简介</strong> <br> 　　2014年ILSVRC图像分类竞赛的第二名是VGGNet网络模型，其 top-5 错误率为 7.3%，它对卷积神经网络的深度与其性能之间的关系进行了探索。在将网络迁移到其他图片数据上进行应用时， VGGNet比GoogleNet有着更好的泛化性。此外，VGGNet模型是从图像中提取特征的CNN首选算法。<br></p>
-<p><strong>2、模型结构</strong> <br> 　　网络的结构非常简洁，在整个网络中全部使用了大小相同的卷积核 (3×3 )和 最大油化核 (2x2 )。<font color="red">VGGNet模型通过不断地加深网络结构来提升性能</font>，通过重复堆叠的方式，使用这些卷积层和最大池化层成功地搭建了11～19层深的卷积神经网络。下表是这些网络的结构组成层： <img src="https://img-blog.csdnimg.cn/20200401200252309.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="VGGNet"> 　　表中的conv3表示大小为3×3的卷积核，conv1则是1×1的卷积核，参数量主要集中在全连接层，其他卷积层的参数共享和局部连接降低了参数的数量。表中五个阶段的卷积用于提取特征，每段卷积后面都有最大池化操作，目的是缩小图像尺寸。多个卷积的堆叠可以降低参数量，也有助于学习特征，C级的VGG用到conv1是为了在输入通道数和输出通道数不变(不发生数据降维)的情况下实现线性变换，对非线性提升效果有较好的作用，但是换成conv3效果更好。VGG19的效果只比VGG16好一点点，所以牛津的研究团队就停止在VGG19层了，不再增加更多层数了。下图是VGG-16的网络构架图： 　　<img src="https://img-blog.csdnimg.cn/20200401203149754.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="VGG-16"></p>
-<p><strong>3、pytorch和tensorflow实现</strong> <br> 　　这里实现的是VGG-16网络(pytorch中只是搭建了网络)，代码地址：<a href="https://github.com/KK-xi/VGGNet-16" target="_blank" rel="noopener">GitHub</a> 　　在通常的网络训练时，<font color="red">VGGNet通过Multi-Scale方法对图像进行数据增强处理</font>，我自己在训练MNIST的时候没有用数据增强。因为卷积神经网络对于图像的缩放有一定的不变性，所以将这种经过 Multi-Scale多尺度缩放裁剪后的图片合在一起输入到卷积神经网络中训练，可以增加网络的这种<font color="red">不变性</font>(不变性的理解：pooling操作时，对局部感受野取其极大值，如果图像在尺度上发生了变化，有一定概率在尺度变化后对应的感受野取到的极大值不变，这样就可以使特征图不变，同样也增加了一定的平移不变性)。在预测时也采用了Multi-Scale的方法，将图像Scale到一个尺寸再裁剪并输入到卷积网络计算。输入到网络中的图片是某一张图片经过缩放裁剪后的多个样本，这样会得到一张图片的多个分类结果，所以紧接着要做的事就是对这些分类结果进行平均以得到最后这张图片的分类结果，这种平均的方式会提高图片数据的利用率并使分类的效果变好。</p>
-<h3 id="四inceptionnet-v3">四、InceptionNet-V3</h3>
-<p><strong>1、InceptionNet-V3网络简介</strong> <br> 　Google的InceptionNet首次亮相是在2014年的ILSVRC比赛中，称为 Inception-V1，后来又开发了三个版本，其中InceptionNet-V3最具代表性。相比VGGNet, Inception-V1增加了深度，达到了22层，但是其参数却只有500万个左右(SM)，这是远低于AlexNet(60M 左右)和VGGNet (140M 左右)的，是因为该网络将全连层和一般的卷积中采用了<font color="red">稀疏连接的方法(Hebbian原理)</font>。根据相关性高的单元应该被聚集在一起的结论，这些在同一空间位置但在不同通道的卷积核的输出结果也是稀疏的，也可以通过类似将稀疏矩阵聚类为较为密集的子矩阵的方式来提高计算性能。沿着这样的一个思路，Google团队提出了Inception Module结构来实现这样的目标。</p>
-<p><strong>2、模型结构</strong> <br> 　　网络中主要用到了稀疏连接的思想提出了<font color="red">Inception Module</font>，其借鉴了论文《Network in Network》的做法，即提出的<font color="red">MLPConv</font>——使用MLP对卷积操作得到的特征图进行进一步的操作，从而得到本层的最终输出特征图，这样可以允许在输出通道之间组合信息，以此提升卷积层的表达能力。在InceptionNet-V3中，Inception Module的基本结构如下图：　　<img src="https://img-blog.csdnimg.cn/20200401233024519.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="Inception Module"> 结构中的<font color="red">Filter Concat</font>是将特征图在深度方向(channel维度)进行串联拼接，这样可以构建出符合Hebbian原理的稀疏结构。conv1的作用是把相关性高、同一空间位置不同通道的特征连接在一起，并且计算量小，<strong>可以增加一层特征变换和非线性化</strong>，最大池化是为了增加网络对不同尺度的适应性。在Inception V2中首次用到了<font color="red">.批标准化(Batch Normalization)</font>，V3在V2基础上的Module<font color="red">改进之处就是在分支中使用分支，将二维卷积拆分为两个非对称一维卷积</font>，这种卷积可以在处理更丰富的空间特征以及增加特征多样性等方面做得比普通卷积更好。多个这种Inception Module堆叠起来就形成了InceptionNet-V3，其网络构架如下图，整个网络的主要思想就是找到一个最优的Inception Module结构，更好的实现局部稀疏的稠密化。 <img src="https://img-blog.csdnimg.cn/20200401235114326.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="InceptionNet-V3"></p>
-<p><strong>3、使用InceptionNet-V3完成模型迁移学习</strong></p>
-<ul>
-<li><font color="red">迁移学习</font>：随着卷积神经网络模型层数的加深以及复杂度的逐渐增加，训练这些模型所需要的带有标注的数据也越来越多。比如对于ResNet，其深度有 152 层，使用ImageNet数据集中带有标注的 120 万张图片才能将其训练得到 96.5% 的准确率。尽管这是个比较不错的准确率，但是在真实应用中，几乎很难收集到这么多带有标注的图片数据，而且这些数据训练一个复杂的卷积神经网络也要花费很长的时间 。<strong>迁移学习的出现就是为了解决上述标注数据以及训练时间的问题</strong>。所谓迁移学习，就是将一个问题上训练好的模型通过简单的调整使其适用于 一个新的问题，例如在 Google 提供的基于 ImageNet 数据集训练好的 Inception V3 模型的基础上进行简单的修改，使其能够解决基于其他数据集的图片分类任务。被修改的全连接层之前的一个网络层叫做<font color="red">瓶颈层</font>(Bottleneck，这里是V3中最后一个Dropout层)。</li>
-<li>模型迁移学习tensorflow代码地址：<a href="https://github.com/KK-xi/Inception_V3_transfer_learning" target="_blank" rel="noopener">Github</a></li>
-</ul>
-<h3 id="五resnet">五、ResNet</h3>
-<p><strong>1、ResNet网络简介</strong> <br> 　　ResNet (Residual Neural Network）由微软研究院的何情明等 4 名华人提出，网络深度达到了152 层，top-5 错误率 只有3.57% 。虽然ResNet的深度远远高于 VGGNet，但是参数量却比 VGGNet 低，效果也更好。ResNet 中最创新就是<font color="red">残差学习单元（Residual Unit）</font>的引入，它是参考了瑞士教授 Schmidhuber 的论文《Training Very Deep Networks》中提出的 Highway Network。 <font color="red"> Highway Network</font> 的出现是为了解决较深的神经 网络难以训练的问题，主要思想是启发于LSTM的门(Gate)结构，使得有一定比例的前一层的信息没有经过矩阵乘法和非线性变换而是直接传输到下一层，网络要学习的就是原始信息应该以何种比例保留下来。后来残差网络的学习单元就受益于Highway Network加深网络层数的做法。</p>
-<p><strong>2、模型结构</strong> <br> 　　随着网络加深，由于反向传播过程的叠乘可能出现<font color="red">梯度消失</font>，结果就是准确率下降，为此ReNet中引入残差学习单元(如图所示，2层和3层)，思想就是对于一个达到了准确率饱和的较浅网络，在后面加几个全等映射层允许初始信息直接传到下一层(y=x)时，误差不会因此而增加，并且网络要学习的就是原来输出<span class="math inline">\(H(x)\)</span>与原始输入<span class="math inline">\(x\)</span>的残差<span class="math inline">\(F(x)=H(x)-x\)</span>。 <img src="https://img-blog.csdnimg.cn/20200402093002712.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="残差单元"> 　　将多个残差单元堆叠起来就组成了ResNet网络，如下图所示是一个34层的残差网络： <img src="https://img-blog.csdnimg.cn/20200402095125460.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="ResNet"> 旁边的支线就是将上一层残差单元的输出直接参与到该层的输出，这样的连接方式被称为<font color="red">Shortcut和Skip Connection</font>，这样可以一定程度上保护信息的完整性。最后在改进的ResNet V2中通过该连接使用的激活函数(ReLU)被更换为Identity Mappings (<span class="math inline">\(y=x\)</span>)，残差单元都使用了BN归一化处理，使得训练更加容易并且泛化能力更强。</p>
-<p><strong>3、pytorch和tensorflow实现ResNet</strong> <br> 　代码地址：<a href="https://github.com/KK-xi/ResNet" target="_blank" rel="noopener">GitHub</a> 　这里只是搭建的网络，没有进行任何任务的训练，可以在自己的数据集上训练试一下。</p>
-]]></content>
-      <categories>
-        <category>work</category>
-        <category>深度学习模型</category>
-      </categories>
-      <tags>
-        <tag>深度学习网络</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>总结SLAM相关知识点资源库以及企业</title>
     <url>/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<h3 id="视觉slam的知识资源以及相关企业总结">视觉SLAM的知识资源以及相关企业总结</h3>
@@ -882,6 +857,63 @@ autoencoder = AutoEncoder()
       </tags>
   </entry>
   <entry>
+    <title>总结经典深度学习网络（pytorch、tensorflow实现）</title>
+    <url>/2020/03/31/%E7%BB%93%E5%B8%B8%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%BB%9C/</url>
+    <content><![CDATA[<h2 id="总结经典的深度学习模型">总结经典的深度学习模型</h2>
+<p>参考书目：《深度学习算法原理与编程实战》 | 蒋子阳著</p>
+<h3 id="一lenet-5">一、LeNet-5</h3>
+<p><strong>1、LeNet-5网络简介</strong></p>
+<p>　　LeNet-5是一个专为手写数字识别而设计的最经典的卷积神经网络，被誉为早期卷积神经网络中最有代表性的实验系统之一。LeNet-5 模型由Yann LeCun教授于1998年提出， 在MNIST数据集上，LeNet-5模型可以达到大约99.4%的准确率。与近几年的卷积神经网络比较，LeNet-5的网络规模比较小，但却包含了构成现代CNN网络的基本组件——卷积层、 Pooling层、全连接层。 <br> <strong>2、模型结构</strong> <br> 　　网络一共有8层(包含输入和输出在内)，基本网络架构如下： <img src="https://img-blog.csdnimg.cn/20200401163708326.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="ＬｅＮｅｔ－５"> 备注：图中C表示卷积层 ，S表示池化层。　<br></p>
+<ul>
+<li><p><font color="red"><strong>Layer1</strong></font>：Input层，输入图片大小32×32×1，MNIST数据集大小是28×28，所以输入reshape为32×32是希望高层特征监测感受野的中心能够收集更多潜在的明显特征。</p></li>
+<li><p><font color="red"><strong>Layer2</strong></font>：Conv1层——卷积层，有6个Feature Map，即Convolutions操作时的卷积核的个数为6，卷积核大小为5×5，该层每个单元和输入层的25个单元连接，padding没有使用，stride为1。</p></li>
+<li><p><font color="red"><strong>Layer3</strong></font>：S2为下采样层(Subsampling)，6个14×14的特征图，是上一层的每个特征图经过2×2的最大池化操作得到的，且长宽步长都为2，S2层每个特征图的每一个单元与C3对应特征图中2×2大小的区域连接。</p></li>
+<li><p><font color="red"><strong>Layer4</strong></font>：Conv3层，由上一层的特征图经过卷积操作得到，卷积核大小为5×5，卷积核个数为16，即该层有16个特征图，但并不是与上一层的6个特征图一一对应，而是有固定的连接关系，例如第一个特征图只与Layer3的第1、2、3个特征图的有卷积关系。</p></li>
+<li><p><font color="red"><strong>Layer5</strong></font>：S4层，16个5×5的特征图，每个特征图都是由第四层经过一个2×2的最大池化操作得到的，意义同Layer3。</p></li>
+<li><p><font color="red"><strong>Layer6</strong></font>：Conv5，120个特征图，是由上一层输出经过120个大小为5×5的卷积核得到的，没有padding，stride为1，上一层的16个特征图都连接到该层的每一个单元，所以这里相当于一个全连接层。</p></li>
+<li><p><font color="red"><strong>Layer7</strong></font>：F6是全连接层，有84个神经元，与上一层构成全连接的关系，再经由Sigmoid激活函数传到输出层。</p></li>
+<li><p><font color="red"><strong>Layer8</strong></font>：Output层也是一个全连接层，共有10个单元，对应0~9十个数字。本层单元计算的是径向基函数：<span class="math inline">\(y_i =\sum_{j}(x-w_{i,j})^2\)</span>,RBF的计算与第i个数字的比特图编码有关，对于第i个单元，yi的值越接近0，则表示越接近第i个数字的比特编码，即识别当前输入的结果为第i个数字。</p></li>
+</ul>
+<p><strong>3、pytorch和tensorflow实现LeNet-5网络的MNIST手写数字识别</strong> <br> 　　代码地址：<a href="https://github.com/KK-xi/LeNet-5" target="_blank" rel="noopener">GitHub</a> <br> 　　LeNet-5网络规模比较小，所以它无法很好的处理类似ImageNet的比较大的图像数据集。</p>
+<h3 id="二alexnet">二、AlexNet</h3>
+<p>1、<strong>AlexNet网络简介</strong> <br> 　　2012年， Hinton的学生Alex Krizhevsky借助深度学习的相关理论提出了深度卷积神经网络模型AlexNet。卷积层的数量有5个，池化层的数量有3个，也就是说，并不是所有的卷积层后面都连接有池化层。在这些卷积与池化层之后是3个全连层，最后一个全连层的单元数量为1000个，用于完成对ImageNet数据集中的图片完成1000分类（具体分类通过Softmax层实现)。</p>
+<p>2、<strong>模型结构</strong> <br>　　 　　网络结构如下图所示，有两个子网络，可以用<font color="red">GPU分别进行训练</font>(特点1)，两个GPU之间存在通信： 　　<img src="https://img-blog.csdnimg.cn/20200401164504200.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="AlexNet"></p>
+<ul>
+<li><p><font color="red"><strong>第一段卷积</strong></font>: 使用了96个11×11卷积核对输入的224×224×3的RGB图像进行卷积操作，长宽移动步长均为4，得到的结果是96个55x55的特征图；得到基本的卷积数据后，第二个操作是<font color="red">ReLU去线性化</font>(这是AlexNet的特点2)；第三个操作是<font color="red">LRN局部归一化</font>（AlexNet首次提出,特点3)；第四个操作是3×3的max pooling，步长为2。</p></li>
+<li><p><font color="red"><strong>第二段卷积</strong></font>：流程类似第一阶段，用到的核大小不同，256个深度为3(因为是三通道图像)的5×5的卷积核，stride为1×1，然后ReLU去线性化，再是LRN局部归一化，最后是3×3的最大池化操作，步长为2。</p></li>
+<li><p><font color="red"><strong>第三段卷积</strong></font>：输入上一阶段的特征图，首先经过384个3×3的卷积核，步长参数为1，然后再经过ReLU去线性化，这一阶段没有LRN和池化。</p></li>
+<li><p><font color="red"><strong>第四段卷积</strong></font>：首先经过384个3×3的卷积核，步长参数为1，然后再经过ReLU去线性化。</p></li>
+<li><p><font color="red"><strong>第五段卷积</strong></font>：首先经过256个3×3的卷积核，步长参数为1，然后再经过ReLU去线性化，最后是3×3的最大池化操作，步长为2。</p></li>
+<li><p><font color="red"><strong>第六段全连接(FC)</strong></font>：以上过程完了以后经过三层全连接层，前两层有4096个单元，与前一层构成全连接关系，然后都经过一个ReLU函数，左后一层是1000个单元的全连接层(Softmax层)，训练时这几个<font color="red">全连接层使用了Dropout</font>(特点4)。</p></li>
+</ul>
+<p>备注：<font color="red">数据增强的运用</font>(特点5)，在训练的时候模型随机从大小为256×256的原始图像中截取224×224大小的区域，同时还得到图像水平翻转的镜像图，用以增加样本的数量。在测试时，模型会首先截取一张图片的四个角加中间的位置，并进行左右翻转，这样会获得10张图片，将这10张图片作为预测的输入并对得到的10个预测结果求均值，就是这张图片最终的预测结果。</p>
+<p><strong>3、pytorch和tensorflow实现</strong> <br> 　　代码地址：<a href="https://github.com/KK-xi/AlexNet" target="_blank" rel="noopener">Github</a></p>
+<h3 id="三vggnet">三、VGGNet</h3>
+<p><strong>1、VGGNet网络简介</strong> <br> 　　2014年ILSVRC图像分类竞赛的第二名是VGGNet网络模型，其 top-5 错误率为 7.3%，它对卷积神经网络的深度与其性能之间的关系进行了探索。在将网络迁移到其他图片数据上进行应用时， VGGNet比GoogleNet有着更好的泛化性。此外，VGGNet模型是从图像中提取特征的CNN首选算法。<br></p>
+<p><strong>2、模型结构</strong> <br> 　　网络的结构非常简洁，在整个网络中全部使用了大小相同的卷积核 (3×3 )和 最大油化核 (2x2 )。<font color="red">VGGNet模型通过不断地加深网络结构来提升性能</font>，通过重复堆叠的方式，使用这些卷积层和最大池化层成功地搭建了11～19层深的卷积神经网络。下表是这些网络的结构组成层： <img src="https://img-blog.csdnimg.cn/20200401200252309.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="VGGNet"> 　　表中的conv3表示大小为3×3的卷积核，conv1则是1×1的卷积核，参数量主要集中在全连接层，其他卷积层的参数共享和局部连接降低了参数的数量。表中五个阶段的卷积用于提取特征，每段卷积后面都有最大池化操作，目的是缩小图像尺寸。多个卷积的堆叠可以降低参数量，也有助于学习特征，C级的VGG用到conv1是为了在输入通道数和输出通道数不变(不发生数据降维)的情况下实现线性变换，对非线性提升效果有较好的作用，但是换成conv3效果更好。VGG19的效果只比VGG16好一点点，所以牛津的研究团队就停止在VGG19层了，不再增加更多层数了。下图是VGG-16的网络构架图： 　　<img src="https://img-blog.csdnimg.cn/20200401203149754.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="VGG-16"></p>
+<p><strong>3、pytorch和tensorflow实现</strong> <br> 　　这里实现的是VGG-16网络(pytorch中只是搭建了网络)，代码地址：<a href="https://github.com/KK-xi/VGGNet-16" target="_blank" rel="noopener">GitHub</a> 　　在通常的网络训练时，<font color="red">VGGNet通过Multi-Scale方法对图像进行数据增强处理</font>，我自己在训练MNIST的时候没有用数据增强。因为卷积神经网络对于图像的缩放有一定的不变性，所以将这种经过 Multi-Scale多尺度缩放裁剪后的图片合在一起输入到卷积神经网络中训练，可以增加网络的这种<font color="red">不变性</font>(不变性的理解：pooling操作时，对局部感受野取其极大值，如果图像在尺度上发生了变化，有一定概率在尺度变化后对应的感受野取到的极大值不变，这样就可以使特征图不变，同样也增加了一定的平移不变性)。在预测时也采用了Multi-Scale的方法，将图像Scale到一个尺寸再裁剪并输入到卷积网络计算。输入到网络中的图片是某一张图片经过缩放裁剪后的多个样本，这样会得到一张图片的多个分类结果，所以紧接着要做的事就是对这些分类结果进行平均以得到最后这张图片的分类结果，这种平均的方式会提高图片数据的利用率并使分类的效果变好。</p>
+<h3 id="四inceptionnet-v3">四、InceptionNet-V3</h3>
+<p><strong>1、InceptionNet-V3网络简介</strong> <br> 　Google的InceptionNet首次亮相是在2014年的ILSVRC比赛中，称为 Inception-V1，后来又开发了三个版本，其中InceptionNet-V3最具代表性。相比VGGNet, Inception-V1增加了深度，达到了22层，但是其参数却只有500万个左右(SM)，这是远低于AlexNet(60M 左右)和VGGNet (140M 左右)的，是因为该网络将全连层和一般的卷积中采用了<font color="red">稀疏连接的方法(Hebbian原理)</font>。根据相关性高的单元应该被聚集在一起的结论，这些在同一空间位置但在不同通道的卷积核的输出结果也是稀疏的，也可以通过类似将稀疏矩阵聚类为较为密集的子矩阵的方式来提高计算性能。沿着这样的一个思路，Google团队提出了Inception Module结构来实现这样的目标。</p>
+<p><strong>2、模型结构</strong> <br> 　　网络中主要用到了稀疏连接的思想提出了<font color="red">Inception Module</font>，其借鉴了论文《Network in Network》的做法，即提出的<font color="red">MLPConv</font>——使用MLP对卷积操作得到的特征图进行进一步的操作，从而得到本层的最终输出特征图，这样可以允许在输出通道之间组合信息，以此提升卷积层的表达能力。在InceptionNet-V3中，Inception Module的基本结构如下图：　　<img src="https://img-blog.csdnimg.cn/20200401233024519.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="Inception Module"> 结构中的<font color="red">Filter Concat</font>是将特征图在深度方向(channel维度)进行串联拼接，这样可以构建出符合Hebbian原理的稀疏结构。conv1的作用是把相关性高、同一空间位置不同通道的特征连接在一起，并且计算量小，<strong>可以增加一层特征变换和非线性化</strong>，最大池化是为了增加网络对不同尺度的适应性。在Inception V2中首次用到了<font color="red">.批标准化(Batch Normalization)</font>，V3在V2基础上的Module<font color="red">改进之处就是在分支中使用分支，将二维卷积拆分为两个非对称一维卷积</font>，这种卷积可以在处理更丰富的空间特征以及增加特征多样性等方面做得比普通卷积更好。多个这种Inception Module堆叠起来就形成了InceptionNet-V3，其网络构架如下图，整个网络的主要思想就是找到一个最优的Inception Module结构，更好的实现局部稀疏的稠密化。 <img src="https://img-blog.csdnimg.cn/20200401235114326.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="InceptionNet-V3"></p>
+<p><strong>3、使用InceptionNet-V3完成模型迁移学习</strong></p>
+<ul>
+<li><font color="red">迁移学习</font>：随着卷积神经网络模型层数的加深以及复杂度的逐渐增加，训练这些模型所需要的带有标注的数据也越来越多。比如对于ResNet，其深度有 152 层，使用ImageNet数据集中带有标注的 120 万张图片才能将其训练得到 96.5% 的准确率。尽管这是个比较不错的准确率，但是在真实应用中，几乎很难收集到这么多带有标注的图片数据，而且这些数据训练一个复杂的卷积神经网络也要花费很长的时间 。<strong>迁移学习的出现就是为了解决上述标注数据以及训练时间的问题</strong>。所谓迁移学习，就是将一个问题上训练好的模型通过简单的调整使其适用于 一个新的问题，例如在 Google 提供的基于 ImageNet 数据集训练好的 Inception V3 模型的基础上进行简单的修改，使其能够解决基于其他数据集的图片分类任务。被修改的全连接层之前的一个网络层叫做<font color="red">瓶颈层</font>(Bottleneck，这里是V3中最后一个Dropout层)。</li>
+<li>模型迁移学习tensorflow代码地址：<a href="https://github.com/KK-xi/Inception_V3_transfer_learning" target="_blank" rel="noopener">Github</a></li>
+</ul>
+<h3 id="五resnet">五、ResNet</h3>
+<p><strong>1、ResNet网络简介</strong> <br> 　　ResNet (Residual Neural Network）由微软研究院的何情明等 4 名华人提出，网络深度达到了152 层，top-5 错误率 只有3.57% 。虽然ResNet的深度远远高于 VGGNet，但是参数量却比 VGGNet 低，效果也更好。ResNet 中最创新就是<font color="red">残差学习单元（Residual Unit）</font>的引入，它是参考了瑞士教授 Schmidhuber 的论文《Training Very Deep Networks》中提出的 Highway Network。 <font color="red"> Highway Network</font> 的出现是为了解决较深的神经 网络难以训练的问题，主要思想是启发于LSTM的门(Gate)结构，使得有一定比例的前一层的信息没有经过矩阵乘法和非线性变换而是直接传输到下一层，网络要学习的就是原始信息应该以何种比例保留下来。后来残差网络的学习单元就受益于Highway Network加深网络层数的做法。</p>
+<p><strong>2、模型结构</strong> <br> 　　随着网络加深，由于反向传播过程的叠乘可能出现<font color="red">梯度消失</font>，结果就是准确率下降，为此ReNet中引入残差学习单元(如图所示，2层和3层)，思想就是对于一个达到了准确率饱和的较浅网络，在后面加几个全等映射层允许初始信息直接传到下一层(y=x)时，误差不会因此而增加，并且网络要学习的就是原来输出<span class="math inline">\(H(x)\)</span>与原始输入<span class="math inline">\(x\)</span>的残差<span class="math inline">\(F(x)=H(x)-x\)</span>。 <img src="https://img-blog.csdnimg.cn/20200402093002712.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="残差单元"> 　　将多个残差单元堆叠起来就组成了ResNet网络，如下图所示是一个34层的残差网络： <img src="https://img-blog.csdnimg.cn/20200402095125460.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="ResNet"> 旁边的支线就是将上一层残差单元的输出直接参与到该层的输出，这样的连接方式被称为<font color="red">Shortcut和Skip Connection</font>，这样可以一定程度上保护信息的完整性。最后在改进的ResNet V2中通过该连接使用的激活函数(ReLU)被更换为Identity Mappings (<span class="math inline">\(y=x\)</span>)，残差单元都使用了BN归一化处理，使得训练更加容易并且泛化能力更强。</p>
+<p><strong>3、pytorch和tensorflow实现ResNet</strong> <br> 　代码地址：<a href="https://github.com/KK-xi/ResNet" target="_blank" rel="noopener">GitHub</a> 　这里只是搭建的网络，没有进行任何任务的训练，可以在自己的数据集上训练试一下。</p>
+]]></content>
+      <categories>
+        <category>work</category>
+        <category>深度学习模型</category>
+      </categories>
+      <tags>
+        <tag>深度学习网络</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>图像处理的注意力机制</title>
     <url>/2020/03/30/%E5%83%8F%E5%A4%84%E7%90%86%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/</url>
     <content><![CDATA[<h3 id="图像处理中的attention-mechanism">图像处理中的Attention Mechanism</h3>
@@ -937,7 +969,9 @@ M_c(F)=σ(MLP(AvgPool(F))+ MLP(MaxPool(F)))=σ(W_1(W_0(F^c_{avg}))+ W_1(W_0(F^c_
   <entry>
     <title> 视觉SLAM十四讲 第一章</title>
     <url>/2020/03/30/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/</url>
-    <content><![CDATA[<h3 id="第一-章-前言">第一 章 前言</h3>
+    <content><![CDATA[<h2 id="视觉slam十四讲">视觉SLAM十四讲</h2>
+<p>作者：高翔 | 张涛 最后更新于：2017.03.31</p>
+<h3 id="第一-章-前言">第一 章 前言</h3>
 <h4 id="本书讲什么">1.1本书讲什么</h4>
 <p>　　本书介绍视觉SLAM。</p>
 <p>　　SLAM 是 Simultaneous Localization and Mapping 的缩写，中文译作“同时定位与地图构建”。它是指搭载特定传感器的主体，在没有环境先验信息的情况下，于运动过程中建立环境的模型，同时估计自己的运动。如果这里的传感器主要为相机，那就称为 “视觉 SLAM”，此时我们要做的，就是根据一张张连续运动的图像（它们形成一段视频），从中推断相机的运动，以及周围环境的情况。</p>
