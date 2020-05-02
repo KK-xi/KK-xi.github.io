@@ -17,7 +17,7 @@
   <meta name="description" content="记录生活">
   <meta name="author" content="kiki">
   <meta name="keywords" content="CV">
-  <title>RNN-循环神经网络入门 - KK&#39;s Blog</title>
+  <title>视觉SLAM十四讲 第八章 - KK&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
 <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
@@ -140,7 +140,7 @@
               
                 <p class="mt-3 post-meta">
                   <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期五, 四月 3日 2020, 8:34 晚上
+                  星期五, 五月 1日 2020, 11:23 上午
                 </p>
               
 
@@ -149,7 +149,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    2k 字
+                    1.8k 字
                   </span>
                 
 
@@ -157,7 +157,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      7 分钟
+                      6 分钟
                   </span>
                 
 
@@ -185,48 +185,47 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="循环神经网络入门（pytorch实现）">循环神经网络入门（pytorch实现）</h2>
-<p>参考书目：《深度学习算法原理与编程实战》 |   蒋子阳著<br>
-<br>
-参考视频：<a href="https://www.bilibili.com/video/BV134411w76S" target="_blank" rel="noopener">微软人工智能公开课—循环神经网络RNN</a></p>
-<p><strong>一、回顾前馈神经网络</strong> <br><br>
-　　RNN是在前馈式神经网络基础上的，所以先回顾一下前馈神经网络。 <br><br>
-　　前馈式神经网络（FNN, Feedforward Neural Network）一般的结构如下图：<br>
-　　<img src="https://img-blog.csdnimg.cn/20200403141749146.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_1,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_1,color_FFFFFF,t_7#pic_center" srcset="/img/loading.gif" alt="前馈式神经网络"><br>
-图中神经元的输出表示为：$O_t=f(\sum_{i=1}^n a_iw_i+b)$假设某一层的输出为$h_n$，则下一层的输出为$f_{out}(h_n)$，这样重复迭代网络的输出为$y=f_{out}(f_n(f_{n-1}(…)))$，如此一来神经网络就成了巨大的复合函数，但实际我们并不会用到这个函数来计算，而使用计算图来表示，这样方便得出每一个节点的输入输出数据的梯度。对于RNN，就从这样的简单的前馈神经网络的传递方式说起。</p>
-<p><strong>二、RNN网络简介</strong> <br><br>
-　　循环神经网络（ Recurrent Neural Network, RNN ）雏形见于美国物理学家 J.J.Hopfield 于 1982 年提出的可用作联想存储器的互联网络——Hopfield 神经网络模型，如下图，每个节点都有输入，两两节点之间有双相连接：<br>
-　　<img src="https://img-blog.csdnimg.cn/20200403144156566.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="Hopfiled Network"><br>
-　　基于传统的机器学习算法十分依赖人工特征的提取致使模型一直无法提高正确率，而之前的全连神经网络以及卷积神经网络中，信息只在层与层之间存在运算关系，而没有连接节点之间的信息流动，这样在每一个时间都会有一个单独的参数，<font color="red">因此不能在时间上共享不同序列长度或序列不同位置的统计强度，所以无法对训练时没有见过的序列长度进行泛化</font>。 所以发展RNN对具有时间序列特性的数据非常有效，它能挖掘数据中的时序信息以及语义信息，在模型的不同部分共享参数解决了这个问题，并使得模型能够扩展到对不同形式的样本（这里指不同长度的样本）进行泛化。 <strong>循环神经网络会在几个时间步内共享相同的权重以刻画一个序列当前的输出与之前信息的关系，这体现在结构上是循环神经网络的隐藏层之间存在连接，隐藏层的输入来自于输入层的数据以及上一时刻隐藏层的输出</strong>。这样的结构使得循环神经网络会对之前的信息有所记忆， 同时利用之前的信息影响后面节点的输出。 <br><br>
-　　RNN网络主要用于处理离散序列数据：离散线性、长度可变的序列，例如时域语音信号，金融市场走势等。网络可用于序列数据的分析（市场趋势预测）、序列数据的生产（基于图片的文字描述）、序列数据的转换（语音识别以及机器翻译）。</p>
-<p><strong>三、循环网络结构</strong> <br><br>
-　 　循环神经网络典型结构及其按时间先后展开结构如图所示：　<br>
-　 　<img src="https://img-blog.csdnimg.cn/20200403160334980.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="RNN"><br>
-对于主体结构$A$，一般可认为是循环神经网络的一个隐藏单元。在$t$时刻，主体结构$A$会读取输入层的输入$x_t$以及上一时刻的输出，并输出当前时刻的$o_t$值（图中未给出）。此后$A$结构在$t$时刻的状态值表达式：$h<sup>t=f(h</sup>{t-1},x_t;\theta)$，其中$\theta$可以是网络中的其它参数比如权重或偏置等，循环的过程就是$A$不断被执行的过程。但是循环神经网络目前无法做到无限循环，因为循环过多会出现梯度消失的问题。 <br><br>
-　　假设隐藏单元的激活函数是tanh函数，则循环体结构$A$如下：　　<img src="https://img-blog.csdnimg.cn/20200403155812724.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="循环体"><br>
-则隐藏单元状态值表示为：$h<sup>t=tanh(Wh</sup>{t-1}+Ux_t+b<sup>h)$，$b</sup>h$是由$x_t$得到$h<sup>t$的偏置，$W$是相邻时刻隐藏单元间的权重矩阵，$U$是从$x_t$计算得到这个隐藏单元时用到的权重矩阵。从当前的状态值$h</sup>t$都得到输出还需要一个全连接神经网络来完成这个过程，表达式为：$o<sup>t=b_o+Vh</sup>t$，$V$是由$h<sup>t$得到$o</sup>t$的权重矩阵。如果输出是离散的，则可以用softmax处理$o<sup>t$得到标准化的概率向量$y$：$y</sup>t=softmax(o^t)$，向量的值对应离散变量可能值的概率。</p>
-<p><strong>四、网络的训练</strong> <br><br>
-　　要对网络进行训练，需要有一个与$x$序列配对的$o$的所有时间步内的总loss。 <br><br>
-　　RNN的反向传播算法称为时间反向传播 (Back-Propagation Through Time, BPTT)。基本原理和 BP 算法是一样的，三步走：前向计算每个神经元的输出值；反向计算误差项值；计算每个权重的梯度；最后再用随机梯度下降算法更新权重。详细的计算公式参考<a href="https://zhuanlan.zhihu.com/p/85776566" target="_blank" rel="noopener">知乎</a>。在反向传播过程中，当输入序列过长的时候，在求取一个比较远的时刻的梯度时，需要回溯到前面的所有时刻的信息，由于连乘项的存在，导致前面时刻的信息会缺失，这就是RNN中的梯度消失问题，还有就是当连乘出现大于1时的梯度爆炸，后者采用clip的方式即可，前者将会用到LSTM来缓解。</p>
-<p><strong>五、LSTM</strong> <br><br>
-　　LSTM 结构由 Sepp Hochreiter教授和 Jurgen Schrnidhuber教授于 1997 年 提出，它本身就是一种特殊的循环体结构 。在一个整体的循环神经网络中，除了外部的RNN大循环（<strong>循环体是 LSTM</strong>）外，还需要考虑 LSTM 本身单元“细胞”之间的自循环。LSTM单元结构如下图：<br>
-　　<img src="https://img-blog.csdnimg.cn/20200403173928627.jpg?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM单元"><br>
-LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输入的信息进行控制，让信息有选择性的影响RNN中每个时刻的状态。遗忘门（Forget Gate）是让网络“忘记”之前没用的信息，上一时刻的状态值通过与自循环权重 (该权重就是遗忘门的输出) 进行位乘可得到当前时刻状态值的一个加数。遗忘门输出表达式：</p>
-<p>$$f_i<sup>t=sigmoid(b_i</sup>f+\sum U_{i,j}<sup>fx_j</sup>t+\sum W_{i,j}<sup>fh_j</sup>{t-1})$$</p>
-<p>其中，$h<sup>{t-1}$是包含一个LSTM细胞上一时刻的所有输出，可以被看作是当前隐藏层向量，数量为$j$，$W$是循环权重。要保存长期的记忆，还需要输入门，同样是根据$x</sup>t$、$b<sup>g$和$h</sup>{t-1}$来决定哪些部分将进入当前时刻的状态，输入门的值表示为：</p>
-<p>$$g_i<sup>t=sigmoid(b_i</sup>g+\sum U_{i,j}<sup>gx_j</sup>t+\sum W_{i,j}<sup>gh_j</sup>{t-1})$$</p>
-<p>进一步计算LSTM结构当前时刻的状态值：</p>
-<p>$$C_i<sup>t=f_i</sup>tC_i<sup>{t-1}+g_i</sup>ttanh(b_i+\sum U_{i,j}x_j^t+\sum W_{i,j}h_j^{t-1})$$</p>
-<p>其中，$W$值为遗忘门的循环权重。然后得出结构当前时刻的输出值：</p>
-<p>$$h<sup>t=tanh(C_i</sup>t)q_i^t$$</p>
-<p>$$q_i<sup>t=sigmoid(b_i</sup>q+\sum U_{i,j}<sup>qx_j</sup>t+\sum W_{i,j}<sup>qh_j</sup>{t-1})$$</p>
-<p>其中，$W<sup>q$为遗忘门的循环权重，$q_i</sup>t$为输出们的输出值。用LSTM作为循环体的RNN网络如下图所示：<br>
-<img src="https://img-blog.csdnimg.cn/20200403192938761.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" alt="LSTM-RNN"></p>
-<p>循环神经网络的变种还有：双向循环神经网络和深层循环神经网络。</p>
+              <h2 id="视觉SLAM十四讲">视觉SLAM十四讲</h2>
+<p>作者：高翔 | 张涛</p>
+<h3 id="第八章-视觉里程计2">第八章  视觉里程计2</h3>
+<h4 id="8-1-直接法的引出">8.1 直接法的引出</h4>
+<p>特征点法的缺点：</p>
 <ul>
-<li>至此，关于RNN和LSTM的学习就结束啦~<br>
-用pytorch实现LSTM的RNN对MNIST数据集分类，以及RNN实现一元二次曲线的回归的代码地址：<a href="https://gitee.com/sparklekk/RNN" target="_blank" rel="noopener">sparklekk</a></li>
+<li>关键点的提取与描述子的计算非常耗时。</li>
+<li>使用特征点时，忽略了除特征点以外的所有信息,一张图像有几十万个像素，而特征点只有几百个。</li>
+<li>相机有时会运动到特征缺失的地方，往往这些地方没有明显的纹理信息 (例如有时会面对一堵白墙，这场景下特征点数量会明显减少， 可能找不到足够的匹配点来计算相机运动) 。</li>
 </ul>
+<p>针对以上问题，有三种思路：第一是保留特征点，但只计算关键点，不计算描述子，同时，使用光流法（Optical Flow）来跟踪特征点的运动；第二是只计算关键点，不计算描述子，同时使用直接法（Direct Method）来计算特征点在下一时刻图像的位置，这同样可以跳过描述子的计算过程，而且直接法的计算更加简单；第三种既不计算关键点、也不计算描述子，而是根据像素灰度的差异，直接计算相机运动。第一种方法仍然使用特征点，只是把匹配描述子替换成了光流跟踪，估计相机运动时仍使用对极几何、PnP 或 ICP 算法。而在后两个方法中，我们会根据图像的像素灰度信息来计算相机运动，它们都称为<font color="maroon">直接法</font>。直接法根据像素的亮度信息，估计相机的运动，可以完全不用计算关键点和描述子，于是既避免了特征的计算时间，也避免了特征缺失的情况。只要场景中存在明暗变化（可以是渐变，不形成局部的图像梯度），直接法就能工作。根据使用像素的数量，直接法分为稀疏、稠密和半稠密三种，相比于特征点法只能重构稀疏特征点（稀疏地图），直接法还具有恢复稠密或半稠密结构的能力。</p>
+<h4 id="8-2-光流-Optical-Flow">8.2 光流 (Optical Flow)</h4>
+<p>直接法是从光流演变而来的， 光流描述了像素在图像中的运动，而直接法则附带着一个相机运动模型。计算部分像素运动的 称为稀疏光流，计算所有像素的称为稠密光流，稀疏光流以 Lucas-Kanade 光流为代表，并 可以在 SLAM 中用于跟踪特征点位置。下图为LK光流法示意图：<br>
+<img src="https://img-blog.csdnimg.cn/20200501231933270.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<h5 id="8-2-1-Lucas-Kanade-光流">8.2.1 Lucas-Kanade 光流</h5>
+<p>在 LK 光流中，图像可以看作时间的函数：$I(t)$，那么一个在 t 时刻，位于$(x,y)$处的像素，它的灰度可以写成$I(x,y,t)$。要估计图像坐标，先引入光流法的假设：</p>
+<ul>
+<li>灰度不变假设：同一个空间点的像素灰度值，在各个图像中是固定不变的。（实际中这一假设可能不成立）</li>
+<li>在 LK 光流中，我们假设某一个窗口内的像素具有相同的运动。<br>
+　　对于t 时刻位于$(x,y)$处的像素，我们设$t +d_t$时刻，它运动到$(x +d_x,y +d_y)$处。 由于灰度不变，有: $$I(x+d_x,y+d_y,t+d_t)=I(x,y,t)$$ 左边进行泰勒展开保留一阶项，并由灰度不变得：$$\frac{∂I}{∂x}dx + \frac{∂I}{∂y}dy + \frac{∂I}{∂t}dt = 0$$ 两边同除以$dt$得：$$\frac{∂I}{∂x}\frac{dx}{dt} + \frac{∂I}{∂y}\frac{dy}{dt} =- \frac{∂I}{∂t}$$ 其中 $dx/dt$ 为像素在 x 轴上运动速度，而 $dy/dt$ 为 y 轴速度，把它们记为$u,v$，$∂I/∂x$为图像在该点处 x 方向的梯度，另一项则是在 y 方向的梯度，记为$Ix,Iy$。上式写为矩阵形式有：$$ \begin{bmatrix} I_x &amp; I_y  \ \end{bmatrix} \begin{bmatrix} u \ v \ \end{bmatrix}=-I_t$$ 其中$u,v$就是想要计算的运动，考虑在一个$w×w$得窗口中，像素量为$w<sup>2$。由于该窗口内像素具有同样的运动，所以共有$w</sup>2$个方程：$$ \begin{bmatrix} I_x &amp; I_y  \ \end{bmatrix}<em>k \begin{bmatrix} u \ v \ \end{bmatrix}=-I</em>{tk}, k=1,…,w^2$$ 记 $$A= \begin{bmatrix}  \begin{bmatrix} I_x , I_y  \ \end{bmatrix}<em>1 \ \vdots \  \begin{bmatrix} I_x , I_y  \ \end{bmatrix}<em>k  \ \end{bmatrix} , b= \begin{bmatrix} I</em>{t1} \ \vdots \ I</em>{tk} \ \end{bmatrix}$$  于是整个方程为：$$ A\begin{bmatrix} u\ v  \ \end{bmatrix}=-b$$ 对以上方程用最小二乘解： $$\begin{bmatrix} u\ v  \ \end{bmatrix}<sup>*=-(A</sup>TA)<sup>{-1}A</sup>Tb$$ 由于像素梯度仅在局部有效，所以如果一次迭代不够好的话，会多迭代几次这个方程，在 SLAM 中，LK 光流常被用来跟踪角点的运动。</li>
+</ul>
+<h4 id="8-3-实践：光流">8.3 实践：光流</h4>
+<h5 id="8-3-1-使用-TUM-公开数据集">8.3.1 使用 TUM 公开数据集</h5>
+<p>数据集来自于慕尼黑工业大学（TUM）提供的公开 RGB-D 数据集，它含有许 多个 RGB-D 视频，可以作为 RGB-D 或单目 SLAM 的实验数据。它还提供了用运动捕捉系统测量的精确轨迹，可以作为标准轨迹以校准 SLAM 系统。</p>
+<h5 id="8-3-2-使用-LK-光流">8.3.2 使用 LK 光流</h5>
+<p>编写程序使用 OpenCV 中的 LK 光流，使用 LK 的目的是跟踪特征点，对第一张图像提取 FAST 角点，然后用 LK 光流跟踪它们。</p>
+<p></p>
+<h4 id="8-4-直接法（Direct-Methods）">8.4 直接法（Direct Methods）</h4>
+<h5 id="8-4-1-直接法推导">8.4.1 直接法推导</h5>
+<p>涉及李导数的扰动模型，待续…</p>
+<h5 id="8-4-2-直接法的讨论">8.4.2 直接法的讨论</h5>
+<p>在上面的推导中，P 是一个已知位置的空间点，在 RGB-D 相 机下，可以把任意像素反投影到三维空间，然后投影到下一个图像中。如果在单目相机中，这件事情要更为困难，因为还需考虑由 P 的深度带来的不确定性。现在先来考 P 深度已知的情况，根据 P 的来源，可以把直接法进行分类：</p>
+<ul>
+<li>P 来自于稀疏关键点，我们称之为<font color="maroon">稀疏直接法</font>。通常我们使用数百个至上千个关键 点，并且像 L-K 光流那样，假设它周围像素也是不变的。这种稀疏直接法不必计算描述子，并且只使用数百个像素，因此速度最快，但<font color="maroon">只能计算稀疏的重构</font>。</li>
+<li>P 来自部分像素。考虑只使用带有梯度的像素点，舍弃像素梯度不明显的地方（这些地方的雅可比为零，不会对计算运动增量有任何贡献）。这称之为半稠密（Semi-Dense）的直接法，可以<font color="maroon">重构一个半稠密结构</font>。</li>
+<li>P 为所有像素，称为稠密直接法。稠密重构需要计算所有像素，因此需要 GPU 的加速，但是度不明显的点，在运动估计中不会有太大贡献，在重构时也会难以估计位置。</li>
+</ul>
+<p>可以看到，从稀疏到稠密重构，都可以用直接法来计算。 稀疏方法可以快速地求解相机位姿，而稠密方法可以建立完整地图。在低端的计算平台上，稀疏直接法可以做到非常快速的效果，适用于实时性较高且计算资源有限的场合 。</p>
+<h4 id="8-5-实践：RGB-D-的直接法">8.5 实践：RGB-D 的直接法</h4>
+<p>待续…</p>
+<p></p>
 
             </div>
             <hr>
@@ -239,7 +238,10 @@ LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输
                       <a class="hover-with-bg" href="/categories/work/">work</a>
                       &nbsp;
                     
-                      <a class="hover-with-bg" href="/categories/work/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B/">深度学习模型</a>
+                      <a class="hover-with-bg" href="/categories/work/%E8%A7%86%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/">视觉SLAM十四讲</a>
+                      &nbsp;
+                    
+                      <a class="hover-with-bg" href="/categories/work/%E8%A7%86%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/%E7%AC%AC%E5%85%AB%E7%AB%A0/">第八章</a>
                       &nbsp;
                     
                   </span>&nbsp;&nbsp;
@@ -248,7 +250,7 @@ LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输
                   <span>
                 <i class="iconfont icon-tag"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">循环神经网络</a>
+                      <a class="hover-with-bg" href="/tags/%E8%A7%86%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/">视觉SLAM十四讲</a>
                     
                   </span>
                 
@@ -261,18 +263,12 @@ LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/04/03/ytorch%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/">
-                        <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">pytorch学习记录</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/">
-                        <span class="hidden-mobile">总结SLAM相关知识点资源库以及企业</span>
+                      <a href="/2020/04/30/mputer-Vision-for-Autonomous-Vehicles-Chapter-1-Introduction/">
+                        <span class="hidden-mobile">Computer Vision for Autonomous Vehicles | Chapter 1 Introduction</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="fa fa-chevron-right"></i>
                       </a>
@@ -457,7 +453,7 @@ LSTM由自身的三个门结构进行控制，门结构使用Sigmoid函数对输
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "RNN-循环神经网络入门&nbsp;",
+        "视觉SLAM十四讲 第八章&nbsp;",
       ],
       cursorChar: "|",
       typeSpeed: 80,
