@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>视觉SLAM十四讲 第十章</title>
-    <url>/2020/05/03/ntitled/</url>
+    <url>/2020/05/03/%E8%A7%86%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2%20%E7%AC%AC%E5%8D%81%E7%AB%A0/</url>
     <content><![CDATA[
 ]]></content>
       <categories>
@@ -11,7 +11,7 @@
         <category>第十章</category>
       </categories>
       <tags>
-        <tag>视觉SLAM 十四讲</tag>
+        <tag>视觉SLAM</tag>
       </tags>
   </entry>
   <entry>
@@ -1251,7 +1251,7 @@ M_c(F)=σ(MLP(AvgPool(F))+ MLP(MaxPool(F)))=σ(W_1(W_0(F^c_{avg}))+ W_1(W_0(F^c_
   </entry>
   <entry>
     <title> 视觉SLAM十四讲 第一章</title>
-    <url>/2020/03/30/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/</url>
+    <url>/2020/03/30/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2%20%E7%AC%AC%E4%B8%80%E7%AB%A0/</url>
     <content><![CDATA[<h2 id="视觉slam十四讲">视觉SLAM十四讲</h2>
 <p>作者：高翔 | 张涛 <br> 最后更新于：2017.03.31</p>
 <h3 id="第一-章-前言">第一 章 前言</h3>
