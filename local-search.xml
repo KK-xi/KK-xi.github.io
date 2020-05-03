@@ -53,7 +53,7 @@
     
     <tags>
       
-      <tag>视觉SLAM十四讲</tag>
+      <tag>视觉SLAM</tag>
       
     </tags>
     
@@ -82,36 +82,7 @@
     
     <tags>
       
-      <tag>视觉SLAM十四讲</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>视觉SLAM十四讲 第八章</title>
-    <link href="/2020/05/01/%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E5%85%AB%E7%AB%A0/"/>
-    <url>/2020/05/01/%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E5%85%AB%E7%AB%A0/</url>
-    
-    <content type="html"><![CDATA[<h2 id="视觉slam十四讲">视觉SLAM十四讲</h2><p>作者：高翔 | 张涛</p><h3 id="第八章-视觉里程计2">第八章 视觉里程计2</h3><h4 id="直接法的引出">8.1 直接法的引出</h4><p>特征点法的缺点： * 关键点的提取与描述子的计算非常耗时。 * 使用特征点时，忽略了除特征点以外的所有信息,一张图像有几十万个像素，而特征点只有几百个。 * 相机有时会运动到特征缺失的地方，往往这些地方没有明显的纹理信息 (例如有时会面对一堵白墙，这场景下特征点数量会明显减少， 可能找不到足够的匹配点来计算相机运动) 。</p><p>　　针对以上问题，有三种思路：第一是保留特征点，但只计算关键点，不计算描述子，同时，使用光流法（Optical Flow）来跟踪特征点的运动；第二是只计算关键点，不计算描述子，同时使用直接法（Direct Method）来计算特征点在下一时刻图像的位置，这同样可以跳过描述子的计算过程，而且直接法的计算更加简单；第三种既不计算关键点、也不计算描述子，而是根据像素灰度的差异，直接计算相机运动。第一种方法仍然使用特征点，只是把匹配描述子替换成了光流跟踪，估计相机运动时仍使用对极几何、PnP 或 ICP 算法。而在后两个方法中，我们会根据图像的像素灰度信息来计算相机运动，它们都称为<font color="maroon">直接法</font>。直接法根据像素的亮度信息，估计相机的运动，可以完全不用计算关键点和描述子，于是既避免了特征的计算时间，也避免了特征缺失的情况。只要场景中存在明暗变化（可以是渐变，不形成局部的图像梯度），直接法就能工作。根据使用像素的数量，直接法分为稀疏、稠密和半稠密三种，相比于特征点法只能重构稀疏特征点（稀疏地图），直接法还具有恢复稠密或半稠密结构的能力。</p><h4 id="光流-optical-flow">8.2 光流 (Optical Flow)</h4><p>　　直接法是从光流演变而来的， 光流描述了像素在图像中的运动，而直接法则附带着一个相机运动模型。计算部分像素运动的 称为稀疏光流，计算所有像素的称为稠密光流，稀疏光流以 Lucas-Kanade 光流为代表，并 可以在 SLAM 中用于跟踪特征点位置。下图为LK光流法示意图： <img src="https://img-blog.csdnimg.cn/20200501231933270.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p><h5 id="lucas-kanade-光流">8.2.1 Lucas-Kanade 光流</h5><p>在 LK 光流中，图像可以看作时间的函数：<span class="math inline">\(I(t)\)</span>，那么一个在 t 时刻，位于<span class="math inline">\((x,y)\)</span>处的像素，它的灰度可以写成<span class="math inline">\(I(x,y,t)\)</span>。要估计图像坐标，先引入光流法的假设： * 灰度不变假设：同一个空间点的像素灰度值，在各个图像中是固定不变的。（实际中这一假设可能不成立） * 在 LK 光流中，我们假设某一个窗口内的像素具有相同的运动。 　　对于t 时刻位于<span class="math inline">\((x,y)\)</span>处的像素，我们设<span class="math inline">\(t +d_t\)</span>时刻，它运动到<span class="math inline">\((x +d_x,y +d_y)\)</span>处。 由于灰度不变，有: <span class="math display">\[I(x+d_x,y+d_y,t+d_t)=I(x,y,t)\]</span> 左边进行泰勒展开保留一阶项，并由灰度不变得：<span class="math display">\[\frac{∂I}{∂x}dx + \frac{∂I}{∂y}dy + \frac{∂I}{∂t}dt = 0\]</span> 两边同除以<span class="math inline">\(dt\)</span>得：<span class="math display">\[\frac{∂I}{∂x}\frac{dx}{dt} + \frac{∂I}{∂y}\frac{dy}{dt} =- \frac{∂I}{∂t}\]</span> 其中 <span class="math inline">\(dx/dt\)</span> 为像素在 x 轴上运动速度，而 <span class="math inline">\(dy/dt\)</span> 为 y 轴速度，把它们记为<span class="math inline">\(u,v\)</span>，<span class="math inline">\(∂I/∂x\)</span>为图像在该点处 x 方向的梯度，另一项则是在 y 方向的梯度，记为<span class="math inline">\(Ix,Iy\)</span>。上式写为矩阵形式有：<span class="math display">\[ \begin{bmatrix} I_x &amp; I_y  \\ \end{bmatrix} \begin{bmatrix} u \\ v \\ \end{bmatrix}=-I_t\]</span> 其中<span class="math inline">\(u,v\)</span>就是想要计算的运动，考虑在一个<span class="math inline">\(w×w\)</span>得窗口中，像素量为<span class="math inline">\(w^2\)</span>。由于该窗口内像素具有同样的运动，所以共有<span class="math inline">\(w^2\)</span>个方程：<span class="math display">\[ \begin{bmatrix} I_x &amp; I_y  \\ \end{bmatrix}_k \begin{bmatrix} u \\ v \\ \end{bmatrix}=-I_{tk}, k=1,...,w^2\]</span> 记 <span class="math display">\[A= \begin{bmatrix}  \begin{bmatrix} I_x , I_y  \\ \end{bmatrix}_1 \\ \vdots \\  \begin{bmatrix} I_x , I_y  \\ \end{bmatrix}_k  \\ \end{bmatrix} , b= \begin{bmatrix} I_{t1} \\ \vdots \\ I_{tk} \\ \end{bmatrix}\]</span> 于是整个方程为：<span class="math display">\[ A\begin{bmatrix} u\\ v  \\ \end{bmatrix}=-b\]</span> 对以上方程用最小二乘解： <span class="math display">\[\begin{bmatrix} u\\ v  \\ \end{bmatrix}^*=-(A^TA)^{-1}A^Tb\]</span> 由于像素梯度仅在局部有效，所以如果一次迭代不够好的话，会多迭代几次这个方程，在 SLAM 中，LK 光流常被用来跟踪角点的运动。</p><h4 id="实践光流">8.3 实践：光流</h4><h5 id="使用-tum-公开数据集">8.3.1 使用 TUM 公开数据集</h5><p>数据集来自于慕尼黑工业大学（TUM）提供的公开 RGB-D 数据集，它含有许 多个 RGB-D 视频，可以作为 RGB-D 或单目 SLAM 的实验数据。它还提供了用运动捕捉系统测量的精确轨迹，可以作为标准轨迹以校准 SLAM 系统。</p><h5 id="使用-lk-光流">8.3.2 使用 LK 光流</h5><p>编写程序使用 OpenCV 中的 LK 光流，使用 LK 的目的是跟踪特征点，对第一张图像提取 FAST 角点，然后用 LK 光流跟踪它们。</p><p>　　 #### 8.4 直接法（Direct Methods） ##### 8.4.1 直接法推导 涉及李导数的扰动模型，待续...</p><h5 id="直接法的讨论">8.4.2 直接法的讨论</h5><p>　　在上面的推导中，P 是一个已知位置的空间点，在 RGB-D 相 机下，可以把任意像素反投影到三维空间，然后投影到下一个图像中。如果在单目相机中，这件事情要更为困难，因为还需考虑由 P 的深度带来的不确定性。现在先来考 P 深度已知的情况，根据 P 的来源，可以把直接法进行分类： * P 来自于稀疏关键点，我们称之为<font color="maroon">稀疏直接法</font>。通常我们使用数百个至上千个关键 点，并且像 L-K 光流那样，假设它周围像素也是不变的。这种稀疏直接法不必计算描述子，并且只使用数百个像素，因此速度最快，但<font color="maroon">只能计算稀疏的重构</font>。 * P 来自部分像素。考虑只使用带有梯度的像素点，舍弃像素梯度不明显的地方（这些地方的雅可比为零，不会对计算运动增量有任何贡献）。这称之为半稠密（Semi-Dense）的直接法，可以<font color="maroon">重构一个半稠密结构</font>。 * P 为所有像素，称为稠密直接法。稠密重构需要计算所有像素，因此需要 GPU 的加速，但是度不明显的点，在运动估计中不会有太大贡献，在重构时也会难以估计位置。</p><p>　　可以看到，从稀疏到稠密重构，都可以用直接法来计算。 稀疏方法可以快速地求解相机位姿，而稠密方法可以建立完整地图。在低端的计算平台上，稀疏直接法可以做到非常快速的效果，适用于实时性较高且计算资源有限的场合 。</p><h4 id="实践rgb-d-的直接法">8.5 实践：RGB-D 的直接法</h4><p>待续...</p><p>　</p>]]></content>
-    
-    
-    <categories>
-      
-      <category>work</category>
-      
-      <category>视觉SLAM十四讲</category>
-      
-      <category>第八章</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>视觉SLAM十四讲</tag>
+      <tag>视觉SLAM</tag>
       
     </tags>
     
@@ -454,33 +425,6 @@
   
   
   <entry>
-    <title>总结SLAM相关知识点资源库以及企业</title>
-    <link href="/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/"/>
-    <url>/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/</url>
-    
-    <content type="html"><![CDATA[<h3 id="视觉slam的知识资源以及相关企业总结">视觉SLAM的知识资源以及相关企业总结</h3><pre><code>先在这儿记录一下，SLAM涉及的太多了，现在接触的只是冰山一角。</code></pre><p>声名：我只是微信公众号<font color="red">计算机视觉life</font>的搬运工。 <bar> <bar> <bar></bar></bar></bar></p><h4 id="一slam知识库">一、SLAM知识库</h4><p><strong>1、SLAM框架/算法流程</strong></p><p><a href="img-Nb7dyKIQ-1586231125936"></a><img src="https://img-blog.csdnimg.cn/20200407114420210.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" width="50%"></p><p><strong>2、应掌握的数学知识</strong></p><ul><li><strong>矩阵</strong>：四则运算、求逆、反对称矩阵；矩阵分解（SVD、QR、Cholesky）。</li><li><strong>李群与李代数</strong>：指数对数映射；李代数求导；扰动模型。</li><li><strong>非线性优化</strong>：梯度下降；牛顿法；高斯牛顿法；LM算法；Bundle Adjustment。</li><li><strong>微积分</strong>：求(偏)导、泰勒展开等。</li></ul><p><strong>3、专业知识</strong> <br> - <strong>计算机视觉</strong> <br> 　<strong>①</strong> 传感器类型： <br> 　　　激光雷达 <br> 　　　视觉传感器：单目相机、双目相机、RGB-D相机、全景相机、Event相机。 <br> 　　　IMU (Inertial measurement unit，测量物体三轴姿态角及加速度的装置) <br> 　<strong>②</strong> 相机： <br> 　　　针孔相机模型、双目相机模型、RGB-D相机模型、相机标定、 去畸变。 <br> 　<strong>③</strong> 特征点 <br> 　　　特征点检测、特征点描述子、特征点匹配、特征点筛选。 <br> 　<strong>④</strong> 多视角几何 <br> 　　　对极约束、本质矩阵、单应矩阵、三角化。 <br>　　　 - <strong>书籍文献</strong> <br> 　《视觉SLAM十四讲》、《Multiple View Geometry》、《机器人状态估计》</p><p><strong>4、编程环境</strong></p><ul><li>Linux系统操作：推荐Ubuntu16.04 <br> 　　　　　　　　书《鸟哥的Linux私房菜》 　　　　　　　　</li><li>开发环境：Clion（JetBrains推出的C/C++跨平台集成开发环境） <br> 　　　　　　Kdevelop（免费的） 　　　　　　</li><li><p>编译工具：学习跨平台编译器cmake、电子书《Cmake Practice》</p></li><li>第三方库：Opencv(计算机视觉)、Eigen(几何变换)、Sophus(李代数)、Ceres(非线性优化)、G2o(图优化)、OpenGL(计算机图形学) 　　　　　　</li><li><p>文档编辑：Gedit、Vim、Nano</p></li></ul><p><strong>5、应用场景</strong></p><ul><li><p>自动驾驶：作为激光传感器的辅助（百度、腾讯、驭势、图森）</p></li><li><p>增强现实：手机、智能眼镜上结合IMU用于定位（微软、三星、华为、虹软、悉见）</p></li><li><p>机器人：无人机定位、建立地图（大疆）；服务机器人室内定位及导航（思岚）；工业机器人定位导航（阿里、京东AGV仓库运输）</p></li><li><p>三维重建：物体重建（3D打印、3D虚拟试衣）；大场景重建（虚拟全景漫游）</p></li></ul><p><strong>6、公开数据集</strong> <br> 　　TUM RGB-D SLAM Dataset、KITTI Vision Benchmark Suite、EuRoC MAV Dataset.</p><p><strong>7、典型开源方案</strong></p><ul><li>稀疏法：ORB-SLAM2（单目、双目、RGB-D）</li><li>半稠密法：LSD-SLAM（单目、双目、RGB-D）、DSO（单目）</li><li>稠密法：Elastic Fusion（RGB-D）、Bundle Fusion（RGB-D）、 　　　　　RGB-D SLAM V2（RGB-D）</li><li>多传感器融合：VINS（单目+IMU）、OKVIS（单目、双目、四目+IMU）</li></ul><h4 id="二slam学习资源总结">二、SLAM学习资源总结</h4><p><strong>1、公众号</strong> <br> 　　泡泡机器人SLAM、计算机视觉life、3D视觉工坊、小白学视觉、计算机视觉之路、AI算法修炼营、PCL点云。 　</p><p><strong>2、视频公开课</strong> <br> 　　① <a href="https://space.bilibili.com/38737757" target="_blank" rel="noopener">泡泡机器人公开课</a> <br> 　　② <a href="https://space.bilibili.com/45189691" target="_blank" rel="noopener">计算机视觉life SLAM研习社直播公开课</a> <br> 　　③ <a href="https://www.dis.uniroma1.it/~labrococo/tutorial_icra_2016/" target="_blank" rel="noopener">SLAM Totorial@ICRA 2016</a> <br> 　　④ <a href="https://www.coursera.org/specializations/robotics" target="_blank" rel="noopener">Robotics-UPenn on Coursera by Vijay Kumar(2016)</a> <br> 　　⑤ <a href="https://vision.in.tum.de/teaching/ss2016/mvg2016" target="_blank" rel="noopener">Computer Vision Ⅱ：Multiple View Geometry-TUM by Daniel Cremers (Spring 2016)</a> <br> 　　⑥ <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa15/" target="_blank" rel="noopener">Advanced Robotics-UCBerkeley by Pieter Abbeel (Fall 2015)</a> <br> 　　⑦ <a href="https://ylatif.github.io/movingsensors/" target="_blank" rel="noopener">The Problem of Mobile Sensors</a> <br></p><p><strong>3、主要研究方向</strong> <br> 　　视觉里程计：线特征；点线特征融合；点面特征融合；点线面多特征融合；多鱼眼VO；特征点发直接法结合；抗光照变化。 <br></p><p>　　语义SLAM：3D语义地图重定位；语义建图互相促进。 <br></p><p>　　多传感器融合：VIO（松耦合、紧耦合）；多传感器在线标定；camera，lidar融合定位；lidar，天花板摄像头融合；lidar，imu融合；TOF辅助双目密集匹配；事件相机SLAM；多机协同SLAM。 <br></p><p>优化方法：非线性增量优化；BA改进；离散连续图模型优化；边缘的约束图优化。 <br></p><p>　　三维重建：大尺度场景下的实时重建；RGBD室内稠密重建；地图数据关联；MVS；3D物体分类，提升重建质量；多子图融合。 <br></p><p>　　结合深度学习：基于深度学习的特征点；结合深度学习的深度估计；深度学习做闭环检测；深度学习估计关键帧深度。</p><p><strong>4、会议期刊</strong></p><ul><li><p>英文期刊 <br> ICRA（IEEE International Conference on Robotics and Automation） <br> IROS（IEEE International Conference on Intelligent Robots and Systems） <br> CVPR（IEEE International Conference on Computer Vision and Pattern Recognition） <br> RSS（Robotics：Science and Systems） <br> ECCV（European Conference on Computer Vision） <br> ISMAR（IEEE and ACM International Symposium on Mixed and Augmented Reality.IEEE） <br> JFR（Journal of Field Robotics） <br> IEEE Transactions on Robotics <br> ACRA（Australian Conference on Robotics and Automation） <br> ICARCV（International Conference on Cotrol，Automation，Robotics and Vision） <br> ISR（International Symposium on Robotics） <br> IEEE Transactions On Pattern Analysis And achine Intelligence <br></p></li><li><p>中文期刊 <br> 计算机辅助设计与图形学学报 <br> 机器人 <br> 计算机应用研究 <br> 中国科学：信息科学 <br></p></li></ul><p><strong>5、知名研究实验室</strong></p><ul><li><p>欧洲 <br> 苏黎世联邦理工学院的Autonomous System Lab <br> 苏黎世大学Robotics and Perception Group <br> 慕尼黑工业大学The Computer Vision Group <br> 英国伦敦大学帝国理工学院 Dyson 机器人实验室 <br> 英国牛津大学Active Vision Laboratory <br> 德国弗莱堡大学Autonomous Intelligent Systems <br> 西班牙萨拉戈萨大学SLAM实验室 <br></p></li><li><p>北美 <br> 麻省理工计算机科学与人工智能实验室（CSAIL）海洋机器人组 <br> 明尼苏达大学Multiple Autonomous Robotics Systems Laboratory <br> 宾夕法尼亚大学GRASP实验室 <br> 华盛顿大学UW Robotics and Estimation Lab <br> 哥伦比亚大学计算机视觉与机器人组 <br> 加拿大谢布鲁克大学IntRoLab <br> 斯坦福大学人工智能实验室自动驾驶团队 <br> 卡内基梅隆大学Robot Perception Lab <br> 特拉华大学Robot Perception and Navigation Group</p></li><li><p>亚洲 <br> 香港科技大学Aerial Robotics Group <br> 浙江大学CAD&amp;CG国家重点实验室Computer Vision Group <br> 清华大学自动化系宽带网络与数字媒体实验室BBNC <br> 中科院自动化研究所国家模式识别实验室Robot Vision Group <br> 上海交通大学感知与导航研究所 <br> 武汉大学Computer Vision &amp; Remote Sensing Lab <br> 日本先进工业科技研究所 <br> 筑波大学智能机器人研究室 <br> 新加坡南洋理工大学HESL实验室 <br> 韩国科学技术研究院 <br></p></li><li><p>澳洲 <br> 澳大利亚悉尼科技大数学CAS实验室 <br> 澳大利亚机器学习研究所机器人视觉中心 <br></p></li></ul><h4 id="三slam相关企业">三、SLAM相关企业</h4><p><strong>1、移动机器人</strong></p><ul><li><p>扫地机器人 <br> 科沃斯（苏州）、石头（北京）、追觅（上海）、银星智能（深圳）</p></li><li><p>服务机器人 <br> 优必选（深圳）、达闼（北京）、思岚（上海）、高仙（上海）、猎户星空（北京）、速感（北京）、普渡（深圳）、美团（北京）</p></li><li><p>仓储机器人 <br> 旷视（北京、上海）、京东（北京）、顺丰（深圳）、海康威视（杭州）、极智嘉（北京）</p></li></ul><p><strong>2、相机传感器</strong></p><ul><li><p>双目相机 <br> 小觅（无锡）、Indemind（北京）、爱观（上海）、中科慧眼（北京）</p></li><li><p>RGBD相机 <br> Intel（北京、上海）、奥比中光（深圳）、Pico（青岛、北京）、图漾（上海）、云从（重庆）</p></li><li><p>激光雷达 <br> 禾赛（上海）、镭神智能（深圳）、速腾聚创（深圳）</p></li><li><p>事件相机 <br> 芯仑（上海）</p></li></ul><p><strong>3、无人机</strong> <br> 　　大疆（深圳、上海）、亿航（广州）、臻迪（北京）</p><p><font color="red"><strong>4、智能驾驶</strong></font></p><ul><li><p>无人驾驶 <br> 百度（北京）、阿里菜鸟/达摩院（杭州）、腾讯（北京）、驭势（北京、上海）、momenta（北京）、滴滴（北京）、图森（北京）、飞步科技（杭州）、纽励科技（上海）、小马智行（广州）、Aptiv（上海）、文远知行（广州）</p></li><li><p>辅助驾驶 <br> 纵目科技（上海）、魔视智能（上海）、极目智能（武汉）、虹软（杭州）、商汤（北京）</p></li><li><p>芯片 <br> NVIDIA（上海）、地平线（北京、南京）</p></li><li><p>高精地图 <br> 高德（北京）、四维图新（北京）</p></li><li><p>汽车厂商 <br> 上汽研究院（上海）、蔚来汽车（上海）、小鹏汽车（广州）、宇通客车（郑州）</p></li></ul><p><strong>5、增强现实</strong></p><ul><li><p>智能眼镜 <br> 联想（上海）、视辰（上海）、肇观电子（上海）、悉见（北京）</p></li><li><p>手机 <br> 华为（上海）、虹软（杭州、上海）、商汤（杭州）、亮风台（上海）、今日头条（北京）</p></li></ul>]]></content>
-    
-    
-    <categories>
-      
-      <category>work</category>
-      
-      <category>SLAM</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>SLAM</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>总结经典深度学习网络（pytorch、tensorflow实现）</title>
     <link href="/2020/03/31/%E7%BB%93%E5%B8%B8%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%BB%9C/"/>
     <url>/2020/03/31/%E7%BB%93%E5%B8%B8%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%BB%9C/</url>
@@ -500,6 +444,33 @@
     <tags>
       
       <tag>深度学习网络</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>总结SLAM相关知识点资源库以及企业</title>
+    <link href="/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/"/>
+    <url>/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/</url>
+    
+    <content type="html"><![CDATA[<h3 id="视觉slam的知识资源以及相关企业总结">视觉SLAM的知识资源以及相关企业总结</h3><pre><code>先在这儿记录一下，SLAM涉及的太多了，现在接触的只是冰山一角。</code></pre><p>声名：我只是微信公众号<font color="red">计算机视觉life</font>的搬运工。 <bar> <bar> <bar></bar></bar></bar></p><h4 id="一slam知识库">一、SLAM知识库</h4><p><strong>1、SLAM框架/算法流程</strong></p><p><a href="img-Nb7dyKIQ-1586231125936"></a><img src="https://img-blog.csdnimg.cn/20200407114420210.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70#pic_center" srcset="/img/loading.gif" width="50%"></p><p><strong>2、应掌握的数学知识</strong></p><ul><li><strong>矩阵</strong>：四则运算、求逆、反对称矩阵；矩阵分解（SVD、QR、Cholesky）。</li><li><strong>李群与李代数</strong>：指数对数映射；李代数求导；扰动模型。</li><li><strong>非线性优化</strong>：梯度下降；牛顿法；高斯牛顿法；LM算法；Bundle Adjustment。</li><li><strong>微积分</strong>：求(偏)导、泰勒展开等。</li></ul><p><strong>3、专业知识</strong> <br> - <strong>计算机视觉</strong> <br> 　<strong>①</strong> 传感器类型： <br> 　　　激光雷达 <br> 　　　视觉传感器：单目相机、双目相机、RGB-D相机、全景相机、Event相机。 <br> 　　　IMU (Inertial measurement unit，测量物体三轴姿态角及加速度的装置) <br> 　<strong>②</strong> 相机： <br> 　　　针孔相机模型、双目相机模型、RGB-D相机模型、相机标定、 去畸变。 <br> 　<strong>③</strong> 特征点 <br> 　　　特征点检测、特征点描述子、特征点匹配、特征点筛选。 <br> 　<strong>④</strong> 多视角几何 <br> 　　　对极约束、本质矩阵、单应矩阵、三角化。 <br>　　　 - <strong>书籍文献</strong> <br> 　《视觉SLAM十四讲》、《Multiple View Geometry》、《机器人状态估计》</p><p><strong>4、编程环境</strong></p><ul><li>Linux系统操作：推荐Ubuntu16.04 <br> 　　　　　　　　书《鸟哥的Linux私房菜》 　　　　　　　　</li><li>开发环境：Clion（JetBrains推出的C/C++跨平台集成开发环境） <br> 　　　　　　Kdevelop（免费的） 　　　　　　</li><li><p>编译工具：学习跨平台编译器cmake、电子书《Cmake Practice》</p></li><li>第三方库：Opencv(计算机视觉)、Eigen(几何变换)、Sophus(李代数)、Ceres(非线性优化)、G2o(图优化)、OpenGL(计算机图形学) 　　　　　　</li><li><p>文档编辑：Gedit、Vim、Nano</p></li></ul><p><strong>5、应用场景</strong></p><ul><li><p>自动驾驶：作为激光传感器的辅助（百度、腾讯、驭势、图森）</p></li><li><p>增强现实：手机、智能眼镜上结合IMU用于定位（微软、三星、华为、虹软、悉见）</p></li><li><p>机器人：无人机定位、建立地图（大疆）；服务机器人室内定位及导航（思岚）；工业机器人定位导航（阿里、京东AGV仓库运输）</p></li><li><p>三维重建：物体重建（3D打印、3D虚拟试衣）；大场景重建（虚拟全景漫游）</p></li></ul><p><strong>6、公开数据集</strong> <br> 　　TUM RGB-D SLAM Dataset、KITTI Vision Benchmark Suite、EuRoC MAV Dataset.</p><p><strong>7、典型开源方案</strong></p><ul><li>稀疏法：ORB-SLAM2（单目、双目、RGB-D）</li><li>半稠密法：LSD-SLAM（单目、双目、RGB-D）、DSO（单目）</li><li>稠密法：Elastic Fusion（RGB-D）、Bundle Fusion（RGB-D）、 　　　　　RGB-D SLAM V2（RGB-D）</li><li>多传感器融合：VINS（单目+IMU）、OKVIS（单目、双目、四目+IMU）</li></ul><h4 id="二slam学习资源总结">二、SLAM学习资源总结</h4><p><strong>1、公众号</strong> <br> 　　泡泡机器人SLAM、计算机视觉life、3D视觉工坊、小白学视觉、计算机视觉之路、AI算法修炼营、PCL点云。 　</p><p><strong>2、视频公开课</strong> <br> 　　① <a href="https://space.bilibili.com/38737757" target="_blank" rel="noopener">泡泡机器人公开课</a> <br> 　　② <a href="https://space.bilibili.com/45189691" target="_blank" rel="noopener">计算机视觉life SLAM研习社直播公开课</a> <br> 　　③ <a href="https://www.dis.uniroma1.it/~labrococo/tutorial_icra_2016/" target="_blank" rel="noopener">SLAM Totorial@ICRA 2016</a> <br> 　　④ <a href="https://www.coursera.org/specializations/robotics" target="_blank" rel="noopener">Robotics-UPenn on Coursera by Vijay Kumar(2016)</a> <br> 　　⑤ <a href="https://vision.in.tum.de/teaching/ss2016/mvg2016" target="_blank" rel="noopener">Computer Vision Ⅱ：Multiple View Geometry-TUM by Daniel Cremers (Spring 2016)</a> <br> 　　⑥ <a href="https://people.eecs.berkeley.edu/~pabbeel/cs287-fa15/" target="_blank" rel="noopener">Advanced Robotics-UCBerkeley by Pieter Abbeel (Fall 2015)</a> <br> 　　⑦ <a href="https://ylatif.github.io/movingsensors/" target="_blank" rel="noopener">The Problem of Mobile Sensors</a> <br></p><p><strong>3、主要研究方向</strong> <br> 　　视觉里程计：线特征；点线特征融合；点面特征融合；点线面多特征融合；多鱼眼VO；特征点发直接法结合；抗光照变化。 <br></p><p>　　语义SLAM：3D语义地图重定位；语义建图互相促进。 <br></p><p>　　多传感器融合：VIO（松耦合、紧耦合）；多传感器在线标定；camera，lidar融合定位；lidar，天花板摄像头融合；lidar，imu融合；TOF辅助双目密集匹配；事件相机SLAM；多机协同SLAM。 <br></p><p>优化方法：非线性增量优化；BA改进；离散连续图模型优化；边缘的约束图优化。 <br></p><p>　　三维重建：大尺度场景下的实时重建；RGBD室内稠密重建；地图数据关联；MVS；3D物体分类，提升重建质量；多子图融合。 <br></p><p>　　结合深度学习：基于深度学习的特征点；结合深度学习的深度估计；深度学习做闭环检测；深度学习估计关键帧深度。</p><p><strong>4、会议期刊</strong></p><ul><li><p>英文期刊 <br> ICRA（IEEE International Conference on Robotics and Automation） <br> IROS（IEEE International Conference on Intelligent Robots and Systems） <br> CVPR（IEEE International Conference on Computer Vision and Pattern Recognition） <br> RSS（Robotics：Science and Systems） <br> ECCV（European Conference on Computer Vision） <br> ISMAR（IEEE and ACM International Symposium on Mixed and Augmented Reality.IEEE） <br> JFR（Journal of Field Robotics） <br> IEEE Transactions on Robotics <br> ACRA（Australian Conference on Robotics and Automation） <br> ICARCV（International Conference on Cotrol，Automation，Robotics and Vision） <br> ISR（International Symposium on Robotics） <br> IEEE Transactions On Pattern Analysis And achine Intelligence <br></p></li><li><p>中文期刊 <br> 计算机辅助设计与图形学学报 <br> 机器人 <br> 计算机应用研究 <br> 中国科学：信息科学 <br></p></li></ul><p><strong>5、知名研究实验室</strong></p><ul><li><p>欧洲 <br> 苏黎世联邦理工学院的Autonomous System Lab <br> 苏黎世大学Robotics and Perception Group <br> 慕尼黑工业大学The Computer Vision Group <br> 英国伦敦大学帝国理工学院 Dyson 机器人实验室 <br> 英国牛津大学Active Vision Laboratory <br> 德国弗莱堡大学Autonomous Intelligent Systems <br> 西班牙萨拉戈萨大学SLAM实验室 <br></p></li><li><p>北美 <br> 麻省理工计算机科学与人工智能实验室（CSAIL）海洋机器人组 <br> 明尼苏达大学Multiple Autonomous Robotics Systems Laboratory <br> 宾夕法尼亚大学GRASP实验室 <br> 华盛顿大学UW Robotics and Estimation Lab <br> 哥伦比亚大学计算机视觉与机器人组 <br> 加拿大谢布鲁克大学IntRoLab <br> 斯坦福大学人工智能实验室自动驾驶团队 <br> 卡内基梅隆大学Robot Perception Lab <br> 特拉华大学Robot Perception and Navigation Group</p></li><li><p>亚洲 <br> 香港科技大学Aerial Robotics Group <br> 浙江大学CAD&amp;CG国家重点实验室Computer Vision Group <br> 清华大学自动化系宽带网络与数字媒体实验室BBNC <br> 中科院自动化研究所国家模式识别实验室Robot Vision Group <br> 上海交通大学感知与导航研究所 <br> 武汉大学Computer Vision &amp; Remote Sensing Lab <br> 日本先进工业科技研究所 <br> 筑波大学智能机器人研究室 <br> 新加坡南洋理工大学HESL实验室 <br> 韩国科学技术研究院 <br></p></li><li><p>澳洲 <br> 澳大利亚悉尼科技大数学CAS实验室 <br> 澳大利亚机器学习研究所机器人视觉中心 <br></p></li></ul><h4 id="三slam相关企业">三、SLAM相关企业</h4><p><strong>1、移动机器人</strong></p><ul><li><p>扫地机器人 <br> 科沃斯（苏州）、石头（北京）、追觅（上海）、银星智能（深圳）</p></li><li><p>服务机器人 <br> 优必选（深圳）、达闼（北京）、思岚（上海）、高仙（上海）、猎户星空（北京）、速感（北京）、普渡（深圳）、美团（北京）</p></li><li><p>仓储机器人 <br> 旷视（北京、上海）、京东（北京）、顺丰（深圳）、海康威视（杭州）、极智嘉（北京）</p></li></ul><p><strong>2、相机传感器</strong></p><ul><li><p>双目相机 <br> 小觅（无锡）、Indemind（北京）、爱观（上海）、中科慧眼（北京）</p></li><li><p>RGBD相机 <br> Intel（北京、上海）、奥比中光（深圳）、Pico（青岛、北京）、图漾（上海）、云从（重庆）</p></li><li><p>激光雷达 <br> 禾赛（上海）、镭神智能（深圳）、速腾聚创（深圳）</p></li><li><p>事件相机 <br> 芯仑（上海）</p></li></ul><p><strong>3、无人机</strong> <br> 　　大疆（深圳、上海）、亿航（广州）、臻迪（北京）</p><p><font color="red"><strong>4、智能驾驶</strong></font></p><ul><li><p>无人驾驶 <br> 百度（北京）、阿里菜鸟/达摩院（杭州）、腾讯（北京）、驭势（北京、上海）、momenta（北京）、滴滴（北京）、图森（北京）、飞步科技（杭州）、纽励科技（上海）、小马智行（广州）、Aptiv（上海）、文远知行（广州）</p></li><li><p>辅助驾驶 <br> 纵目科技（上海）、魔视智能（上海）、极目智能（武汉）、虹软（杭州）、商汤（北京）</p></li><li><p>芯片 <br> NVIDIA（上海）、地平线（北京、南京）</p></li><li><p>高精地图 <br> 高德（北京）、四维图新（北京）</p></li><li><p>汽车厂商 <br> 上汽研究院（上海）、蔚来汽车（上海）、小鹏汽车（广州）、宇通客车（郑州）</p></li></ul><p><strong>5、增强现实</strong></p><ul><li><p>智能眼镜 <br> 联想（上海）、视辰（上海）、肇观电子（上海）、悉见（北京）</p></li><li><p>手机 <br> 华为（上海）、虹软（杭州、上海）、商汤（杭州）、亮风台（上海）、今日头条（北京）</p></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>work</category>
+      
+      <category>SLAM</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>SLAM</tag>
       
     </tags>
     
