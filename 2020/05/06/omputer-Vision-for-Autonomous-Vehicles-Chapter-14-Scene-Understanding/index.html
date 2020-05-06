@@ -17,7 +17,7 @@
   <meta name="description" content="记录生活">
   <meta name="author" content="kiki">
   <meta name="keywords" content="CV">
-  <title>视觉SLAM十四讲 第四章 - KK&#39;s Blog</title>
+  <title>Computer Vision for Autonomous Vehicles | Chapter 14 Scene Understanding - KK&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
 <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
@@ -140,7 +140,7 @@
               
                 <p class="mt-3 post-meta">
                   <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期三, 四月 29日 2020, 5:35 下午
+                  星期三, 五月 6日 2020, 10:06 上午
                 </p>
               
 
@@ -149,7 +149,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    12 字
+                    1.1k 字
                   </span>
                 
 
@@ -157,7 +157,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      1 分钟
+                      3 分钟
                   </span>
                 
 
@@ -185,35 +185,26 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="视觉slam十四讲">视觉SLAM十四讲</h2>
-<p>作者： 高翔 | 张涛</p>
+              <h2 id="computer-vision-for-autonomous-vehicles-problems-datasets-and-state-of-the-art">《Computer Vision for Autonomous Vehicles Problems, Datasets and State of the Art》</h2>
+<p>Author：Joel Janai, Fatma Guney, Aseem Behl, Andreas Geiger Date：December 18, 2019</p>
+<h3 id="chapter-14-scene-understanding">Chapter 14 Scene Understanding</h3>
+<h4 id="problem-definition">14.1 Problem Definition</h4>
+<p>　　在室外场景理解中的任务一般有深度估计、场景分类、目标检测和跟踪，以及事件分类等，这些人物都是场景的一个特定的方面，所以为了对场景更全面的理解，同时获取到这些任务中的互补的场景线索（布局、交通参与者以及它们之间的关系）是有益的。3D 场景比 2D 场景更容易进行几何场景的理解，其结果可以得到 3D 物体模型、布局以及遮挡关系，所以这一章节关注自动驾驶任务中 3D 场景理解的技术，包括场景图估计和图像标注即道路存在可变性，并且模糊的视觉特征、遮挡，和挑战性的照明条件也是难点。</p>
+<h4 id="methods">14.2 Methods</h4>
+<p>　　场景理解的方法分为传统和现代的方法。早期的方法主要从不一样的视角来处理这个问题，大多数方法依赖于启发法而不是学习，并且不能推广到复杂的现实场景；现在的方法主要是从数据中学习复杂的关系。</p>
+<h5 id="road-topology-and-traﬃc-participants">14.2.1 Road Topology and Traﬃc Participants</h5>
+<p>　　现有的方法有：第一，用语义分割作为中间的表示来获取道路拓扑，并且检测十字路口和其他的交通对象，语义分割同时还对空间布局进行了编码；第二，用基于线性运动模型的时间滤波器检测和跟踪车辆，还估计相机的运动，并使用动态条件随机场（CRF）模型的对象和场景类的联合标签传播到下一帧，但是这个只用到了拓扑模型而没用到几何模型。 　　基于以上的不足，就有人提出利用几何模型的方法：首先是对上面第一个方法的改进，扩展为包含多类目标检测、目标跟踪、场景标记和几何关系推理的概率型三维场景模型；另一个团队推导了十字路口的三维场景布局以及车辆在场景中的位置和方向，他们提出了一个概率生成模型，通过利用车辆轨迹、语义标签、场景和占据网格来捕捉场景的拓扑、几何和交通活动。 　　除了基于 3D 原始的表示外，还有其他的方法来表示街景。比如 Topfer 等人提出了一种更细粒度的道路模型，将复杂的道路场景分层分解为道路、车道、道路边缘和车道标记，这样可以得到更有表现力的道路模型；Steff 和 Xiao 定义了道路布局属性列表，如车道数、可行驶方向、到十字路口的距离等。</p>
+<h5 id="physical-and-temporal-relationships">14.2.2 Physical and Temporal Relationships</h5>
+<p>　　场景理解系统旨在将目标检测和跟踪与物理约束相结合，并对交通参与者和场景之间的时间行为和关系建模。Pellegrini 等人采用多目标跟踪公式对行人(社会行为)与场景(碰撞)之间的交互作用进行了建模；Kuettel 等通过学习复杂动态场景中移动代理之间的协同活动和时间规则，对移动代理的时空依赖性进行建模，然而这两种方法都假设有一个静态观察者和一个很长的观察周期，即在作出决定之前，必须观察相当长的一段时间，因此它不适用于自治系统。 　　有人在上述缺陷上，考虑一个移动的车辆作为观察者，通过对遮挡和交通模式的推理来构建三维场景模型。</p>
+<h4 id="discussion">14.3 Discussion</h4>
+<p>　　场景理解从早期的工作到基于学习的更具表现力的理解方法，经历了从简单的 2D 表示道路拓扑和对象的方法，到更加复杂的包含物理和时间约束的 3D 模型。然而，自动驾驶所需的表达能力水平仍然是一个开放的问题，而通过最先进的场景理解模型实现的准确性仍然有限。此外，由于模型的复杂性和它们所处理的挑战不同，很难对场景理解方法进行统一的评估。</p>
+<p>　</p>
 
             </div>
             <hr>
             <div>
               <p>
                 
-                  <span>
-                <i class="iconfont icon-inbox"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/work/">work</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/work/%E8%A7%86%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/">视觉SLAM十四讲</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/work/%E8%A7%86%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2/%E7%AC%AC%E5%9B%9B%E7%AB%A0/">第四章</a>
-                      &nbsp;
-                    
-                  </span>&nbsp;&nbsp;
-                
-                
-                  <span>
-                <i class="iconfont icon-tag"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/%E8%A7%86%E8%A7%89SLAM/">视觉SLAM</a>
-                    
-                  </span>
                 
               </p>
               
@@ -224,18 +215,12 @@
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/04/29/SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E5%85%AD%E7%AB%A0/">
-                        <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">视觉SLAM十四讲 第六章</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/04/29/%E8%A7%89SLAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E4%BA%94%E7%AB%A0/">
-                        <span class="hidden-mobile">视觉SLAM十四讲 第五章</span>
+                      <a href="/2020/05/04/%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E8%AE%BA%E6%96%87%E8%AF%A5%E6%80%8E%E4%B9%88%E8%AF%BB%EF%BC%9F/">
+                        <span class="hidden-mobile">计算机视觉论文该怎么读？</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="fa fa-chevron-right"></i>
                       </a>
@@ -420,7 +405,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "视觉SLAM十四讲 第四章&nbsp;",
+        "Computer Vision for Autonomous Vehicles | Chapter 14 Scene Understanding&nbsp;",
       ],
       cursorChar: "|",
       typeSpeed: 80,
@@ -477,37 +462,6 @@
   </script>
 
 
-
-  
-
-  
-    <!-- MathJax -->
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-          tex2jax: {
-              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-              processEscapes: true,
-              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-          }
-      });
-      MathJax.Hub.Register.StartupHook("End Jax",function () {
-        var BROWSER = MathJax.Hub.Browser;
-        var jax = "HTML-CSS";
-        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
-        return MathJax.Hub.setRenderer(jax);
-      });
-      MathJax.Hub.Queue(function() {
-          var all = MathJax.Hub.getAllJax(), i;
-          for(i=0; i < all.length; i += 1) {
-              all[i].SourceElement().parentNode.className += ' has-jax';
-          }
-      });
-
-    </script>
-
-    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
-
-  
 
 
 

@@ -149,7 +149,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    3.8k 字
+                    3.9k 字
                   </span>
                 
 
@@ -185,91 +185,46 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h3 id="图像处理中的Attention-Mechanism">图像处理中的Attention Mechanism</h3>
-<pre><code>摘要：关于在图像处理任务(图像分类、超分辨率、图像描述、图像分割等)中添加注意力机制的问题，计算机视觉（computer vision）中的注意力机制（attention）就是想让系统学会注意重点信息。
-</code></pre>
+              <h3 id="图像处理中的attention-mechanism">图像处理中的Attention Mechanism</h3>
+<pre><code>摘要：关于在图像处理任务(图像分类、超分辨率、图像描述、图像分割等)中添加注意力机制的问题，计算机视觉（computer vision）中的注意力机制（attention）就是想让系统学会注意重点信息。</code></pre>
 <p>参考博客：<a href="https://blog.csdn.net/xys430381_1/article/details/89323444" target="_blank" rel="noopener">blog1</a>总结的很好，<a href="https://blog.csdn.net/bvl10101111/article/details/78470716" target="_blank" rel="noopener">blog2</a>给了添加注意力的基本套路，<a href="https://blog.csdn.net/Wayne2019/article/details/78488142" target="_blank" rel="noopener">blog3</a>也可以看看。</p>
 <p>参考文献：《Spatial transformer networks》、《Squeeze and Excitation Networks》、《CBAM: Convolutional Block Attention Module》</p>
-<h4 id="一、图像处理的注意力机制基本概念">一、图像处理的注意力机制基本概念</h4>
-<p>通常举的例子来讲，有一幅图：一只鸟儿翱翔在天空。如果要对这幅图进行鸟类的分类识别任务，人眼去看可能就关注这只鸟是什么鸟，神经网络去做这个任务就要提取特征然后再分类，他对于这幅图中像素点的处理都是一样的，不会像人眼一样专门关注鸟儿，所以神经网络需要我们告知它重点关注哪部分，这就是注意力机制。 <br><br>
-　　现在的深度学习与视觉注意力机制结合的研究工作，大多数是集中于使用<font color="red">掩码(mask)</font>来形成注意力机制。(<strong>掩码的原理</strong>就是：根据掩码矩阵（也称作核）重新计算图像中每个像素的值。掩码矩阵中的值表示一层新的权重，将图片数据中关键的特征标识出来，通过学习训练，让深度神经网络学到每一张新图片中需要关注的区域，也就形成了注意力。)</p>
-<h4 id="二、注意力机制分类">二、注意力机制分类</h4>
-<p><font color="navy">▲ <strong>按注意力的可微性来分</strong></font><br>
-<font color="navy"><strong>1、软注意力 (soft attention)</strong></font> <br><br>
-　　每个区域被关注的程度高低，用0~1的score表示。软注意力的关键点在于，这种注意力更关注区域或者通道，而且软注意力是确定性的注意力，学习完成后直接可以通过网络生成，最关键的地方是软注意力是可微的。可以微分的注意力就可以通过神经网络算出梯度并且前向传播和后向反馈来学习得到注意力的权重。软注意力的注意力域可以分为：空间域 (spatial domain)、通道域(channel domain)、层域(layer domain)、混合域(mixed domain)。</p>
-<p><strong>① 空间域</strong>： <br><br>
-　　从文章<font color="maroon"><strong>《Spatial transformer networks》</strong></font>来了解空间注意力机制，其中的spatial transformer就起到了空间注意力机制的作用，不仅可以选择空间中最关注（注意力集中）的区域，还可以将这些区域转换为规范的、预期的姿态（Spatial transformer具有旋转、缩放变换的功能，这样图片局部的重要信息能够通过变换而被框盒提取出来），从而简化以下层的识别。下面说说这篇文章：</p>
+<h4 id="一图像处理的注意力机制基本概念">一、图像处理的注意力机制基本概念</h4>
+<p>　　通常举的例子来讲，有一幅图：一只鸟儿翱翔在天空。如果要对这幅图进行鸟类的分类识别任务，人眼去看可能就关注这只鸟是什么鸟，神经网络去做这个任务就要提取特征然后再分类，他对于这幅图中像素点的处理都是一样的，不会像人眼一样专门关注鸟儿，所以神经网络需要我们告知它重点关注哪部分，这就是注意力机制。 <br> 　　现在的深度学习与视觉注意力机制结合的研究工作，大多数是集中于使用<font color="red">掩码(mask)</font>来形成注意力机制。(<strong>掩码的原理</strong>就是：根据掩码矩阵（也称作核）重新计算图像中每个像素的值。掩码矩阵中的值表示一层新的权重，将图片数据中关键的特征标识出来，通过学习训练，让深度神经网络学到每一张新图片中需要关注的区域，也就形成了注意力。)</p>
+<h4 id="二注意力机制分类">二、注意力机制分类</h4>
+<p><font color="navy">▲ <strong>按注意力的可微性来分</strong></font> <font color="navy"><strong>1、软注意力 (soft attention)</strong></font> <br> 　　每个区域被关注的程度高低，用0~1的score表示。软注意力的关键点在于，这种注意力更关注区域或者通道，而且软注意力是确定性的注意力，学习完成后直接可以通过网络生成，最关键的地方是软注意力是可微的。可以微分的注意力就可以通过神经网络算出梯度并且前向传播和后向反馈来学习得到注意力的权重。软注意力的注意力域可以分为：空间域 (spatial domain)、通道域(channel domain)、层域(layer domain)、混合域(mixed domain)。</p>
+<p><strong>① 空间域</strong>： <br> 　　从文章<font color="maroon"><strong>《Spatial transformer networks》</strong></font>来了解空间注意力机制，其中的spatial transformer就起到了空间注意力机制的作用，不仅可以选择空间中最关注（注意力集中）的区域，还可以将这些区域转换为规范的、预期的姿态（Spatial transformer具有旋转、缩放变换的功能，这样图片局部的重要信息能够通过变换而被框盒提取出来），从而简化以下层的识别。下面说说这篇文章：</p>
 <ul>
-<li>
-<p><font color="teal"><strong>文章的思路及其好处</strong></font>：在CNNs中只有有限的（小空间的）、预先定义好的池化机制（max pooling 或者average pooling 的方法）来处理数据空间排列的变化，将图片信息压缩以减少运算量提升准确率，但这样导致了空间不变性只在较深的网络层中存在，而在输入数据变换较大时实际上不存在这种不变性。这篇文章中的空间转换模块优点：一个spatial transformer可以将适当的区域裁剪和缩放标准化，这样可以简化后续的分类任务，并获得更好的分类性能；给定一组包含相同（但未知）类的不同实例的图像，可以使用spatial transformer在每个图像中框选它们；利用spatial transformer（注意力）的好处在于，低分辨率的输入可以转换为高分辨率的原始输入，从而提高计算效率。</p>
-</li>
-<li>
-<p><font color="teal"><strong>模型构架</strong></font>：spatial transformer可以放在任意网络中，并且计算速度快，其构架如下图：<br>
-<img src="https://img-blog.csdnimg.cn/20200411231633386.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="100%"><br>
-空间转换模块(注意力机制模块)有三个组成部分：</p>
-<p><strong>Localisation Network</strong> —— 为了便于计算，首先用一个定位网络(Localisation Network) 获取输入的特征图$U∈R^{H×W×C}$，并通过若干隐藏层输出应用于特征图的空间变换参数$θ=floc(U)$。本地化网络函数$floc()$可以采用任何形式，例如完全连接的网络或卷积网络，但应包括最终回归层，以生成转换参数$θ$。</p>
-<p><strong>Grid generator</strong>—— 使用变换参数$θ$生成一个采样网格 (即变换矩阵$T_θ(G)$)，该网格是一组对输入映射进行采样从而产生变换后的输出点，这是由Grid generator完成的。下图是文章的一个例子：<br>
-　　　　 <img src="https://img-blog.csdnimg.cn/20200412091624329.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="80%"><br>
-其中，(a)中的采样矩阵是单位矩阵，不做任何变换，其中I是恒等变换参数。(b)中的矩阵是可以产生缩放旋转变换$T_θ(G)$的采样矩阵。</p>
-<p><strong>Sampler</strong>—— 最后，将原始特征图 U 和变换器作为采样器的输入，生成最后的特征图V，其中 V 的像素点是输入 U 经由上一阶段的采样网格作用的结果。现假设这个变换是2D的情况 (假设$T_θ=A_θ$)，变换公式如下：<br>
-$$ \left(\begin{array}{c}x_i^s \y_i^s\end{array}\right) =T_θ(G_i)=A_θ\left(\begin{array}{c}x_i^t \y_i^t\1\end{array}\right) =\left[\begin{array}{ccc}θ_{11}&amp;θ_{12}&amp;θ_{13}\θ_{21}&amp;θ_{22}&amp;θ_{23}\end{array}\right] \left(\begin{array}{c}x_i^t \y_i^t\1\end{array}\right)$$ 公式中$(x_i^t ，y_i<sup>t)$是输出特征图的常规网格的目标坐标，$(x_i</sup>s，y_i^s)$是输入特征图中定义采样点的源坐标，$A_θ$是仿射变换矩阵。宽度和高度坐标均为归一化的。当然，也有定义3D情况下的变换，允许裁剪、平移、旋转和缩放。这个模块加进去最大的好处就是能够对上一层信号的关键信息进行识别(即添加attention)。</p>
-</li>
-<li>
-<p><font color="teal"><strong>结果讨论</strong></font>：由于文章的方法对通道信息没有特别的处理变换，所以这种变换更适合用在添加卷积层之前的变换，因为每一个卷积核(filter)在卷积操作以后都会产生的通道信息，而且它们含有的信息以及信息的关注程度是不一样的。所以有了第二种注意域的机制——通道域。</p>
-</li>
+<li><p><font color="teal"><strong>文章的思路及其好处</strong></font>：在CNNs中只有有限的（小空间的）、预先定义好的池化机制（max pooling 或者average pooling 的方法）来处理数据空间排列的变化，将图片信息压缩以减少运算量提升准确率，但这样导致了空间不变性只在较深的网络层中存在，而在输入数据变换较大时实际上不存在这种不变性。这篇文章中的空间转换模块优点：一个spatial transformer可以将适当的区域裁剪和缩放标准化，这样可以简化后续的分类任务，并获得更好的分类性能；给定一组包含相同（但未知）类的不同实例的图像，可以使用spatial transformer在每个图像中框选它们；利用spatial transformer（注意力）的好处在于，低分辨率的输入可以转换为高分辨率的原始输入，从而提高计算效率。</p></li>
+<li><p><font color="teal"><strong>模型构架</strong></font>：spatial transformer可以放在任意网络中，并且计算速度快，其构架如下图： <img src="https://img-blog.csdnimg.cn/20200411231633386.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="100%"> 空间转换模块(注意力机制模块)有三个组成部分：</p>
+<p><strong>Localisation Network</strong> —— 为了便于计算，首先用一个定位网络(Localisation Network) 获取输入的特征图<span class="math inline">\(U∈R^{H×W×C}\)</span>，并通过若干隐藏层输出应用于特征图的空间变换参数<span class="math inline">\(θ=floc(U)\)</span>。本地化网络函数<span class="math inline">\(floc()\)</span>可以采用任何形式，例如完全连接的网络或卷积网络，但应包括最终回归层，以生成转换参数<span class="math inline">\(θ\)</span>。</p>
+<p><strong>Grid generator</strong>—— 使用变换参数<span class="math inline">\(θ\)</span>生成一个采样网格 (即变换矩阵<span class="math inline">\(T_θ(G)\)</span>)，该网格是一组对输入映射进行采样从而产生变换后的输出点，这是由Grid generator完成的。下图是文章的一个例子： 　　　　 <img src="https://img-blog.csdnimg.cn/20200412091624329.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="80%"> 其中，(a)中的采样矩阵是单位矩阵，不做任何变换，其中I是恒等变换参数。(b)中的矩阵是可以产生缩放旋转变换<span class="math inline">\(T_θ(G)\)</span>的采样矩阵。</p>
+<p><strong>Sampler</strong>—— 最后，将原始特征图 U 和变换器作为采样器的输入，生成最后的特征图V，其中 V 的像素点是输入 U 经由上一阶段的采样网格作用的结果。现假设这个变换是2D的情况 (假设<span class="math inline">\(T_θ=A_θ\)</span>)，变换公式如下： <span class="math display">\[ \left(\begin{array}{c}x_i^s \\y_i^s\end{array}\right) =T_θ(G_i)=A_θ\left(\begin{array}{c}x_i^t \\y_i^t\\1\end{array}\right) =\left[\begin{array}{ccc}θ_{11}&amp;θ_{12}&amp;θ_{13}\\θ_{21}&amp;θ_{22}&amp;θ_{23}\end{array}\right] \left(\begin{array}{c}x_i^t \\y_i^t\\1\end{array}\right)\]</span> 公式中<span class="math inline">\((x_i^t ，y_i^t)\)</span>是输出特征图的常规网格的目标坐标，<span class="math inline">\((x_i^s，y_i^s)\)</span>是输入特征图中定义采样点的源坐标，<span class="math inline">\(A_θ\)</span>是仿射变换矩阵。宽度和高度坐标均为归一化的。当然，也有定义3D情况下的变换，允许裁剪、平移、旋转和缩放。这个模块加进去最大的好处就是能够对上一层信号的关键信息进行识别(即添加attention)。</p></li>
+<li><p><font color="teal"><strong>结果讨论</strong></font>：由于文章的方法对通道信息没有特别的处理变换，所以这种变换更适合用在添加卷积层之前的变换，因为每一个卷积核(filter)在卷积操作以后都会产生的通道信息，而且它们含有的信息以及信息的关注程度是不一样的。所以有了第二种注意域的机制——通道域。</p></li>
 </ul>
-<p><strong>② 通道域</strong>： <br><br>
-　　从文章<font color="maroon"><strong>《Squeeze and Excitation Networks》</strong></font>来了解通道注意力机制。计算机视觉任务中，捕获特征的空间相关性可以提升CNNs的性能，以上有了空间注意力，这篇文章就研究了网络设计的不同方面，即添加通道注意力。</p>
+<p><strong>② 通道域</strong>： <br> 　　从文章<font color="maroon"><strong>《Squeeze and Excitation Networks》</strong></font>来了解通道注意力机制。计算机视觉任务中，捕获特征的空间相关性可以提升CNNs的性能，以上有了空间注意力，这篇文章就研究了网络设计的不同方面，即添加通道注意力。</p>
 <ul>
-<li>
-<p><font color="teal"><strong>文章的思路及其好处</strong></font>：文章引入了一种新的架构单元 Squeeze-and-Excitation (SE) block，其目的是通过利用卷积特征之间的相互依赖关系来提高网络的质量。文中提出了一种机制，允许网络执行特征重新校准，通过这种机制，网络可以学习使用全局信息来选择性地强调信息特征和抑制不太有用的特征。</p>
-</li>
-<li>
-<p><font color="teal"><strong>模型构架</strong></font>：多个这种SE block聚合在一起就构成了SENet。文章所提到的SE blok构架如下图所示：<br>
-<img src="https://img-blog.csdnimg.cn/20200412131746928.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="-"><br>
-对于任何给定的变换$F_{tr}$ (例后边将其当作如卷积)，将输入X变换到$U∈R^{H×W×C}$，可以构造相应的SE block来执行特征重新校准。重先对一些符号做提前声明：$V=[v_1,v_2,…,v_c]$表示变换$F_{tr}$的一系列卷积核，$v_c$表示第 c 个卷积的参数；卷积之后的输出$U=[u_1,u_2,…,u_c]$，其中$u_c=v_c*X$，需注意具体过程是vc的一个单通道 (二维空间核$v_c^s$) 作用于x的对应通道 ($x^s$) 上，为了简化表示省略了偏置项。校准的三个过程过程就是通道注意力机制的过程：</p>
-<p><strong>挤压(squeeze， Global Information Embedding)</strong> —— 由于卷积操作只是局部感受野，最终输出的特征图的每个小单元不能用来探索除开这个小区域以外的联系特征，所以该方法首先将特征 U 通过挤压操作传递，挤压操作通过压缩其空间维度（H×W）上的特征来生成通道描述符。基于通道的特征量$z∈R^c$，其第 c 个量计算方式如下：<br>
-　　　　　　　　　<img src="https://img-blog.csdnimg.cn/20200412151403621.png" srcset="/img/loading.gif" width="50%"><br>
-其实这里就是全局平均池化操作。</p>
-<p><strong>激励(excitation )</strong> —— 聚合之后是一个激励操作，其目的是捕获通道依赖关系，为满足条件，文章用到的机制函数如下：$$s=F_{ex}(z,W)=\sigma(g(z,W))=\sigma(W_2\delta(W_1z))$$其中的$\sigma$表示ReLU函数，$\delta$是sigmoid函数，用于生成channel 间0~1的 attention weights（注意力权重用于激励每一层通道，权重通过学习生成）。为简化模型，在非线性前接了一个两层全连接FC的botteneck (一个降维层压缩 channel 数)，然后再是ReLU和升维层重构回 channel 数。</p>
-<p><strong>缩放(scale)</strong> —— block的最终输出是通过激活s重新缩放 U 来获得的，其公式如下：$$\tilde{x}=F_{scale}(u_c,s_c)=s_cu_c$$其中$\tilde{X}=[\tilde{x_1},\tilde{x_2},…,\tilde{x_c}]$，$F_{scale}(u_c,s_c)$表$s_c$与H×W维度上的特征图$u_c$的乘积，不同通道的值乘上不同的权重，从而可以增强对关键通道域的注意力。</p>
-</li>
-<li>
-<p><font color="teal"><strong>结果讨论</strong></font>：通道域的注意力是对一个通道内的信息直接全局平均池化，而忽略每一个通道内的局部信息，这种做法其实也是比较简单粗暴。所以结合两种思路，就可以设计出混合域的注意力机制模型。</p>
-</li>
+<li><p><font color="teal"><strong>文章的思路及其好处</strong></font>：文章引入了一种新的架构单元 Squeeze-and-Excitation (SE) block，其目的是通过利用卷积特征之间的相互依赖关系来提高网络的质量。文中提出了一种机制，允许网络执行特征重新校准，通过这种机制，网络可以学习使用全局信息来选择性地强调信息特征和抑制不太有用的特征。</p></li>
+<li><p><font color="teal"><strong>模型构架</strong></font>：多个这种SE block聚合在一起就构成了SENet。文章所提到的SE blok构架如下图所示： <img src="https://img-blog.csdnimg.cn/20200412131746928.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="-"> 对于任何给定的变换<span class="math inline">\(F_{tr}\)</span> (例后边将其当作如卷积)，将输入X变换到<span class="math inline">\(U∈R^{H×W×C}\)</span>，可以构造相应的SE block来执行特征重新校准。重先对一些符号做提前声明：<span class="math inline">\(V=[v_1,v_2,...,v_c]\)</span>表示变换<span class="math inline">\(F_{tr}\)</span>的一系列卷积核，<span class="math inline">\(v_c\)</span>表示第 c 个卷积的参数；卷积之后的输出<span class="math inline">\(U=[u_1,u_2,...,u_c]\)</span>，其中<span class="math inline">\(u_c=v_c*X\)</span>，需注意具体过程是vc的一个单通道 (二维空间核<span class="math inline">\(v_c^s\)</span>) 作用于x的对应通道 (<span class="math inline">\(x^s\)</span>) 上，为了简化表示省略了偏置项。校准的三个过程过程就是通道注意力机制的过程：</p>
+<p><strong>挤压(squeeze， Global Information Embedding)</strong> —— 由于卷积操作只是局部感受野，最终输出的特征图的每个小单元不能用来探索除开这个小区域以外的联系特征，所以该方法首先将特征 U 通过挤压操作传递，挤压操作通过压缩其空间维度（H×W）上的特征来生成通道描述符。基于通道的特征量<span class="math inline">\(z∈R^c\)</span>，其第 c 个量计算方式如下： 　　　　　　　　　<img src="https://img-blog.csdnimg.cn/20200412151403621.png" srcset="/img/loading.gif" width="50%"> 其实这里就是全局平均池化操作。</p>
+<p><strong>激励(excitation )</strong> —— 聚合之后是一个激励操作，其目的是捕获通道依赖关系，为满足条件，文章用到的机制函数如下：<span class="math display">\[s=F_{ex}(z,W)=\sigma(g(z,W))=\sigma(W_2\delta(W_1z))\]</span>其中的<span class="math inline">\(\sigma\)</span>表示ReLU函数，<span class="math inline">\(\delta\)</span>是sigmoid函数，用于生成channel 间0~1的 attention weights（注意力权重用于激励每一层通道，权重通过学习生成）。为简化模型，在非线性前接了一个两层全连接FC的botteneck (一个降维层压缩 channel 数)，然后再是ReLU和升维层重构回 channel 数。</p>
+<strong>缩放(scale)</strong> —— block的最终输出是通过激活s重新缩放 U 来获得的，其公式如下：<span class="math display">\[\tilde{x}=F_{scale}(u_c,s_c)=s_cu_c\]</span>其中<span class="math inline">\(\tilde{X}=[\tilde{x_1},\tilde{x_2},...,\tilde{x_c}]\)</span>，<span class="math inline">\(F_{scale}(u_c,s_c)\)</span>表<span class="math inline">\(s_c\)</span>与H×W维度上的特征图<span class="math inline">\(u_c\)</span>的乘积，不同通道的值乘上不同的权重，从而可以增强对关键通道域的注意力。 　　</li>
+<li><p><font color="teal"><strong>结果讨论</strong></font>：通道域的注意力是对一个通道内的信息直接全局平均池化，而忽略每一个通道内的局部信息，这种做法其实也是比较简单粗暴。所以结合两种思路，就可以设计出混合域的注意力机制模型。</p></li>
 </ul>
-<p><strong>③混合域</strong>： <br><br>
-　　从2018年的文章<font color="maroon"><strong>《CBAM: Convolutional Block Attention Module》</strong></font>来了解混合域注意力机制。这篇文章是基于 SE-Net 的 Squeeze-and-Excitation block进行进一步拓展，可以理解为文中把 channel attention看成是教网络关注什么；而spatial attention 是教网络关注何处。</p>
+<p><strong>③混合域</strong>： <br> 　　从2018年的文章<font color="maroon"><strong>《CBAM: Convolutional Block Attention Module》</strong></font>来了解混合域注意力机制。这篇文章是基于 SE-Net 的 Squeeze-and-Excitation block进行进一步拓展，可以理解为文中把 channel attention看成是教网络关注什么；而spatial attention 是教网络关注何处。</p>
 <ul>
-<li>
-<p><font color="teal"><strong>文章的思路及好处</strong></font>：提出了一个新模块“卷积块注意模块”。由于卷积运算通过将跨通道和空间信息融合在一起来提取信息特征，因此文中用到的模块是用来注意沿这两个维度（通道和空间轴）的重要特征。文章的贡献之处有：注意力模块（CBAM）简单而有效，该模块可应用于提高CNN提取描述符的能力。</p>
-</li>
-<li>
-<p><font color="teal"><strong>模型构架</strong></font>：在SENet的基础上进行改进，得到CBAM模型基本构架如下图所示：<img src="https://img-blog.csdnimg.cn/2020041223143241.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="CBAM"><br>
-给定一个中间特征图$F∈R<sup>{C×H×W}$作为输入，CBAM依次得到1D的通道注意图$M_c∈R</sup>{C×1×1}$和2D空间注意图$M_s∈R^{1×H×W}。 整个注意力过程可以总结为：<br>
-$$F’ = M_c(F)⊗F$$$$F’’= M_s(F_0)⊗F_0$$其中⊗表示逐元素乘法。 在乘法过程中，注意值会相应地传递：通道注意值会沿空间维度传递，反之亦然。 $F’’$是最终输出。下面介绍每个注意模块：</p>
-<p><strong>Channel attention module</strong> —— 该子模块构架如下图：<br>
-<img src="https://img-blog.csdnimg.cn/20200412235136512.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt><br>
-为计算通道注意力，我们压缩输入特征图的空间尺寸，过使用平均池化操作和最大池化操作来收集特征图的部分信息，生成两个不同的空间上下文描述符：$F<sup>c_{avg}$和$F</sup>c_{max}$，分别表示平均池化特征和最大池化特征。然后将两个描述符传送到共享网络(多层感知器MLP组成)，以生成我们的频道注意图$M_c$。为了减少参数，隐藏层的激活输出大小设置为$R^{C / r×1×1}$，其中 r 是缩小率。通道注意力的计算公式为：$$<br>
-M_c(F)=σ(MLP(AvgPool(F))+ MLP(MaxPool(F)))=σ(W_1(W_0(F^c_{avg}))+ W_1(W_0(F^c_{max})))$$ 其中 σ 表示Sigmoid函数，$W_0∈R^{C/ r×C}$，$W_1∈R^{C×C / r}$。两个输入均共享MLP权重$W_0$和$W_1$，并且ReLU激活后才乘$W_0$。</p>
-<p><strong>Spatial attention module</strong> —— 空间注意力子模块的构架如下图：<br>
-<img src="https://img-blog.csdnimg.cn/20200412235258831.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt><br>
-利用特征之间的空间关系来生成空间注​​意图，空间注意力集中在“哪里”是一个信息部分，与通道注意力是互补的。为了计算空间注意力，首先沿通道轴应用平均池化和最大池化操作，来聚合特征图的通道信息，生成两个二维图：$F<sup>s_{avg}∈R</sup>{1×H×W}$和$F<sup>s_{max}∈R</sup>{1×H×W}$。在级联的特征描述符上，应用卷积层以生成空间注​​意图$M_s(F)∈R^{H×W}$，该图对强调或抑制的位置进行编码。，空间注意力的计算公式为：<br>
-　　　　　　　　<img src="https://img-blog.csdnimg.cn/20200413000142165.png" srcset="/img/loading.gif" width="60%"></p>
-<p>其中σ表示S型函数，$f^{7×7}$表示大小为7×7的卷积核。下图是一个ResNet中嵌入这个CBAM块的Resblock构架图：<br>
-<img src="https://img-blog.csdnimg.cn/20200413000728407.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt></p>
-</li>
-<li>
-<p><font color="teal"><strong>结果讨论</strong></font>：这里的CBAM模块是轻量级的。所以放在网络中也比较方便，而且包含了通道信息和空间信息的处理，总体上比SENet要好。</p>
-</li>
+<li><p><font color="teal"><strong>文章的思路及好处</strong></font>：提出了一个新模块“卷积块注意模块”。由于卷积运算通过将跨通道和空间信息融合在一起来提取信息特征，因此文中用到的模块是用来注意沿这两个维度（通道和空间轴）的重要特征。文章的贡献之处有：注意力模块（CBAM）简单而有效，该模块可应用于提高CNN提取描述符的能力。</p></li>
+<li><p><font color="teal"><strong>模型构架</strong></font>：在SENet的基础上进行改进，得到CBAM模型基本构架如下图所示：<img src="https://img-blog.csdnimg.cn/2020041223143241.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="CBAM"> 给定一个中间特征图<span class="math inline">\(F∈R^{C×H×W}\)</span>作为输入，CBAM依次得到1D的通道注意图<span class="math inline">\(M_c∈R^{C×1×1}\)</span>和2D空间注意图$M_s∈R^{1×H×W}。 整个注意力过程可以总结为： <span class="math display">\[F&#39; = M_c(F)⊗F\]</span><span class="math display">\[F&#39;&#39;= M_s(F_0)⊗F_0\]</span>其中⊗表示逐元素乘法。 在乘法过程中，注意值会相应地传递：通道注意值会沿空间维度传递，反之亦然。 <span class="math inline">\(F&#39;&#39;\)</span>是最终输出。下面介绍每个注意模块：</p>
+<p><strong>Channel attention module</strong> —— 该子模块构架如下图： <img src="https://img-blog.csdnimg.cn/20200412235136512.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif"> 为计算通道注意力，我们压缩输入特征图的空间尺寸，过使用平均池化操作和最大池化操作来收集特征图的部分信息，生成两个不同的空间上下文描述符：<span class="math inline">\(F^c_{avg}\)</span>和<span class="math inline">\(F^c_{max}\)</span>，分别表示平均池化特征和最大池化特征。然后将两个描述符传送到共享网络(多层感知器MLP组成)，以生成我们的频道注意图<span class="math inline">\(M_c\)</span>。为了减少参数，隐藏层的激活输出大小设置为<span class="math inline">\(R^{C / r×1×1}\)</span>，其中 r 是缩小率。通道注意力的计算公式为：<span class="math display">\[
+M_c(F)=σ(MLP(AvgPool(F))+ MLP(MaxPool(F)))=σ(W_1(W_0(F^c_{avg}))+ W_1(W_0(F^c_{max})))\]</span> 其中 σ 表示Sigmoid函数，<span class="math inline">\(W_0∈R^{C/ r×C}\)</span>，<span class="math inline">\(W_1∈R^{C×C / r}\)</span>。两个输入均共享MLP权重<span class="math inline">\(W_0\)</span>和<span class="math inline">\(W_1\)</span>，并且ReLU激活后才乘<span class="math inline">\(W_0\)</span>。</p>
+<p><strong>Spatial attention module</strong> —— 空间注意力子模块的构架如下图： <img src="https://img-blog.csdnimg.cn/20200412235258831.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif"> 利用特征之间的空间关系来生成空间注​​意图，空间注意力集中在“哪里”是一个信息部分，与通道注意力是互补的。为了计算空间注意力，首先沿通道轴应用平均池化和最大池化操作，来聚合特征图的通道信息，生成两个二维图：<span class="math inline">\(F^s_{avg}∈R^{1×H×W}\)</span>和<span class="math inline">\(F^s_{max}∈R^{1×H×W}\)</span>。在级联的特征描述符上，应用卷积层以生成空间注​​意图<span class="math inline">\(M_s(F)∈R^{H×W}\)</span>，该图对强调或抑制的位置进行编码。，空间注意力的计算公式为： 　　　　　　　　<img src="https://img-blog.csdnimg.cn/20200413000142165.png" srcset="/img/loading.gif" width="60%"></p>
+其中σ表示S型函数，<span class="math inline">\(f^{7×7}\)</span>表示大小为7×7的卷积核。下图是一个ResNet中嵌入这个CBAM块的Resblock构架图： <img src="https://img-blog.csdnimg.cn/20200413000728407.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif"></li>
+<li><p><font color="teal"><strong>结果讨论</strong></font>：这里的CBAM模块是轻量级的。所以放在网络中也比较方便，而且包含了通道信息和空间信息的处理，总体上比SENet要好。</p></li>
 </ul>
-<p><font color="blue"><strong>2、硬注意力</strong> (hard attention)</font> <br><br>
-　　首先强注意力是更加关注点，也就是图像中的每个点都有可能延伸出注意力，同时强注意力是一个随机的预测过程，更强调动态变化。当然，最关键是强注意力是一个不可微的注意力，训练过程往往是通过增强学习(reinforcement learning)来完成的。Hard-attention，就是0/1问题，哪些区域是被 attentioned，哪些区域不关注。在这里不做介绍。</p>
-<p><font color="blue"><strong>3、自意力</strong> (self-attention)</font> <br><br>
-　　自注意力机制是注意力机制的改进，其减少了对外部信息的依赖，更擅长捕捉数据或特征的内部相关性。自注意力机制 (self-attention)在序列模型中取得了很大的进步；另外一方面，上下文信息（context information）对于很多视觉任务都很关键，如语义分割，目标检测。自注意力机制通过（key, query, value）的三元组提供了一种有效的捕捉全局上下文信息的建模方式。</p>
-<p><strong>自注意力的缺点和相应的改进策略</strong>：由于每一个点都要捕捉全局的上下文信息，这就导致了自注意力机制模块会有很大的计算复杂度和显存容量。如果我们能知道一些先验信息，比如上述的特征对其通常是一定的邻域内，我们可以通过限制在一定的邻域内来做，另外还有如何进行高效的稀疏化，以及自注意力机制和图卷积的联系。同时，这种建模方式的缺点还没有考虑channel上信息，相应的改进策略是如何进行spatial和channel上信息的有效结合。<br>
-　　不对自注意力机制做过多的介绍。</p>
-<h4 id="三、注意力机制的实现">三、注意力机制的实现</h4>
+<p><font color="blue"><strong>2、硬注意力</strong> (hard attention)</font> <br> 　　首先强注意力是更加关注点，也就是图像中的每个点都有可能延伸出注意力，同时强注意力是一个随机的预测过程，更强调动态变化。当然，最关键是强注意力是一个不可微的注意力，训练过程往往是通过增强学习(reinforcement learning)来完成的。Hard-attention，就是0/1问题，哪些区域是被 attentioned，哪些区域不关注。在这里不做介绍。</p>
+<p><font color="blue"><strong>3、自意力</strong> (self-attention)</font> <br> 　　自注意力机制是注意力机制的改进，其减少了对外部信息的依赖，更擅长捕捉数据或特征的内部相关性。自注意力机制 (self-attention)在序列模型中取得了很大的进步；另外一方面，上下文信息（context information）对于很多视觉任务都很关键，如语义分割，目标检测。自注意力机制通过（key, query, value）的三元组提供了一种有效的捕捉全局上下文信息的建模方式。</p>
+<p>　　<strong>自注意力的缺点和相应的改进策略</strong>：由于每一个点都要捕捉全局的上下文信息，这就导致了自注意力机制模块会有很大的计算复杂度和显存容量。如果我们能知道一些先验信息，比如上述的特征对其通常是一定的邻域内，我们可以通过限制在一定的邻域内来做，另外还有如何进行高效的稀疏化，以及自注意力机制和图卷积的联系。同时，这种建模方式的缺点还没有考虑channel上信息，相应的改进策略是如何进行spatial和channel上信息的有效结合。 　　不对自注意力机制做过多的介绍。</p>
+<h4 id="三注意力机制的实现">三、注意力机制的实现</h4>
 <p>主要参考别人复现的CBAM，即通道注意力和空间注意力结合的模型：pytorch实现，地址：<a href="https://github.com/KK-xi/CBAM-attention_mechanism-_pytorch" target="_blank" rel="noopener">github</a>。</p>
 
             </div>
@@ -305,9 +260,9 @@ M_c(F)=σ(MLP(AvgPool(F))+ MLP(MaxPool(F)))=σ(W_1(W_0(F^c_{avg}))+ W_1(W_0(F^c_
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/03/31/%E8%A7%86%E8%A7%89SLAM%E7%9F%A5%E8%AF%86%E8%B5%84%E6%BA%90%E7%9B%B8%E5%85%B3%E4%BC%81%E4%B8%9A%E6%80%BB%E7%BB%93/">
+                      <a href="/2020/03/31/%E7%BB%93%E5%B8%B8%E7%94%A8%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%BB%9C/">
                         <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">总结SLAM相关知识点资源库以及企业</span>
+                        <span class="hidden-mobile">总结经典深度学习网络（pytorch、tensorflow实现）</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
