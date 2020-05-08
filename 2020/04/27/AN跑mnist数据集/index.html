@@ -185,209 +185,214 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="gan网络在手写数字数据集mnist上的运用">GAN网络在手写数字数据集mnist上的运用</h2>
-<p>前言：最近学了几种GAN网络，想自己动手跑一跑，就搭了个很简单的普通GAN网络。</p>
-<p><strong>一、网络架构</strong><br>
-GAN的原理就不详细说明了，有很多很好资源都可以学习到，在这里定义的GAN网络结构如下（图来自灵魂画手<a href="https://zhuanlan.zhihu.com/p/85908702" target="_blank" rel="noopener">知乎</a>）： <img src="https://img-blog.csdnimg.cn/20200316163116180.png?,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="framework"> <font color="red">结构</font> ：input --&gt; 全连接层 --&gt; leak Relu --&gt; dropout20% --&gt; 全连接层 --&gt; tanh --&gt;output。（生成器和判别器的网络架构一样） <br> <font color="red">判别器的目的是</font>：1. 对于真实图片，D要为其打上标签1；对于生成图片，D要为其打上标签0。 <br> <font color="red">生成器的目的是 </font>：对于生成的图片，G希望D打上标签1。</p>
-<p><strong>二、源代码</strong><br>
-part1，import~~</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="im">import</span> tensorflow <span class="im">as</span> tf</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="im">import</span> numpy <span class="im">as</span> np</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="im">import</span> pickle</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="im">from</span> tensorflow.examples.tutorials.mnist <span class="im">import</span> input_data</a></code></pre></div>
-<p>part2,定义generator 和 discriminator * Generator</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">def</span> generator(noise_img,reuse):</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">    <span class="co">&quot;&quot;&quot;</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">    生成器</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">    :param noise_img:</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">    :return:</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">    &quot;&quot;&quot;</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">    alpha <span class="op">=</span> <span class="fl">0.01</span>      <span class="co"># parameter of leaky ReLU</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8">    out_dim <span class="op">=</span> <span class="dv">784</span>     <span class="co"># the output size of the generator, MNIST images are 28*28, into a length of 784 array.</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">    g_units <span class="op">=</span> <span class="dv">128</span>    <span class="co"># hidden layer nodes</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">    <span class="cf">with</span> tf.variable_scope(<span class="st">&quot;generator&quot;</span>, reuse<span class="op">=</span>reuse):</a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">        <span class="co"># hidden layer</span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13">        hidden1 <span class="op">=</span> tf.layers.dense(noise_img, g_units)</a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">        <span class="co"># leaky ReLU</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16">        hidden1 <span class="op">=</span> tf.maximum(alpha <span class="op">*</span> hidden1, hidden1)</a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18">        <span class="co"># dropout</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19">        hidden1 <span class="op">=</span> tf.layers.dropout(hidden1, rate<span class="op">=</span><span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb2-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb2-21" data-line-number="21">        <span class="co"># logits &amp; outputs,tf.layers.dense——full connection</span></a>
-<a class="sourceLine" id="cb2-22" data-line-number="22">        logits <span class="op">=</span> tf.layers.dense(hidden1, out_dim)</a>
-<a class="sourceLine" id="cb2-23" data-line-number="23">        <span class="co"># the pixel range of MNIST  dataset is 0-1, the generated image range is (-1,1).</span></a>
-<a class="sourceLine" id="cb2-24" data-line-number="24">        outputs <span class="op">=</span> tf.tanh(logits)</a>
-<a class="sourceLine" id="cb2-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb2-26" data-line-number="26">    <span class="cf">return</span> logits, outputs</a></code></pre></div>
+              <h2 id="GAN网络在手写数字数据集mnist上的运用"><a href="#GAN网络在手写数字数据集mnist上的运用" class="headerlink" title="GAN网络在手写数字数据集mnist上的运用"></a>GAN网络在手写数字数据集mnist上的运用</h2><p>   前言：最近学了几种GAN网络，想自己动手跑一跑，就搭了个很简单的普通GAN网络。</p>
+<p><strong>一、网络架构</strong><br>   GAN的原理就不详细说明了，有很多很好资源都可以学习到，在这里定义的GAN网络结构如下（图来自灵魂画手<a href="https://zhuanlan.zhihu.com/p/85908702" target="_blank" rel="noopener">知乎</a>）：<br>   <img src="https://img-blog.csdnimg.cn/20200316163116180.png?,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="framework"><br>  <font color="red">结构</font> ：input —&gt; 全连接层 —&gt; leak Relu —&gt; dropout20% —&gt; 全连接层 —&gt; tanh —&gt;output。（生成器和判别器的网络架构一样） &lt;/br&gt;<br>   <font color="red">判别器的目的是</font>：1. 对于真实图片，D要为其打上标签1；对于生成图片，D要为其打上标签0。 &lt;/br&gt;<br>    <font color="red">生成器的目的是 </font>：对于生成的图片，G希望D打上标签1。</p>
+<p> <strong>二、源代码</strong><br> part1，import~~</p>
+<pre><code class="lang-python">import tensorflow as tf
+import numpy as np
+import pickle
+import matplotlib.pyplot as plt
+from tensorflow.examples.tutorials.mnist import input_data
+</code></pre>
+<p>part2,定义generator 和 discriminator</p>
+<ul>
+<li>Generator</li>
+</ul>
+<pre><code class="lang-python">def generator(noise_img,reuse):
+    &quot;&quot;&quot;
+    生成器
+    :param noise_img:
+    :return:
+    &quot;&quot;&quot;
+    alpha = 0.01      # parameter of leaky ReLU
+    out_dim = 784     # the output size of the generator, MNIST images are 28*28, into a length of 784 array.
+    g_units = 128    # hidden layer nodes
+
+    with tf.variable_scope(&quot;generator&quot;, reuse=reuse):
+        # hidden layer
+        hidden1 = tf.layers.dense(noise_img, g_units)
+
+        # leaky ReLU
+        hidden1 = tf.maximum(alpha * hidden1, hidden1)
+
+        # dropout
+        hidden1 = tf.layers.dropout(hidden1, rate=0.2)
+
+        # logits &amp; outputs,tf.layers.dense——full connection
+        logits = tf.layers.dense(hidden1, out_dim)
+        # the pixel range of MNIST  dataset is 0-1, the generated image range is (-1,1).
+        outputs = tf.tanh(logits)
+
+    return logits, outputs
+</code></pre>
 <ul>
 <li>Discriminator</li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">def</span>  discriminator(img,reuse):</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">    <span class="co">&quot;&quot;&quot;</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">    discriminator</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">    :param img:</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">    :return:</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">    &quot;&quot;&quot;</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7">    alpha<span class="op">=</span><span class="fl">0.01</span>      </a>
-<a class="sourceLine" id="cb3-8" data-line-number="8">    d_units<span class="op">=</span><span class="dv">128</span>    </a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10">    <span class="cf">with</span> tf.variable_scope(<span class="st">&quot;discriminator&quot;</span>, reuse<span class="op">=</span>reuse):</a>
-<a class="sourceLine" id="cb3-11" data-line-number="11">        <span class="co"># hidden layer</span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12">        hidden2 <span class="op">=</span> tf.layers.dense(img, d_units)</a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">        <span class="co"># leaky ReLU</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14">        hidden2 <span class="op">=</span> tf.maximum(alpha <span class="op">*</span> hidden2, hidden2)</a>
-<a class="sourceLine" id="cb3-15" data-line-number="15">        <span class="co"># dropout</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16">        hidden2 <span class="op">=</span> tf.layers.dropout(hidden2, rate<span class="op">=</span><span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb3-17" data-line-number="17">        <span class="co"># logits &amp; outputs</span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18">        logits <span class="op">=</span> tf.layers.dense(hidden2,<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb3-19" data-line-number="19">        outputs <span class="op">=</span> tf.tanh(logits)</a>
-<a class="sourceLine" id="cb3-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb3-21" data-line-number="21">    <span class="cf">return</span> logits, outputs</a></code></pre></div>
+<pre><code class="lang-python">def  discriminator(img,reuse):
+    &quot;&quot;&quot;
+    discriminator
+    :param img:
+    :return:
+    &quot;&quot;&quot;
+    alpha=0.01      
+    d_units=128    
+
+    with tf.variable_scope(&quot;discriminator&quot;, reuse=reuse):
+        # hidden layer
+        hidden2 = tf.layers.dense(img, d_units)
+        # leaky ReLU
+        hidden2 = tf.maximum(alpha * hidden2, hidden2)
+        # dropout
+        hidden2 = tf.layers.dropout(hidden2, rate=0.2)
+        # logits &amp; outputs
+        logits = tf.layers.dense(hidden2,1)
+        outputs = tf.tanh(logits)
+
+    return logits, outputs
+</code></pre>
 <p>part3，mian() —初始化、训练、抽样评估</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">def</span> GAN_mnist():</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">    <span class="co">&quot;&quot;&quot;</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">    simple GAN generate handwritten digital picture</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">    :return:</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">    &quot;&quot;&quot;</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">    mnist <span class="op">=</span> input_data.read_data_sets(<span class="st">&#39;./mnist_dataset/&#39;</span>,one_hot<span class="op">=</span><span class="va">True</span>)</a>
-<a class="sourceLine" id="cb4-7" data-line-number="7">    img_size <span class="op">=</span> mnist.train.images[<span class="dv">0</span>].shape[<span class="dv">0</span>]</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">    noise_size <span class="op">=</span> <span class="dv">100</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">    <span class="co"># 1、parameters preparing</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">    learning_rate <span class="op">=</span> <span class="fl">0.001</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">    smooth <span class="op">=</span> <span class="fl">0.1</span>    <span class="co"># label smoothing</span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">    n_sample <span class="op">=</span> <span class="dv">25</span> <span class="co"># number of samples</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14">    samples<span class="op">=</span>[]</a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16">    tf.reset_default_graph()</a>
-<a class="sourceLine" id="cb4-17" data-line-number="17">    <span class="co"># 2、dataset preparing</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18">    real_img <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, img_size], name<span class="op">=</span><span class="st">&#39;real_img&#39;</span>) <span class="co"># image size784=28*28</span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19">    <span class="co"># noise size input generator</span></a>
-<a class="sourceLine" id="cb4-20" data-line-number="20">    noise_img <span class="op">=</span> tf.placeholder(tf.float32, [<span class="va">None</span>, noise_size], name<span class="op">=</span><span class="st">&#39;noise_img&#39;</span>)</a>
-<a class="sourceLine" id="cb4-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22">    <span class="co"># 3、Generator generate image</span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23">    g_logits,g_outputs <span class="op">=</span> generator(noise_img,reuse<span class="op">=</span><span class="va">False</span>)</a>
-<a class="sourceLine" id="cb4-24" data-line-number="24">    <span class="co"># generator的loss</span></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26">    <span class="co"># 4、discriminator discriminates between true and false</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27">    d_logits_real, d_outputs_real <span class="op">=</span> discriminator(real_img , reuse<span class="op">=</span><span class="va">False</span>)</a>
-<a class="sourceLine" id="cb4-28" data-line-number="28">    d_logits_fake, d_outputs_fake <span class="op">=</span> discriminator(g_outputs , reuse<span class="op">=</span><span class="va">True</span>)</a>
-<a class="sourceLine" id="cb4-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb4-30" data-line-number="30">    <span class="co"># 5、calculate loss</span></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31">    <span class="co"># discriminator_loss：discriminate real image + discriminate fake image</span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32"></a>
-<a class="sourceLine" id="cb4-33" data-line-number="33">    <span class="co"># test the discriminant discriminant ability</span></a>
-<a class="sourceLine" id="cb4-34" data-line-number="34">    d_loss_real <span class="op">=</span> tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(</a>
-<a class="sourceLine" id="cb4-35" data-line-number="35">        logits<span class="op">=</span>d_logits_real,labels<span class="op">=</span>tf.ones_like(d_logits_real)) <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> smooth))</a>
-<a class="sourceLine" id="cb4-36" data-line-number="36"></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37">    <span class="co"># test the discriminant discriminant ability</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38">    d_loss_fake <span class="op">=</span> tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(</a>
-<a class="sourceLine" id="cb4-39" data-line-number="39">        logits<span class="op">=</span>d_logits_fake,labels<span class="op">=</span>tf.zeros_like(d_logits_fake)))</a>
-<a class="sourceLine" id="cb4-40" data-line-number="40"></a>
-<a class="sourceLine" id="cb4-41" data-line-number="41">    <span class="co"># sum_loss</span></a>
-<a class="sourceLine" id="cb4-42" data-line-number="42">    d_loss <span class="op">=</span> tf.add(d_loss_real, d_loss_fake)</a>
-<a class="sourceLine" id="cb4-43" data-line-number="43"></a>
-<a class="sourceLine" id="cb4-44" data-line-number="44">    <span class="co"># generator_loss</span></a>
-<a class="sourceLine" id="cb4-45" data-line-number="45">    g_loss <span class="op">=</span> tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(</a>
-<a class="sourceLine" id="cb4-46" data-line-number="46">        logits<span class="op">=</span>d_logits_fake,labels<span class="op">=</span>tf.ones_like(d_logits_fake)) <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> smooth))</a>
-<a class="sourceLine" id="cb4-47" data-line-number="47"></a>
-<a class="sourceLine" id="cb4-48" data-line-number="48">    <span class="co"># 6、Gradient descent loss optimization</span></a>
-<a class="sourceLine" id="cb4-49" data-line-number="49">    train_vars <span class="op">=</span> tf.trainable_variables()</a>
-<a class="sourceLine" id="cb4-50" data-line-number="50">    <span class="co"># generator_tensor</span></a>
-<a class="sourceLine" id="cb4-51" data-line-number="51">    g_vars <span class="op">=</span> [var <span class="cf">for</span> var <span class="kw">in</span> train_vars <span class="cf">if</span> var.name.startswith(<span class="st">&quot;generator&quot;</span>)]</a>
-<a class="sourceLine" id="cb4-52" data-line-number="52">    <span class="co"># discriminator_tensor</span></a>
-<a class="sourceLine" id="cb4-53" data-line-number="53">    d_vars <span class="op">=</span> [var <span class="cf">for</span> var <span class="kw">in</span> train_vars <span class="cf">if</span> var.name.startswith(<span class="st">&quot;discriminator&quot;</span>)]</a>
-<a class="sourceLine" id="cb4-54" data-line-number="54">    <span class="co"># optimizer</span></a>
-<a class="sourceLine" id="cb4-55" data-line-number="55">    d_train_opt <span class="op">=</span> tf.train.AdamOptimizer(learning_rate).minimize(d_loss, var_list<span class="op">=</span>d_vars)</a>
-<a class="sourceLine" id="cb4-56" data-line-number="56">    g_train_opt <span class="op">=</span> tf.train.AdamOptimizer(learning_rate).minimize(g_loss, var_list<span class="op">=</span>g_vars)</a>
-<a class="sourceLine" id="cb4-57" data-line-number="57"></a>
-<a class="sourceLine" id="cb4-58" data-line-number="58">    <span class="co"># 7、trianing part</span></a>
-<a class="sourceLine" id="cb4-59" data-line-number="59">    <span class="co"># train parameters</span></a>
-<a class="sourceLine" id="cb4-60" data-line-number="60">    batch_size <span class="op">=</span> <span class="dv">64</span></a>
-<a class="sourceLine" id="cb4-61" data-line-number="61">    epoch <span class="op">=</span> <span class="dv">5</span></a>
-<a class="sourceLine" id="cb4-62" data-line-number="62">    n_batch<span class="op">=</span> mnist.train.num_examples <span class="op">//</span> batch_size   <span class="co"># Calculate how many lots there are</span></a>
-<a class="sourceLine" id="cb4-63" data-line-number="63"></a>
-<a class="sourceLine" id="cb4-64" data-line-number="64">    losses <span class="op">=</span> [] <span class="co"># store loss</span></a>
-<a class="sourceLine" id="cb4-65" data-line-number="65"></a>
-<a class="sourceLine" id="cb4-66" data-line-number="66">    <span class="co"># start training</span></a>
-<a class="sourceLine" id="cb4-67" data-line-number="67">    <span class="cf">with</span> tf.Session() <span class="im">as</span> sess:</a>
-<a class="sourceLine" id="cb4-68" data-line-number="68">        sess.run(tf.global_variables_initializer())</a>
-<a class="sourceLine" id="cb4-69" data-line-number="69"></a>
-<a class="sourceLine" id="cb4-70" data-line-number="70">        <span class="cf">for</span> e <span class="kw">in</span> <span class="bu">range</span>(epoch):</a>
-<a class="sourceLine" id="cb4-71" data-line-number="71">            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_batch):</a>
-<a class="sourceLine" id="cb4-72" data-line-number="72">                batch <span class="op">=</span> mnist.train.next_batch(batch_size)</a>
-<a class="sourceLine" id="cb4-73" data-line-number="73">                batch_images <span class="op">=</span> batch[<span class="dv">0</span>].reshape((batch_size,<span class="dv">784</span>))  <span class="co"># batch[0]represents image,reshape-&gt; batch_size*784</span></a>
-<a class="sourceLine" id="cb4-74" data-line-number="74">                batch_images <span class="op">=</span> batch_images <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>   <span class="co"># scale the pixel of images for outputs of tanh are (-1,1)</span></a>
-<a class="sourceLine" id="cb4-75" data-line-number="75">                batch_noise <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, size<span class="op">=</span>(batch_size, <span class="dv">100</span>))</a>
-<a class="sourceLine" id="cb4-76" data-line-number="76"></a>
-<a class="sourceLine" id="cb4-77" data-line-number="77">                _ <span class="op">=</span> sess.run(d_train_opt, feed_dict<span class="op">=</span>{real_img: batch_images, noise_img: batch_noise})</a>
-<a class="sourceLine" id="cb4-78" data-line-number="78">                _ <span class="op">=</span> sess.run(g_train_opt, feed_dict<span class="op">=</span>{noise_img: batch_noise})</a>
-<a class="sourceLine" id="cb4-79" data-line-number="79"></a>
-<a class="sourceLine" id="cb4-80" data-line-number="80">            <span class="co"># calculate the loss after each epoch</span></a>
-<a class="sourceLine" id="cb4-81" data-line-number="81">            train_loss_d_real <span class="op">=</span> sess.run(d_loss_real,feed_dict<span class="op">=</span>{real_img:batch_images,noise_img:batch_noise})</a>
-<a class="sourceLine" id="cb4-82" data-line-number="82">            train_loss_d_fake <span class="op">=</span> sess.run(d_loss_fake,feed_dict<span class="op">=</span>{real_img:batch_images,noise_img:batch_noise})</a>
-<a class="sourceLine" id="cb4-83" data-line-number="83"></a>
-<a class="sourceLine" id="cb4-84" data-line-number="84">            train_loss_d <span class="op">=</span> sess.run(d_loss,feed_dict<span class="op">=</span>{real_img: batch_images, noise_img: batch_noise})</a>
-<a class="sourceLine" id="cb4-85" data-line-number="85"></a>
-<a class="sourceLine" id="cb4-86" data-line-number="86">            train_loss_g <span class="op">=</span> sess.run(g_loss,feed_dict<span class="op">=</span>{noise_img: batch_noise})</a>
-<a class="sourceLine" id="cb4-87" data-line-number="87"></a>
-<a class="sourceLine" id="cb4-88" data-line-number="88">            <span class="bu">print</span>(<span class="st">&quot;Epoch </span><span class="sc">{}</span><span class="st">/</span><span class="sc">{}</span><span class="st">...&quot;</span>.<span class="bu">format</span>(e <span class="op">+</span> <span class="dv">1</span>, epoch),</a>
-<a class="sourceLine" id="cb4-89" data-line-number="89">                  <span class="st">&quot;Discriminator Loss: </span><span class="sc">{:.4f}</span><span class="st">(Real: </span><span class="sc">{:.4f}</span><span class="st"> + Fake: </span><span class="sc">{:.4f}</span><span class="st">)...&quot;</span>.<span class="bu">format</span>(train_loss_d, train_loss_d_real,</a>
-<a class="sourceLine" id="cb4-90" data-line-number="90">                                                                                      train_loss_d_fake),</a>
-<a class="sourceLine" id="cb4-91" data-line-number="91">                  <span class="st">&quot;Generator Loss: </span><span class="sc">{:.4f}</span><span class="st">&quot;</span>.<span class="bu">format</span>(train_loss_g))</a>
-<a class="sourceLine" id="cb4-92" data-line-number="92"></a>
-<a class="sourceLine" id="cb4-93" data-line-number="93">            <span class="co"># record the values of loss</span></a>
-<a class="sourceLine" id="cb4-94" data-line-number="94">            losses.append((train_loss_d, train_loss_d_real, train_loss_d_fake, train_loss_g))</a>
-<a class="sourceLine" id="cb4-95" data-line-number="95"></a>
-<a class="sourceLine" id="cb4-96" data-line-number="96"></a>
-<a class="sourceLine" id="cb4-97" data-line-number="97"></a>
-<a class="sourceLine" id="cb4-98" data-line-number="98"></a>
-<a class="sourceLine" id="cb4-99" data-line-number="99">            <span class="co"># sample to evaluate</span></a>
-<a class="sourceLine" id="cb4-100" data-line-number="100">            sample_noise <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, size<span class="op">=</span>(n_sample, noise_size))</a>
-<a class="sourceLine" id="cb4-101" data-line-number="101">            gen_samples <span class="op">=</span> sess.run(generator(noise_img, reuse<span class="op">=</span><span class="va">True</span>)</a>
-<a class="sourceLine" id="cb4-102" data-line-number="102">                                   ,feed_dict<span class="op">=</span>{noise_img: sample_noise})</a>
-<a class="sourceLine" id="cb4-103" data-line-number="103">            samples.append(gen_samples)</a>
-<a class="sourceLine" id="cb4-104" data-line-number="104"></a>
-<a class="sourceLine" id="cb4-105" data-line-number="105"></a>
-<a class="sourceLine" id="cb4-106" data-line-number="106">    <span class="co"># record the data of samples</span></a>
-<a class="sourceLine" id="cb4-107" data-line-number="107">    <span class="cf">with</span> <span class="bu">open</span>(<span class="st">&#39;train_samples.pkl&#39;</span>, <span class="st">&#39;wb&#39;</span>) <span class="im">as</span> f:</a>
-<a class="sourceLine" id="cb4-108" data-line-number="108">        pickle.dump(samples, f)</a>
-<a class="sourceLine" id="cb4-109" data-line-number="109"></a>
-<a class="sourceLine" id="cb4-110" data-line-number="110">    <span class="co"># plot loss curve</span></a>
-<a class="sourceLine" id="cb4-111" data-line-number="111">    losses <span class="op">=</span> np.array(losses)</a>
-<a class="sourceLine" id="cb4-112" data-line-number="112">    plt.figure(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb4-113" data-line-number="113">    plt.subplot(<span class="dv">221</span>)</a>
-<a class="sourceLine" id="cb4-114" data-line-number="114">    plt.plot(losses.T[<span class="dv">0</span>], label<span class="op">=</span><span class="st">&#39;Discriminator Total Loss&#39;</span>)</a>
-<a class="sourceLine" id="cb4-115" data-line-number="115">    plt.subplot(<span class="dv">222</span>)</a>
-<a class="sourceLine" id="cb4-116" data-line-number="116">    plt.plot(losses.T[<span class="dv">1</span>], label<span class="op">=</span><span class="st">&#39;Discriminator Real Loss&#39;</span>)</a>
-<a class="sourceLine" id="cb4-117" data-line-number="117">    plt.subplot(<span class="dv">223</span>)</a>
-<a class="sourceLine" id="cb4-118" data-line-number="118">    plt.plot(losses.T[<span class="dv">2</span>], label<span class="op">=</span><span class="st">&#39;Discriminator Fake Loss&#39;</span>)</a>
-<a class="sourceLine" id="cb4-119" data-line-number="119">    plt.subplot(<span class="dv">224</span>)</a>
-<a class="sourceLine" id="cb4-120" data-line-number="120">    plt.plot(losses.T[<span class="dv">3</span>], label<span class="op">=</span><span class="st">&#39;Generator&#39;</span>)</a>
-<a class="sourceLine" id="cb4-121" data-line-number="121">    plt.title(<span class="st">&quot;Training Losses&quot;</span>)</a>
-<a class="sourceLine" id="cb4-122" data-line-number="122">    plt.show()</a>
-<a class="sourceLine" id="cb4-123" data-line-number="123"></a>
-<a class="sourceLine" id="cb4-124" data-line-number="124">    <span class="cf">with</span> <span class="bu">open</span>(<span class="st">&#39;train_samples.pkl&#39;</span>, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> f:</a>
-<a class="sourceLine" id="cb4-125" data-line-number="125">        samples <span class="op">=</span> pickle.load(f)</a>
-<a class="sourceLine" id="cb4-126" data-line-number="126"></a>
-<a class="sourceLine" id="cb4-127" data-line-number="127">    rows, cols <span class="op">=</span> <span class="dv">5</span>, <span class="dv">5</span></a>
-<a class="sourceLine" id="cb4-128" data-line-number="128">    fig, axes <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">7</span>), nrows<span class="op">=</span>rows, ncols<span class="op">=</span>cols, sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</a>
-<a class="sourceLine" id="cb4-129" data-line-number="129">    <span class="cf">for</span> ax, img <span class="kw">in</span> <span class="bu">zip</span>(axes.flatten(), samples[epoch <span class="op">-</span> <span class="dv">1</span>][<span class="dv">1</span>]):</a>
-<a class="sourceLine" id="cb4-130" data-line-number="130">        ax.xaxis.set_visible(<span class="va">False</span>)</a>
-<a class="sourceLine" id="cb4-131" data-line-number="131">        ax.yaxis.set_visible(<span class="va">False</span>)</a>
-<a class="sourceLine" id="cb4-132" data-line-number="132">        ax.imshow(img.reshape((<span class="dv">28</span>, <span class="dv">28</span>)), cmap<span class="op">=</span><span class="st">&#39;Greys_r&#39;</span>)</a>
-<a class="sourceLine" id="cb4-133" data-line-number="133">    plt.show()</a></code></pre></div>
+<pre><code class="lang-python">def GAN_mnist():
+    &quot;&quot;&quot;
+    simple GAN generate handwritten digital picture
+    :return:
+    &quot;&quot;&quot;
+    mnist = input_data.read_data_sets(&#39;./mnist_dataset/&#39;,one_hot=True)
+    img_size = mnist.train.images[0].shape[0]
+    noise_size = 100
+
+    # 1、parameters preparing
+    learning_rate = 0.001
+    smooth = 0.1    # label smoothing
+    n_sample = 25 # number of samples
+    samples=[]
+
+    tf.reset_default_graph()
+    # 2、dataset preparing
+    real_img = tf.placeholder(tf.float32, [None, img_size], name=&#39;real_img&#39;) # image size784=28*28
+    # noise size input generator
+    noise_img = tf.placeholder(tf.float32, [None, noise_size], name=&#39;noise_img&#39;)
+
+    # 3、Generator generate image
+    g_logits,g_outputs = generator(noise_img,reuse=False)
+    # generator的loss
+
+    # 4、discriminator discriminates between true and false
+    d_logits_real, d_outputs_real = discriminator(real_img , reuse=False)
+    d_logits_fake, d_outputs_fake = discriminator(g_outputs , reuse=True)
+
+    # 5、calculate loss
+    # discriminator_loss：discriminate real image + discriminate fake image
+
+    # test the discriminant discriminant ability
+    d_loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=d_logits_real,labels=tf.ones_like(d_logits_real)) * (1 - smooth))
+
+    # test the discriminant discriminant ability
+    d_loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=d_logits_fake,labels=tf.zeros_like(d_logits_fake)))
+
+    # sum_loss
+    d_loss = tf.add(d_loss_real, d_loss_fake)
+
+    # generator_loss
+    g_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=d_logits_fake,labels=tf.ones_like(d_logits_fake)) * (1 - smooth))
+
+    # 6、Gradient descent loss optimization
+    train_vars = tf.trainable_variables()
+    # generator_tensor
+    g_vars = [var for var in train_vars if var.name.startswith(&quot;generator&quot;)]
+    # discriminator_tensor
+    d_vars = [var for var in train_vars if var.name.startswith(&quot;discriminator&quot;)]
+    # optimizer
+    d_train_opt = tf.train.AdamOptimizer(learning_rate).minimize(d_loss, var_list=d_vars)
+    g_train_opt = tf.train.AdamOptimizer(learning_rate).minimize(g_loss, var_list=g_vars)
+
+    # 7、trianing part
+    # train parameters
+    batch_size = 64
+    epoch = 5
+    n_batch= mnist.train.num_examples // batch_size   # Calculate how many lots there are
+
+    losses = [] # store loss
+
+    # start training
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+
+        for e in range(epoch):
+            for i in range(n_batch):
+                batch = mnist.train.next_batch(batch_size)
+                batch_images = batch[0].reshape((batch_size,784))  # batch[0]represents image,reshape-&gt; batch_size*784
+                batch_images = batch_images * 2 - 1   # scale the pixel of images for outputs of tanh are (-1,1)
+                batch_noise = np.random.uniform(-1, 1, size=(batch_size, 100))
+
+                _ = sess.run(d_train_opt, feed_dict={real_img: batch_images, noise_img: batch_noise})
+                _ = sess.run(g_train_opt, feed_dict={noise_img: batch_noise})
+
+            # calculate the loss after each epoch
+            train_loss_d_real = sess.run(d_loss_real,feed_dict={real_img:batch_images,noise_img:batch_noise})
+            train_loss_d_fake = sess.run(d_loss_fake,feed_dict={real_img:batch_images,noise_img:batch_noise})
+
+            train_loss_d = sess.run(d_loss,feed_dict={real_img: batch_images, noise_img: batch_noise})
+
+            train_loss_g = sess.run(g_loss,feed_dict={noise_img: batch_noise})
+
+            print(&quot;Epoch {}/{}...&quot;.format(e + 1, epoch),
+                  &quot;Discriminator Loss: {:.4f}(Real: {:.4f} + Fake: {:.4f})...&quot;.format(train_loss_d, train_loss_d_real,
+                                                                                      train_loss_d_fake),
+                  &quot;Generator Loss: {:.4f}&quot;.format(train_loss_g))
+
+            # record the values of loss
+            losses.append((train_loss_d, train_loss_d_real, train_loss_d_fake, train_loss_g))
+
+
+
+
+            # sample to evaluate
+            sample_noise = np.random.uniform(-1, 1, size=(n_sample, noise_size))
+            gen_samples = sess.run(generator(noise_img, reuse=True)
+                                   ,feed_dict={noise_img: sample_noise})
+            samples.append(gen_samples)
+
+
+    # record the data of samples
+    with open(&#39;train_samples.pkl&#39;, &#39;wb&#39;) as f:
+        pickle.dump(samples, f)
+
+    # plot loss curve
+    losses = np.array(losses)
+    plt.figure(1)
+    plt.subplot(221)
+    plt.plot(losses.T[0], label=&#39;Discriminator Total Loss&#39;)
+    plt.subplot(222)
+    plt.plot(losses.T[1], label=&#39;Discriminator Real Loss&#39;)
+    plt.subplot(223)
+    plt.plot(losses.T[2], label=&#39;Discriminator Fake Loss&#39;)
+    plt.subplot(224)
+    plt.plot(losses.T[3], label=&#39;Generator&#39;)
+    plt.title(&quot;Training Losses&quot;)
+    plt.show()
+
+    with open(&#39;train_samples.pkl&#39;, &#39;rb&#39;) as f:
+        samples = pickle.load(f)
+
+    rows, cols = 5, 5
+    fig, axes = plt.subplots(figsize=(7, 7), nrows=rows, ncols=cols, sharex=True, sharey=True)
+    for ax, img in zip(axes.flatten(), samples[epoch - 1][1]):
+        ax.xaxis.set_visible(False)
+        ax.yaxis.set_visible(False)
+        ax.imshow(img.reshape((28, 28)), cmap=&#39;Greys_r&#39;)
+    plt.show()
+</code></pre>
 <p>其中samples的部分就是抽样25个size为100的noise_samples送入生成器经过200epoch之后生成器生成图像，结果在第三部分。最后那几段是画图部分。</p>
 <p>part4，you know</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">    GAN_mnist()</a></code></pre></div>
+<pre><code class="lang-python">if __name__ == &quot;__main__&quot;:
+    GAN_mnist()
+</code></pre>
 <p><strong>三、看结果</strong></p>
-<p>训练时候的loss，这里epoch取的200： <br> 左上是Discriminator Total Loss，右上是Discriminator Real Loss，左下Discriminator Fake Loss，最后是Generator loss。 <img src="https://img-blog.csdnimg.cn/20200316161700318.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="loss"></p>
-<p>生成的数字示例： <img src="https://img-blog.csdnimg.cn/20200316223639385.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="运行结果"> 只是200epoch的结果，感觉隐隐约约能看出来是啥数字，可以试试修改epoch，运行一次有点久了，下次跑cGAN网络。如果有什么错误欢迎指出，谢谢~~</p>
+<p>训练时候的loss，这里epoch取的200： &lt;/br&gt;<br>左上是Discriminator Total Loss，右上是Discriminator Real Loss，左下Discriminator Fake Loss，最后是Generator loss。<br><img src="https://img-blog.csdnimg.cn/20200316161700318.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="loss"></p>
+<p>生成的数字示例：<br><img src="https://img-blog.csdnimg.cn/20200316223639385.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="运行结果"><br>只是200epoch的结果，感觉隐隐约约能看出来是啥数字，可以试试修改epoch，运行一次有点久了，下次跑cGAN网络。如果有什么错误欢迎指出，谢谢~~</p>
 
             </div>
             <hr>

@@ -149,7 +149,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    145 字
+                    6.3k 字
                   </span>
                 
 
@@ -157,7 +157,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      1 分钟
+                      22 分钟
                   </span>
                 
 
@@ -185,11 +185,61 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="computer-vision-for-autonomous-vehicles-problems-datasets-and-state-of-the-art">《Computer Vision for Autonomous Vehicles Problems, Datasets and State of the Art》</h2>
-<p>Author：Joel Janai, Fatma Guney, Aseem Behl, Andreas Geiger</p>
+              <h2 id="《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》"><a href="#《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》" class="headerlink" title="《Computer Vision for Autonomous Vehicles Problems, Datasets and State of the Art》"></a>《Computer Vision for Autonomous Vehicles Problems, Datasets and State of the Art》</h2><p>Author：Joel Janai, Fatma Guney, Aseem Behl, Andreas Geiger</p>
 <p>Date：December 18, 2019</p>
-<p><font color="navy"><strong>声明：</strong>这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> <br></p>
-<p><font color="navy"><strong>Disclaimer:</strong> This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just read the notes here for future reference, if there is any infringement, it will be deleted immediately.</font></p>
+<font color="navy">** 声明：**这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> 
+<br>
+
+<font color="navy">** Disclaimer:** This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just record the reading notes here for future reference, if there is any infringement, it will be deleted immediately.</font>
+
+
+<h3 id="Chapter-6-Object-Tracking"><a href="#Chapter-6-Object-Tracking" class="headerlink" title="Chapter 6 Object Tracking"></a>Chapter 6 Object Tracking</h3><h4 id="6-1-Problem-Definition"><a href="#6-1-Problem-Definition" class="headerlink" title="6.1 Problem Definition"></a>6.1 Problem Definition</h4><p>　　目标跟踪的目的是随着时间的推移根据传感器的测量去跟踪一个或者多个目标的状态，状态包括位置、速度和加速度。在自动驾驶中，目标跟踪极其重要，对未来的轨迹做出预测，才能提前制动，防止碰撞，尤其是对于行人和非机动车辆的突然变动。所以在他们周围行驶及其小心，跟踪与交通参与者的分类相结合可以相应地调整车辆的速度。</p>
+<p>　　跟踪系统的难点在于背景的复杂，机动的变化和复杂性以及遮挡问题。随着时间的推移，由于不同对象(尤其是相同类)的相似性，将同一对象的实例关联起来的问题变得特别具有挑战性，因为他们缺乏辨识度，而且同一类的在不同时间可能因为遮挡会看起来不太相似。对象之间的互动，增加了遮挡的可能性，更困难的情况就是光照条件以及镜子或窗户的反光的影响。</p>
+<h4 id="6-2-Methods"><a href="#6-2-Methods" class="headerlink" title="6.2 Methods"></a>6.2 Methods</h4><p>　　长久以来，跟踪问题都被看作是贝叶斯推理问题来解决，其目标是在给定当前观测和先前状态的情况下估计状态的后验概率密度函数。后验通常以递归的方式更新，包括使用运动模型的预测步骤和使用观察模型的校正步骤，在每次迭代中，都要解决数据关联问题，将新的观察值分配给被跟踪的对象。递归的方法很难从检测错误中恢复，并通过遮挡去跟踪目标，所以非递归的方法，根据时间窗口内的所有轨迹优化全局能量函数，得到了广泛的应用。然而，在一个场景中，每个对象可能的目标轨迹的数量和潜在对象的数量都非常大，这就导致了一个非常大的搜索空间。</p>
+<h5 id="6-2-1-Tracking-by-Detection"><a href="#6-2-1-Tracking-by-Detection" class="headerlink" title="6.2.1 Tracking by Detection"></a>6.2.1 Tracking by Detection</h5><p>　　考虑到静态对象检测器的成功，跟踪中通常使用的一种范式是通过检测跟踪，这个方法通常有两个步骤：先检测人，再是同一个人的关联检测。由于跟踪问题被归结为数据关联问题，因此通过检测跟踪变得非常流行，但是跟踪系统仍然需要处理和从检测系统的错误中恢复，例如错误和丢失检测。</p>
+<p><strong>Tracking on  Graphs：</strong> 图表示的方法如下图所示，用多切分公式求解的基于图的表示法，通过对上面图像的检测，生成图，再通过求解多切分问题，得到图的着色和连接，这样的方法广泛用在推理关系中：</p>
+<p><img src="https://img-blog.csdnimg.cn/20200507082658143.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70
+" width="70%"><br>　　在网络流方法中，首先用节点来表示检测，用边来表示检测之间的空间和时间链接，然后定义一些简单的约束条件作为一个整数程序，再将其放宽为一个线性程序，以避免整数程序的NP难题。各种动态规划方法，例如使用线性规划，k最短路径或集合覆盖优化，都已经被提出来解决网络流。</p>
+<p>　　另一个研究方向是&lt;/font color=red&gt;图形短语跟踪聚类问题&lt;/font&gt;。Minimum Clique和 Minimum Cost Multicut 的方法 找到一个具有最小成本和的图的分解。最大权值独立集公式首先独立求解成对关联问题，并使用学习距离度量将两两关联的解联系起来。图形化模型最小化定义在具有成对和高阶势的节点上的全局能量函数。</p>
+<p><strong>Continuous Optimization：</strong> 连续得能量最小化的提出是为了替代离散化。对于这个高度非凸的问题，Andriyenko 和 Schindler使用了一个具有<font color="red">重复跳跃动作的启发式能量最小化方案</font>来防止局部极小，并更好地探索了变维搜索空间。其能量函数的不同分量的影响如图所示，上排和下排显示的是能量更高、更小的构型，较暗的灰度值对应较高的目标概率:</p>
+<p><img src="https://img-blog.csdnimg.cn/20200507093424855.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70
+" width="70%"></p>
+<p>Milan等扩展了上述的连续能量函数，将目标动力学、互斥和跟踪持久性等物理约束考虑在内。将每个观察值分配给数据关联中的特定目标本质上是一个离散的优化问题，所以 Andriyenko 等人认为联合离散和连续公式更自然地描述了跟踪问题。Milan等人又提出了一种混合的离散-连续条件随机场模型，解决了数据关联和轨迹估计中的互斥问题，在数据关联过程中，每次观测最多分配到一个目标，而在轨迹估计中，两条轨迹始终保持空间分离。</p>
+<p><strong>Multiple Cues：</strong> 在数据关联中，为了提高跟踪系统的鲁棒性，可以结合各种互补的线索。Giebel 等研究了一种基于不同线性子空间模型的时空形状表示方法，在粒子滤波的观测模型中，他们通过结合形状、纹理和立体深度来处理外观变化。Gavrila 和 Munder 在检测和跟踪系统中使用具有一系列模块的相同线索，模块即感兴趣区域生成、基于形状的检测、基于纹理的分类和基于立体的验证。他们的系统可以专注于通过基于立体的感兴趣区域方法推断出的相关图像区域。他们根据形状匹配的结果，通过加权基于纹理的组件分类器，提出了一种新颖的专家混合架构。在他们基于外观的方法中，Choi等人提出组合的检测系统，每个检测系统专门处理不同的任务，例如行人和上半身、面部、肤色、基于深度的形状和运动。所有检测部分的结果都结合在观察可能性中，以提高匹配度。</p>
+<h5 id="6-2-2-Tracking-with-Stereo"><a href="#6-2-2-Tracking-with-Stereo" class="headerlink" title="6.2.2 Tracking with Stereo"></a>6.2.2 Tracking with Stereo</h5><p>　　一些工作已经研究了研究了一种用于目标跟踪和立体深度估计的联合公式，以便在估计场景中的对象轨迹的同时获得场景的结构，场景的结构使跟踪系统可以专注于更合理的解决方案。Leibe 等提出了一种集成场景几何估计、2D 对象检测、3D 定位、轨迹估计和跟踪的方法。 他们使用对象的检测和 top-down 分割来学习特定于对象的颜色模型，如图所示，<br><img src="https://img-blog.csdnimg.cn/20200507102605513.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"><br>该场景的结构引导时空轨迹的物理合理提取，最终的全局优化准则考虑了对象之间的交互作用，以细化三维定位和轨迹估计结果。Ess 等使用图形模型联合估计摄像机的位置、立体深度、物体检测以及所有物体随时间的姿势， 因此，图形模型代表了不同部分之间的相互作用，并结合了对象间的相互作用。</p>
+<p><strong>Tracking-Before-Detection：</strong> 除了便于跟踪问题，深度还允许分割场景到不同的对象，独立于他们的类。在检测前跟踪中，这些分割的类不可知对象直接被视为跟踪公式中的观察值， 这样，跟踪系统独立于分类器，因此能够跟踪以前从未见过的未知对象或仅存在少量训练数据的未知对象。此外，来自对象估计轨迹的运动信息可以用作检测特定类别对象的另一种提示。 Mitzel 和 Leibe 通过使用立体图像的深度对场景进行分割来提取对象的观察结果。利用紧凑的 3D 表示，它们可以很稳地跟踪已知和未知的对象类别，这种表示还允许他们检测异常形状，如携带的物品。</p>
+<h5 id="6-2-3-Pedestrian-Tracking"><a href="#6-2-3-Pedestrian-Tracking" class="headerlink" title="6.2.3 Pedestrian Tracking"></a>6.2.3 Pedestrian Tracking</h5><p>　　识别行人非常困难，特别是由于检测系统的误报。Andriluka 等人用联合检测和链式人体姿态跟踪公式解决了这个问题。他们将现有的人检测器扩展到基于肢体的结构模型，并使用层次高斯过程潜在变量模型 ( hGPLVM ) 对被检测肢体的动力学进行建模，这使得它们比只考虑一帧的方法更可靠。另一些人对这个想法扩展到了单目 3D 位姿估计上，在第一阶段，他们估计 2D 清晰度和人的视角并在少数帧中将它们关联，这些累积的 2D 图像证据再用 hGPLVM估计3D位姿。种方法使他们能够从单目图像中准确地估计多人的 3D 姿态，结合隐马尔可夫模型(HMM)，这些方法可以在很长的序列中跟踪人。</p>
+<h5 id="6-2-4-Joint-Detection-and-Tracking"><a href="#6-2-4-Joint-Detection-and-Tracking" class="headerlink" title="6.2.4 Joint Detection and Tracking"></a>6.2.4 Joint Detection and Tracking</h5><p>　　尽管典型的按检测跟踪方法假定可以进行检测，但 Dehghan 等人（2002年）提出了检测方法 和Tian 提出通过学习每个目标的模型并修改图以编码目标和节点之间的分配概率，来与网络流量方法共同解决检测和关联问题。</p>
+<p>　　Kang等引入 tubelet 提案模块，结合对象物的检测和用于视频对象检测跟踪，tubelet 表示在连续的帧中探测到相同的物体。首先生成静态对象建议作为空间锚点(例如，从区域建议网络中生成)，然后预测调整锚的相对运动，从而提高性能。此外，视频片段生成的时空建议直接取代了每帧建议。唐等人不用传播边界框，而在同一帧中链接对象并在帧之间传播框分数。</p>
+<p>　　另一个方向是用光流来聚合视频中的特征，根据估计的光流对附近帧的特征图进行扭曲，并通过学习自适应加权进行聚合。这样是为了提高对快速移动对象的检测，因为这些对象在一些帧里面容易造成模糊。朱等提出了一种更有效的关键帧选择方法，即选择要聚合的帧或帧的部分。王等人也在不同的层次上使用光流，即通过逐像素的扭曲在像素层次上使用光流，通过预测实例的移动在实例层次上使用光流，然后根据观察到的运动模式，将这两个层次结合起来，例如，在非刚体运动的情况下，更多地依靠像素层次。为了避免大量的光流计算，Bertasius 等人提出了一种基于可变形卷积层的时空采样机制。</p>
+<h5 id="6-2-5-Deep-Learning-for-Multi-Object-Tracking"><a href="#6-2-5-Deep-Learning-for-Multi-Object-Tracking" class="headerlink" title="6.2.5 Deep Learning for Multi-Object Tracking"></a>6.2.5 Deep Learning for Multi-Object Tracking</h5><p>　　深度学习在目标检测方面的成功对于目标跟踪有很大的帮助，此外，深度学习已被用于表示的学习，以验证属于同一人的检测或比较接近的，用于使用顺序模型的学习轨迹表征。与传统的关联模型相结合的学习顺序模型显示，相比之前的工作性能有所提高。例如外观，运动和交互作用的 LSTM 网络的组合，与具有人工特征的Markov决策过程跟踪相比，一种改进的双线性 LSTM 与具有 CNN 特征的多假设跟踪模型形成对比，以及采用 RNN 的基于小波相似性的分层聚类方法，与采用 Siamese 网络的提升式多割方法相比。在这些例子中，通常是学习到一个较好的跟踪表示，然后使用建立的方法进行关联。</p>
+<p>　　最近，提出了几种端到端的学习方法来完成多目标的跟踪，挑战主要是缺乏有标签的数据，输入和输出空间问题的结构化本质以及组合搜索空间。Schulter 等人提出了一种基于手工设计的边界区域表示的网络层来学习网络损失函数。Milan 等人第一个提出用端到端的方法来跟踪目标，如下图中，用RNN网络估计目标的状态，LSTMs 用来数据关联。<br>　　<img src="https://img-blog.csdnimg.cn/20200507231311337.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70
+" width="70%"><br>然而，上面这个模型是基于合成数据进行训练的，缺乏一个外观模型，这使得它无法与之前的方法的性能相匹配。于是 Frossard 和 Urtasun 提提出了一种用于检测和跟踪车辆的三维端到端学习方法，使用深度结构化损失通过线性程序反向传播，解决了关联问题。相反，Feichtenhofer 等提出了一种更通用的检测和跟踪端到端学习方法，该方法通过扩的其他方法得卷积目标检测器而具有跟踪损失，该损失使对象坐标跨帧回归。 但是，他们仅对ImageNet VID 进行评估，该数据集主要由在视频中心具有一个或几个对象的序列组成。</p>
+<h4 id="6-3-Datasets"><a href="#6-3-Datasets" class="headerlink" title="6.3 Datasets"></a>6.3 Datasets</h4><p>　　早期的多目标跟踪的数据集包括独立的序列，例如PETS，TUD 以及 ETHZ，对这些序列的单独评估导致跟踪算法对其中一些序列过拟合，而对另一些序列表现较差。虽然有些序列( 如 PETS 和 TUD) 是从静态观察者捕获的，但其他与自动驾驶更相关的序列是从移动平台获取的。KITTI数据集提供了特定于自动驾驶的跟踪数据，并对车辆和行人类别进行了单独的评估。</p>
+<p>　　MOT基准测试连续三年发布，包括 MOT15、MOT16 和 MOT17，由一系列带有跟踪标签的序列组成，并提供基于 CLEAR 度量的官方评估协议。最早的MOT15使用基于聚合通道特征(ACF)的经典对象检测器，在MOT16中，利用可变形部件模型 (Deformable Parts Model, DPM) 进行检测，而在MOT17中，利用 DPM、Faster R-CNN 和 Scale Dependent Pooling (SDP) 提供了三组不同的目标检测。提供检测集可以根据方法跟踪对象的能力进行比较，而与由不同检测器引起的错误无关。对于MOT16，表一中提供了使用公共（DPM）检测方法的排行榜，表二中显示了使用专用检测器的方法，对于MOT17，表三显示了同一组序列上三个检测器的平均结果。</p>
+<p><strong>表一</strong><br>　　<img src="https://img-blog.csdnimg.cn/20200508100543778.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<p><strong>表二</strong><br>　　<img src="https://img-blog.csdnimg.cn/20200508100643921.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<p><strong>表三</strong><br>　　<img src="https://img-blog.csdnimg.cn/20200508101435516.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<p>表中给出了多目标跟踪精度(MOTA)、识别检测的F1分数(IDF1)、主要跟踪轨迹(MT)和主要丢失轨迹(ML)的比率、ID开关(IDS)的数量和跟踪分段(FRAG)以及运行时间。</p>
+<p>　　对于自动驾驶应用，KITTI  提供了两个基准，一个基准用于表四中的汽车( KITTI ) 汽车跟踪，另一个基准用于表五中的行人跟踪。 标有星号的方法使用 Regionlet 检测来独立比较跟踪性能。 汽车和行人面临的不同挑战允许分别关注每个类别，并深入研究特定于类别的问题。</p>
+<p><strong>表四</strong><br>　　<img src="https://img-blog.csdnimg.cn/20200508103410653.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<p><strong>表五</strong><br>　　<img src="https://img-blog.csdnimg.cn/20200508103500379.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<h4 id="6-4-Metrics"><a href="#6-4-Metrics" class="headerlink" title="6.4 Metrics"></a>6.4 Metrics</h4><p>　　从上面的表中可以看到，用到的度量指标有：多目标跟踪精度 (MOTA)和多目标跟踪精度 (MOTP) 由引入，主要跟踪轨迹 (MT) 和主要丢失轨迹 (ML) 的比例，ID开关的数量 (IDS) 和跟踪分段 (FRAG) 。对于 MOT 的结果，给出的是 IDF1 而不是 MOTP，IDF1 分数为识别精度和召回率的 F1 分数，即正确识别的检测数与ground truth和计算出的检测数的平均数之比。跟踪轨迹和丢失轨迹分别显示了一个假设在至少80%或至多20%的时间内覆盖轨迹的百分比<font color="green">（这里不太理解）</font>。</p>
+<h4 id="6-5-State-of-the-Art-on-MOT-amp-KITTI"><a href="#6-5-State-of-the-Art-on-MOT-amp-KITTI" class="headerlink" title="6.5 State of the Art on MOT &amp; KITTI"></a>6.5 State of the Art on MOT &amp; KITTI</h4><p><strong>MOT16 Benchmark：</strong> 经典的方法，如近在线多目标跟踪方法、多假设跟踪方法、基于马尔科夫决策过程的跟踪等，与新提出的方法相比，在 MOT 基准上仍然表现良好，而在第6.2.5中所说的有更好的外观模型的深度学习模型表现得更好。表三中的 MHT bLSTM 中提出的基于学习的方法在 ground truth 上训练，但由于噪声 DPM 检测影响了总体性能，因此在MOT17 (表三) 方面的表现不如 MHT DAM 。</p>
+<p>　　单目标跟踪器 (SOT) 的成功引出了一些方法，这些方法通过学习每个对象的跟踪器来组合多个 MOT 单目标检测器。这些方法在高度可靠地检测到新对象时会初始化一个新的单对象跟踪器，他们根据运动模型限制搜索空间，并使用二进制分类器选择最佳的检测候选，从而将已知目标的检测分配给每个单一目标跟踪器。Chu等人提出了一种时空注意机制来处理目标之间的遮挡和相互作用引起的漂移，还提出了另一种方法，对对象模型内部和之间的感知进行编码，并提出了一种自适应模型更新策略来消除模型初始化中的噪声。</p>
+<p>　　Ma等人提出的自定义跟踪器是利用所提供的检测在MOT16上发表最好的方法(表一中)，这种基于图的聚类公式虽然是离线的，并不直接适用于自动驾驶，但是在 MOT 上表现得非常好。与以前的方法相比，他们通过使用测试序列微调重新识别网络来学习序列特异性跟踪器，他们假设不重叠的轨迹代表不同的个体，从而在测试序列上采用通用的重新识别CNN。</p>
+<p>　　比较 MOT16 上的公共和专用检测器(表一和表二)，可以看出好的对象检测器的重要性，专用的检测器性能要好一些。最近的目标检测器结合简单的跟踪算法，其性能明显优于任何具有公共检测的跟踪器，如基于 Hungarian 方法结合卡尔曼滤波的简单跟踪器 IOU 或 SORT。 Wojke 等人通过将深度特征合并到 pipeline 中进行外观匹配，进一步提高了SORT的性能，Yu等也采用了一种基于 Hungarian 算法和卡尔曼滤波的跟踪算法，结合深度特征进行外观匹配。然而，他们的探测器会根据额外的数据进行训练，包括一个自我收集的不公开的监控数据集。</p>
+<p><strong>MOT17 Benchmark：</strong>  在 MOT17 上表现最好的方法（表三中）遵循图聚类方案，将小轨迹关联在一起，即较短的检测序列，可以轻松可靠地关联检测序列，而不是检测。Wang 等人首先在移动相机的情况下基于 IOU 和极外几何创建轨迹，轨迹表示图上的节点，然后根据基于贪婪搜索的聚类方法对节点进行聚类。但是这样的方法会有一个预处理生成轨迹，最近的一种方法称为 FAMNet ，它将特征提取、关联估计和分配问题结合在一个网络中，并且为了从失踪的检测中恢复过来，还将单目标跟踪融入到跟踪系统中。</p>
+<p>　　最近，一些方法提出使用额外的线索，如头部检测和运动分割来改进跟踪，MOT17（表三中）表现好的两种方法将头部、身体和关节检测器融合到跟踪系统中。Keuper 等人提出的另一种方法是通过自顶向下的边界盒聚类和自底向上的点轨迹运动分割来处理多目标跟踪。</p>
+<p><strong>KITTI Benchmark：</strong> 与 MOT 相比，KITTI 基准测试关注的是在交通场景中跟踪行人(表五)和汽车(表四)的挑战性场景。与MOT相似，经典方法的效果也相当不错，例如基于 Markov 决策过程（IMMDP）的目标跟踪，改进的最小损失网络流量 flow 或近在线多目标跟踪算法（NOMT）。在 IMMDP 中，学习策略采用强化学习，这相当于学习一个数据关联的相似函数。区域建议网络的改进是汽车跟踪任务中表现最好的方法。Lenz等人提出了一种基于计算和内存的最小损失网络流公式，这种方法取得了良好的准确性和精度，同时是对 KITTI 汽车跟踪中最快的方法。NOMT 提出了对相对运动模式进行编码的聚合局部流描述符 (ALFD)。正是由于这些特点，可以可靠地匹配远距离检测，并在 KITTI 汽车跟踪的表现上优于其他的方法。</p>
+<p>　　最近的方法利用了特定域的信息例如汽车的动作或者场景的结构。Yoon等人通过构建一个网络来描述物体之间的相对运动，从而提取出相机的运动，他们进一步改进，利用了由两个对象之间的位置和速度差定义的结构运动约束，如图所示，正确的检测用红色和黄色的方框标出：<br>　　<img src="https://img-blog.csdnimg.cn/20200508154607627.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"><br>这种结构的联合推理使他们能够缓解 2D 目标跟踪常见的问题 (例如遮挡) ，尤其是跟踪汽车。Frossard 和 Urtasun 提出学习基于 3D 检测的网络 flow 跟踪方法，采用结构化的铰链损耗通过整数规划进行反向传播。其他表现比较好的基于 3D 的方法中，其一使用新的 2D-3D卡尔曼滤波器耦合图像和世界空间估计，其二提出了 Poisson 多伯努利混合（PMBM）跟踪器。另外，Sharma等利用城市道路场景的几何形状来推断 3D 线索，以便基于对象的单视图重建来跟踪 3D 姿态和形状， 此方法在 KITTI 汽车跟踪中的准确性（MOTA）和准确性（MOTP）优于其他所有方法。</p>
+<p>　</p>
+<h4 id="6-6-Discussion"><a href="#6-6-Discussion" class="headerlink" title="6.6 Discussion　"></a>6.6 Discussion　</h4><p>　　　可靠的跟踪检测只能通过使用非常精确的目标检测来实现。检测系统的影响可以对比 KITTI中有星号和没有星号的方法(表四，表五)。在 MOT16的 leader board中，当比较使用表一中的公共检测和表二中的专用对象检测器的方法的表时，可以观察到这一点。于对象检测一样，行人的跟踪具有挑战，因为行人的复杂运动很难预测，这与汽车的刚性运动相反，因为汽车运动会受道路区域约束并由于其较大的质量和动力学约束而遵循较少不稳定行为。3D 推理可以通过根据几何关系识别合理的解决方案来帮助改善跟踪性能，尤其是对于汽车。</p>
+<p>　　　在交通场景中，检测器经常会对部分或完全遮挡的对象失效，在这些情况下，跟踪系统需要在之后的时间重新识别被跟踪的对象，但是由于光照条件的变化或与附近其他对象的相似性，这可能会很困难。这些问题会导致轨迹重新初始化，这在体现在 MOT 和 KITTI 基准测试中的FRAG 和 ID开关（IDS）值比较高。此外，大多数跟踪系统包含复杂的 pipeline，并且在文献中很少提出端到端的多目标跟踪算法。 以通用和端到端可训练模型为目标，缩小从检测到跟踪的差距，将是该领域未来研究的重要方向。</p>
+<p>　　　总的说来，未来的发展方向，网络需具有的功能：端到端的训练网络，多目标跟踪，泛化能力强，减小从检测到跟踪时由于检测的失效而带来的对跟踪的影响。</p>
+<p>　　</p>
+<p>　
+　</p>
 
             </div>
             <hr>
