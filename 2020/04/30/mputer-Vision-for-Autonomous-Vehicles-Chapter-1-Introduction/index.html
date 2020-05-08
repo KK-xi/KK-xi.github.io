@@ -149,7 +149,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    1.1k 字
+                    1.2k 字
                   </span>
                 
 
@@ -157,7 +157,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      3 分钟
+                      4 分钟
                   </span>
                 
 
@@ -185,21 +185,20 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》">《Computer Vision for Autonomous Vehicles: Problems, Datasets and State of the Art》</h2>
-<p>Author：Joel Janai | Fatma Gu ney |  Aseem Behl | Andreas Geiger<br>
-Date：December 18, 2019</p>
-<h3 id="Abstract">Abstract</h3>
-<p>现在还没有关于 CV 的自动驾驶中问题、数据集和方法的综合性研究，这篇综述给出了几乎是最新的数据集和方法。文章不仅呈现以前的文献资料，还有目前的几个 topics，涉及 识别、重建、运动估计、跟踪、场景理解以及自动驾驶端到端的学习。书中分析了当前状态在几个具有挑战性的基准数据集上的表现，包括 KITTI、MOT和 Cityscapes。此外，还讨论了开放的问题和当前的研究挑战。</p>
-<h3 id="Chapter-1-Introduction">Chapter 1 Introduction</h3>
+              <h2 id="computer-vision-for-autonomous-vehicles-problems-datasets-and-state-of-the-art">《Computer Vision for Autonomous Vehicles: Problems, Datasets and State of the Art》</h2>
+<p>Author：Joel Janai | Fatma Gu ney | Aseem Behl | Andreas Geiger Date：December 18, 2019</p>
+<p><font color="navy"><strong>声明：</strong>这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> <br></p>
+<p><font color="navy"><strong>Disclaimer:</strong> This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just read the notes here for future reference, if there is any infringement, it will be deleted immediately.</font></p>
+<h3 id="abstract">Abstract</h3>
+<p>　　现在还没有关于 CV 的自动驾驶中问题、数据集和方法的综合性研究，这篇综述给出了几乎是最新的数据集和方法。文章不仅呈现以前的文献资料，还有目前的几个 topics，涉及 识别、重建、运动估计、跟踪、场景理解以及自动驾驶端到端的学习。书中分析了当前状态在几个具有挑战性的基准数据集上的表现，包括 KITTI、MOT和 Cityscapes。此外，还讨论了开放的问题和当前的研究挑战。</p>
+<h3 id="chapter-1-introduction">Chapter 1 Introduction</h3>
 <p>人们想要实现的全自动导航到现在还没有实现，原因归结为以下两个方面：</p>
 <p>1、首先，在复杂的动态环境中运行的自治系统需要模型，这些模型能够及时地归纳出不可预测的情况和原因。</p>
 <p>2、其次，模型明智的决策需要准确的感知，然而大多数现有的计算机视觉模型仍然不如人类的感知和推理。</p>
-<p>有的自动驾驶方法大致可以分为模块化 pipeline 和单块 end-to-end 的学习方法。两种方法大致的流程对比如下图所示：<br>
-　　<img src="https://img-blog.csdnimg.cn/2020043008241786.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70
-" width="80%"><br>
-模块化 pipeline 是自动驾驶中的标准方法，在行业中经常用到，主要思想就是将高维输入到低维控制变量的复杂映射函数分解成可独立开发、训练和测试的模块。现有的方法通常利用机器学习(例如深度神经网络)来提取 feature 或将 scene 解析为单独的组件，路径规划和车辆控制则由经典的状态机、搜索算法和控制模型主导。这种方法的主要<font color="blue">优点</font>是，首先它们的中间 representations 可由人来解释，如检测到的对象或自由空间信息，从而能够洞察系统的故障模式，其次它的开发可以很容易地在公司内部并行化，而且可以很容易的将基本原理和先验知识集合到系统中。其他人类难以手工处理的方面，例如行人的外观检测，可以从大型带注释的数据集中学习。他的主要<font color="blue">缺陷</font>在于，一是人类设计的中间的 representations 并不一定就是最好的，二是模块都是利用辅助损失单独进行训练验证的（物体检测的例子）。</p>
-<p>为解决以上问题，提出了端到端的学习策略，就是用一种模块（深度网络）完成从观察到行动的函数。但是缺点是整体的网络不易解释，类似一个“黑盒”，不能准确说明哪里出了问题。</p>
-<p>综述注重讲自动驾驶中的感知，一些文章也讨论了关于自动驾驶的一些问题，但没有关于各种视觉任务的先进技术深入的综述，所以这本书的目标是通过提供一些的概述和比较，包括环境感知的工作，来缩短机器人、智能车辆和计算机视觉之间的差距。这篇综述提供了一个<a href="http://www.cvlibs.net/projects/autonomous_vision_survey" target="_blank" rel="noopener">在线交互工具</a>，它可以方便人们访问相关的主题，以及提供额外的信息。综述首先提供了自动驾驶的简要历史，然后介绍了相机模型和校准技术。接着，综述介绍了与自动驾驶相关的数据集（重点关注与感知相关的数据集）、相关的感知任务和最新的解决方法。尤其是，综述回顾了目标检测、目标跟踪、语义（实体）分割、重建、运动估计和场景理解。每个章节包含了问题定义、重要方法和主要设计选择、顶尖技术在流行数据集上的定性和定量分析以及关于领域最先进技术的讨论。最终，综述提供了关于最先进端到端自动驾驶模型的概览。</p>
+<p>　　有的自动驾驶方法大致可以分为模块化 pipeline 和单块 end-to-end 的学习方法。两种方法大致的流程对比如下图所示： 　　<img src="https://img-blog.csdnimg.cn/2020043008241786.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70
+" width="80%"> 模块化 pipeline 是自动驾驶中的标准方法，在行业中经常用到，主要思想就是将高维输入到低维控制变量的复杂映射函数分解成可独立开发、训练和测试的模块。现有的方法通常利用机器学习(例如深度神经网络)来提取 feature 或将 scene 解析为单独的组件，路径规划和车辆控制则由经典的状态机、搜索算法和控制模型主导。这种方法的主要<font color="blue">优点</font>是，首先它们的中间 representations 可由人来解释，如检测到的对象或自由空间信息，从而能够洞察系统的故障模式，其次它的开发可以很容易地在公司内部并行化，而且可以很容易的将基本原理和先验知识集合到系统中。其他人类难以手工处理的方面，例如行人的外观检测，可以从大型带注释的数据集中学习。他的主要<font color="blue">缺陷</font>在于，一是人类设计的中间的 representations 并不一定就是最好的，二是模块都是利用辅助损失单独进行训练验证的（物体检测的例子）。</p>
+<p>　　为解决以上问题，提出了端到端的学习策略，就是用一种模块（深度网络）完成从观察到行动的函数。但是缺点是整体的网络不易解释，类似一个“黑盒”，不能准确说明哪里出了问题。</p>
+<p>　　综述注重讲自动驾驶中的感知，一些文章也讨论了关于自动驾驶的一些问题，但没有关于各种视觉任务的先进技术深入的综述，所以这本书的目标是通过提供一些的概述和比较，包括环境感知的工作，来缩短机器人、智能车辆和计算机视觉之间的差距。这篇综述提供了一个<a href="http://www.cvlibs.net/projects/autonomous_vision_survey" target="_blank" rel="noopener">在线交互工具</a>，它可以方便人们访问相关的主题，以及提供额外的信息。综述首先提供了自动驾驶的简要历史，然后介绍了相机模型和校准技术。接着，综述介绍了与自动驾驶相关的数据集（重点关注与感知相关的数据集）、相关的感知任务和最新的解决方法。尤其是，综述回顾了目标检测、目标跟踪、语义（实体）分割、重建、运动估计和场景理解。每个章节包含了问题定义、重要方法和主要设计选择、顶尖技术在流行数据集上的定性和定量分析以及关于领域最先进技术的讨论。最终，综述提供了关于最先进端到端自动驾驶模型的概览。</p>
 
             </div>
             <hr>
@@ -213,9 +212,6 @@ Date：December 18, 2019</p>
                       &nbsp;
                     
                       <a class="hover-with-bg" href="/categories/work/Autonomous-Vehicles/">Autonomous Vehicles</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/work/Autonomous-Vehicles/chapter-1/">chapter 1</a>
                       &nbsp;
                     
                   </span>&nbsp;&nbsp;
