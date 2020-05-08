@@ -185,50 +185,72 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="视觉SLAM十四讲"><a href="#视觉SLAM十四讲" class="headerlink" title="视觉SLAM十四讲"></a>视觉SLAM十四讲</h2><p>作者： 高翔 | 张涛</p>
-<h3 id="第七章-视觉里程计-1"><a href="#第七章-视觉里程计-1" class="headerlink" title="第七章  视觉里程计 1"></a>第七章  视觉里程计 1</h3><p><strong>主要内容</strong>：本讲关注基于特征点方式的视觉里程计算法，将介绍什么是特征点，如何提取和匹配特征点，以及如何根据配对的特征点估计相机运动。</p>
-<h4 id="7-1-特征点法"><a href="#7-1-特征点法" class="headerlink" title="7.1 特征点法"></a>7.1 特征点法</h4><p>　　VO 的实现方法，按是否需要提取特征，分为特征点法的前端以及不提特征的直接法前端。</p>
-<h5 id="7-1-1-特征点"><a href="#7-1-1-特征点" class="headerlink" title="7.1.1 特征点"></a>7.1.1 特征点</h5><p>　　VO 的主要问题是如何根据图像来估计相机运动，对于图像的处理，我们习惯于这样的做法：首先，从图像中选取比较<strong>有代表性的点</strong>。这些点在相机视角发生少量变化后会保持不变，所以我们会在各个图像中找到相同的点。然后，在这些点的基础上，讨论相机位姿估计问题，以及这些点的定位问题。在经典 SLAM 模型中，把它们称为路标， 而在视觉 SLAM 中，路标则是指图像特征（Features）。 图像的特征点是一些比较特别的地方，如下图所示的角点、边缘和区块：<br>　　<img src="https://img-blog.csdnimg.cn/20200430104056565.png?ype_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"><br>一种比较直观的提取特征的方式就是在不同图像间辨认角点，确定它们的对应关系，就是所谓的特征，因为角点相比边缘和像素块区更加“特别”，它们不同图像之间的辨识度更强。但是角点的外观会发生变化（例如当相机由远及近、旋转时观察到的会变化），所以 CV 研究者就设计出了很多稳定的局部图像特征（SIFT、SURF、ORB等），这些人工设计的特征点具有：</p>
+              <h2 id="视觉slam十四讲">视觉SLAM十四讲</h2>
+<p>作者： 高翔 | 张涛</p>
+<h3 id="第七章-视觉里程计-1">第七章 视觉里程计 1</h3>
+<p><strong>主要内容</strong>：本讲关注基于特征点方式的视觉里程计算法，将介绍什么是特征点，如何提取和匹配特征点，以及如何根据配对的特征点估计相机运动。</p>
+<h4 id="特征点法">7.1 特征点法</h4>
+<p>　　VO 的实现方法，按是否需要提取特征，分为特征点法的前端以及不提特征的直接法前端。</p>
+<h5 id="特征点">7.1.1 特征点</h5>
+<p>　　VO 的主要问题是如何根据图像来估计相机运动，对于图像的处理，我们习惯于这样的做法：首先，从图像中选取比较<strong>有代表性的点</strong>。这些点在相机视角发生少量变化后会保持不变，所以我们会在各个图像中找到相同的点。然后，在这些点的基础上，讨论相机位姿估计问题，以及这些点的定位问题。在经典 SLAM 模型中，把它们称为路标， 而在视觉 SLAM 中，路标则是指图像特征（Features）。 图像的特征点是一些比较特别的地方，如下图所示的角点、边缘和区块： 　　<img src="https://img-blog.csdnimg.cn/20200430104056565.png?ype_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"> 一种比较直观的提取特征的方式就是在不同图像间辨认角点，确定它们的对应关系，就是所谓的特征，因为角点相比边缘和像素块区更加“特别”，它们不同图像之间的辨识度更强。但是角点的外观会发生变化（例如当相机由远及近、旋转时观察到的会变化），所以 CV 研究者就设计出了很多稳定的局部图像特征（SIFT、SURF、ORB等），这些人工设计的特征点具有：</p>
 <p>1、可重复性：相同的“区域”可以在不同的图像中被找到。</p>
-<p>2、可区别性：不同的“区域”有不同的表达。 </p>
-<p>3、高效率：：同一图像中，特征点的数量应远小于像素的数量。 </p>
+<p>2、可区别性：不同的“区域”有不同的表达。</p>
+<p>3、高效率：：同一图像中，特征点的数量应远小于像素的数量。</p>
 <p>4、本地性：特征仅与一小片图像区域相关。</p>
-<p>　　特征点由关键点（Key-point）和描述子（Descriptor）两部分组成：关键点 是指<font color="maroon">该特征点在图像里的位置</font>，有些特征点还具有朝向、大小等信息；描述子通常是一个向量，按照某种人为设计的方式，描述了<font color="maroon">该关键点周围像素的信息</font>。描述子是按照“外观相似的特征应该有相似的描述子”的原则设计的。因此，只要两个特征点的描述子在向量空间上的距离相近，就可以认为它们是同样的特征点。其中 ORB 在保持了特征子具有旋转，尺度不变性的同时，计算速度方面提升明显，对于实时性要求很高的 SLAM 来说是一个很好的选择。  </p>
-<h5 id="7-1-2-ORB-特征"><a href="#7-1-2-ORB-特征" class="headerlink" title="7.1.2 ORB 特征"></a>7.1.2 ORB 特征</h5><p>先看一下ORB特征点检测结果：<br><img src="https://img-blog.csdnimg.cn/20200430112546517.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"><br> 　　ORB 特征由关键点和描述子两部分组成，关键点称为“Oriented FAST”，是 一种改进的 FAST 角点，它的描述子称为 BRIEF （Binary Robust Independent Elementary Features）。因此，提取 ORB 特征分为两个步骤：</p>
+<p>　　特征点由关键点（Key-point）和描述子（Descriptor）两部分组成：关键点 是指<font color="maroon">该特征点在图像里的位置</font>，有些特征点还具有朝向、大小等信息；描述子通常是一个向量，按照某种人为设计的方式，描述了<font color="maroon">该关键点周围像素的信息</font>。描述子是按照“外观相似的特征应该有相似的描述子”的原则设计的。因此，只要两个特征点的描述子在向量空间上的距离相近，就可以认为它们是同样的特征点。其中 ORB 在保持了特征子具有旋转，尺度不变性的同时，计算速度方面提升明显，对于实时性要求很高的 SLAM 来说是一个很好的选择。</p>
+<h5 id="orb-特征">7.1.2 ORB 特征</h5>
+<p>先看一下ORB特征点检测结果： <img src="https://img-blog.csdnimg.cn/20200430112546517.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"> 　　ORB 特征由关键点和描述子两部分组成，关键点称为“Oriented FAST”，是 一种改进的 FAST 角点，它的描述子称为 BRIEF （Binary Robust Independent Elementary Features）。因此，提取 ORB 特征分为两个步骤：</p>
 <p>1、FAST 角点提取：找出图像中的” 角点”。ORB 中计算了特征点的主方向，为后续的 BRIEF 描述子增加了旋转不变特性。</p>
 <p>2、BRIEF 描述子：对前一步提取出特征点的周围图像区域进行描述（例如关键点附近两个像素（比如说 p 和 q）的大小关系：如果 p 比 q 大，则取 1，反之就取 0）。</p>
 <p>关于 FAST 和 BRIEF 的介绍略。</p>
-<h5 id="7-1-3-特征匹配"><a href="#7-1-3-特征匹配" class="headerlink" title="7.1.3 特征匹配"></a>7.1.3 特征匹配</h5><p>特征匹配是视觉 SLAM 中极为关键的一步，解决了 SLAM 中的数据关联问题（data association），即确定当前看到的路标与之前看到的路标之间的对应关系。由于图像特征的局部特性，误匹配的情况广泛存在，目前已经成为视觉 SLAM 中制约性能提升的一大瓶颈。最简单的匹配方法就是<font color="maroon">暴力匹配</font>：计算一幅图中的每一个特征点与另一幅图中所有特征点的距离（距离表示特征之间的相似程度，对于浮点型描述子常用欧氏距离，对于二进制描述子常用汉明距离），最近的为匹配点。由于暴力匹配法的运算量很大，特别是当我们想要匹 配一个帧和一张地图的时候，这不符合我们在 SLAM 中的实时性需求。此时<font color="maroon">快速近似最近邻（FLANN）算法</font>更加适合于匹配点数量极多的情况。</p>
-<h4 id="7-2-实践：特征提取和匹配"><a href="#7-2-实践：特征提取和匹配" class="headerlink" title="7.2 实践：特征提取和匹配"></a>7.2 实践：特征提取和匹配</h4><p>目前主流的几种图像特征在 OpenCV 开源图像库中都已经集成完毕，用的时候可以很方便地进行调用。然后希望根据匹配的点对，估计相机的运动。这里由于相机的原理不同，有以下几种情况：</p>
+<h5 id="特征匹配">7.1.3 特征匹配</h5>
+<p>特征匹配是视觉 SLAM 中极为关键的一步，解决了 SLAM 中的数据关联问题（data association），即确定当前看到的路标与之前看到的路标之间的对应关系。由于图像特征的局部特性，误匹配的情况广泛存在，目前已经成为视觉 SLAM 中制约性能提升的一大瓶颈。最简单的匹配方法就是<font color="maroon">暴力匹配</font>：计算一幅图中的每一个特征点与另一幅图中所有特征点的距离（距离表示特征之间的相似程度，对于浮点型描述子常用欧氏距离，对于二进制描述子常用汉明距离），最近的为匹配点。由于暴力匹配法的运算量很大，特别是当我们想要匹 配一个帧和一张地图的时候，这不符合我们在 SLAM 中的实时性需求。此时<font color="maroon">快速近似最近邻（FLANN）算法</font>更加适合于匹配点数量极多的情况。</p>
+<h4 id="实践特征提取和匹配">7.2 实践：特征提取和匹配</h4>
+<p>目前主流的几种图像特征在 OpenCV 开源图像库中都已经集成完毕，用的时候可以很方便地进行调用。然后希望根据匹配的点对，估计相机的运动。这里由于相机的原理不同，有以下几种情况：</p>
 <p>1、当相机为单目时只知道 2D 的像素坐标，因而问题是根据两组 2D 点估计运 动。该问题用<font color="maroon">对极几何</font>来解决。</p>
-<p>2、当相机为双目、RGB-D 时，或者我们通过某种方法得到了距离信息 (depth information)，那问题就是根据两组 3D 点估计运动。该问题通常用 ICP 来解决。 </p>
+<p>2、当相机为双目、RGB-D 时，或者我们通过某种方法得到了距离信息 (depth information)，那问题就是根据两组 3D 点估计运动。该问题通常用 ICP 来解决。</p>
 <p>3、如果有 3D 点和它们在相机的投影位置，也能估计相机的运动。该问题通过 PnP 求解。</p>
-<h4 id="7-3-2D-2D：对极几何"><a href="#7-3-2D-2D：对极几何" class="headerlink" title="7.3 2D-2D：对极几何"></a>7.3 2D-2D：对极几何</h4><h5 id="7-3-1-对极约束"><a href="#7-3-1-对极约束" class="headerlink" title="7.3.1  对极约束"></a>7.3.1  对极约束</h5><p>如下图匹配好的两幅图的特征点：<br><img src="https://img-blog.csdnimg.cn/20200430134931383.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"><br>　　如果有很多这样的匹配点，就可以通过这些二维图像点的对应关系，恢复出在两帧之间摄像机的运动。设第一帧到第二帧的运动为$R,t$，两个相机的<font color="teal">中心</font>分别为$O_1,O_2$。现在，考虑$I_1$中有一个特征点$p_1$，它在$I_2$中对应着特征点$p_2$，如果匹配正确，说明它们确实是同<font color="teal">一个空间点在两个成像平面上的投影</font>。图中$\overrightarrow{O_1p_1}$和$\overrightarrow{O_2p_2}$在三维空间中会相交于点 P，$O_1,O_2,P$就确定一个<font color="teal">极平面（Epipolar plane）</font>，$O_1,O_2$连线 <font color="teal">(基线 Baseline )</font> 与像平面$I_1,I_2$交于<font color="teal">极点 (Epipoles)</font> $e_1,e_2$。则图中两个平面的交线$l_1,l_2$为<font color="teal">极线（Epipolar line）</font>。</p>
-<p>　 　从第一帧的角度看，射线$\overrightarrow{O_1p_1}$是某个像素可能出现的空间位置，因为该射线上的所有点都会投影到同一个像素点。同时在匹配正确的情况下，如果不知道 P 的位置，那么在第二个图像上看时，第二个图像中的极线就是 P 可能出现的投影的位置，也就是$\overrightarrow{O_1p_1}$在第二个相机中的投影。现在，由于特征点匹配确定了$p_2$的像素位置，所以能够推断 P 的空间位置，以及相机的运动。下面从几何关系来理解：</p>
-<p>　 　两个像素点$p_1,p_2$的像素位置为<script type="math/tex">s_1p_1=KP</script> <script type="math/tex">s_2p_2=K(RP+t)</script> 其中 P 为空间点，K为相机参数，R 和 t 为相机的旋转平移，齐次坐标下<br>表示为 <script type="math/tex">p_1=KP</script> <script type="math/tex">p_2=K(RP+t)</script><br>取两个像素点的归一化平面上的坐标 <script type="math/tex">x_1=K^{-1}p_1</script> <script type="math/tex">x_2=K^{-1}p_2</script> 则得到 <script type="math/tex">x_2=Rx_1+t</script> 两侧同时与 t 做外积得 <script type="math/tex">t∧x_2=t \hat{ }Rx_1</script> 再同时左乘$x_2^T$得  <script type="math/tex">x_2^Tt∧x_2=x_2^Tt∧Rx_1</script> 上式可以简化为 <script type="math/tex">x_2^Tt∧Rx_1=0</script> 重新代入$p_1,p_2$，有 <script type="math/tex">p_2^TK^{-T}t∧RK^{-1}p_1=0</script> 上两式均为<font color="maroon">对极约束</font>，几何意义在于$O_1,P,O_2$三点共面，约束中包含了平移和旋转。再利用本质矩阵$E=t∧R$基础矩阵$F=K^{-T}EK^{-1}$简化对极约束得到：<script type="math/tex">x_2^TEx_2=p_2^TFp_1=0</script> 所以相机位姿估计问题变为以下两步：</p>
-<p>1、根据配对点的像素位置，求出 E 或者 F； </p>
-<p>2、根据 E 或者 F，求出 $R,t$（会用到奇异值分解）。</p>
-<h4 id="7-4-实践：对极约束求解相机运动"><a href="#7-4-实践：对极约束求解相机运动" class="headerlink" title="7.4 实践：对极约束求解相机运动"></a>7.4 实践：对极约束求解相机运动</h4><p>通过Essential 矩阵来求解相机运动。</p>
-<h4 id="7-5-三角测量"><a href="#7-5-三角测量" class="headerlink" title="7.5 三角测量"></a>7.5 三角测量</h4><p>在利用对极约束估计了相机运动之后，下一步需要用相机的运动估计特征点的空间位置。在单目 SLAM 中，仅通过单张图像无法获得像素的深度信息，我们需要通过<font color="maroon">三角测量</font>（Triangulation）（或三 角化）的方法来估计地图点的深度。<br>　　三角测量是指，通过在两处观察同一个点的夹角，确定该点的距离。在 SLAM 中，我们主要用三角化来估计像素点的距离。以7.3.1中的图为例，理论上直线$O_1p_1$与$O_2p_2$会交于一个点 P，即对应的地图点在三维场景中的位置。但是由于噪声的影响，这两条直线往往无法相交，所以要用最小二乘法求解。前面知道特征点的归一化坐标 <script type="math/tex">s_1x_1=s_2Rx_2=+t</script> ,相机运动 $R,t$已经估计出来了，现在要求的是两个特征点的深度。这两个深度可以分开求，要算$s_2$，则在两侧的左边乘以$x_1$外积可使等式归0，则右侧可看成是关于$s_2$的方程，可以求出来。于是两个帧下的点的深度都求出来了，便可以确定空间坐标了，但是由于噪声的存在，估得的$R,t$不一定精确使等式为零，所以更常见的做法求最小二乘解而不是零解。</p>
-<h4 id="7-6-实践：三角测量"><a href="#7-6-实践：三角测量" class="headerlink" title="7.6 实践：三角测量"></a>7.6 实践：三角测量</h4><p>编程调用 OpenCV 提供的 triangulation 函数进行三角化。</p>
+<h4 id="d-2d对极几何">7.3 2D-2D：对极几何</h4>
+<h5 id="对极约束">7.3.1 对极约束</h5>
+<p>如下图匹配好的两幅图的特征点： <img src="https://img-blog.csdnimg.cn/20200430134931383.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"> 　　如果有很多这样的匹配点，就可以通过这些二维图像点的对应关系，恢复出在两帧之间摄像机的运动。设第一帧到第二帧的运动为<span class="math inline">\(R,t\)</span>，两个相机的<font color="teal">中心</font>分别为<span class="math inline">\(O_1,O_2\)</span>。现在，考虑<span class="math inline">\(I_1\)</span>中有一个特征点<span class="math inline">\(p_1\)</span>，它在<span class="math inline">\(I_2\)</span>中对应着特征点<span class="math inline">\(p_2\)</span>，如果匹配正确，说明它们确实是同<font color="teal">一个空间点在两个成像平面上的投影</font>。图中<span class="math inline">\(\overrightarrow{O_1p_1}\)</span>和<span class="math inline">\(\overrightarrow{O_2p_2}\)</span>在三维空间中会相交于点 P，<span class="math inline">\(O_1,O_2,P\)</span>就确定一个<font color="teal">极平面（Epipolar plane）</font>，<span class="math inline">\(O_1,O_2\)</span>连线 <font color="teal">(基线 Baseline )</font> 与像平面<span class="math inline">\(I_1,I_2\)</span>交于<font color="teal">极点 (Epipoles)</font> <span class="math inline">\(e_1,e_2\)</span>。则图中两个平面的交线<span class="math inline">\(l_1,l_2\)</span>为<font color="teal">极线（Epipolar line）</font>。</p>
+<p>　 　从第一帧的角度看，射线<span class="math inline">\(\overrightarrow{O_1p_1}\)</span>是某个像素可能出现的空间位置，因为该射线上的所有点都会投影到同一个像素点。同时在匹配正确的情况下，如果不知道 P 的位置，那么在第二个图像上看时，第二个图像中的极线就是 P 可能出现的投影的位置，也就是<span class="math inline">\(\overrightarrow{O_1p_1}\)</span>在第二个相机中的投影。现在，由于特征点匹配确定了<span class="math inline">\(p_2\)</span>的像素位置，所以能够推断 P 的空间位置，以及相机的运动。下面从几何关系来理解：</p>
+<p>　 　两个像素点<span class="math inline">\(p_1,p_2\)</span>的像素位置为<span class="math display">\[s_1p_1=KP\]</span> <span class="math display">\[s_2p_2=K(RP+t)\]</span> 其中 P 为空间点，K为相机参数，R 和 t 为相机的旋转平移，齐次坐标下 表示为 <span class="math display">\[p_1=KP\]</span> <span class="math display">\[p_2=K(RP+t)\]</span> 取两个像素点的归一化平面上的坐标 <span class="math display">\[x_1=K^{-1}p_1 \]</span> <span class="math display">\[x_2=K^{-1}p_2\]</span> 则得到 <span class="math display">\[x_2=Rx_1+t\]</span> 两侧同时与 t 做外积得 <span class="math display">\[t∧x_2=t \hat{ }Rx_1\]</span> 再同时左乘<span class="math inline">\(x_2^T\)</span>得 <span class="math display">\[x_2^Tt∧x_2=x_2^Tt∧Rx_1\]</span> 上式可以简化为 <span class="math display">\[x_2^Tt∧Rx_1=0\]</span> 重新代入<span class="math inline">\(p_1,p_2\)</span>，有 <span class="math display">\[p_2^TK^{-T}t∧RK^{-1}p_1=0\]</span> 上两式均为<font color="maroon">对极约束</font>，几何意义在于<span class="math inline">\(O_1,P,O_2\)</span>三点共面，约束中包含了平移和旋转。再利用本质矩阵<span class="math inline">\(E=t∧R\)</span>基础矩阵<span class="math inline">\(F=K^{-T}EK^{-1}\)</span>简化对极约束得到：<span class="math display">\[x_2^TEx_2=p_2^TFp_1=0\]</span> 所以相机位姿估计问题变为以下两步：</p>
+<p>1、根据配对点的像素位置，求出 E 或者 F；</p>
+<p>2、根据 E 或者 F，求出 <span class="math inline">\(R,t\)</span>（会用到奇异值分解）。</p>
+<h4 id="实践对极约束求解相机运动">7.4 实践：对极约束求解相机运动</h4>
+<p>通过Essential 矩阵来求解相机运动。</p>
+<h4 id="三角测量">7.5 三角测量</h4>
+<p>在利用对极约束估计了相机运动之后，下一步需要用相机的运动估计特征点的空间位置。在单目 SLAM 中，仅通过单张图像无法获得像素的深度信息，我们需要通过<font color="maroon">三角测量</font>（Triangulation）（或三 角化）的方法来估计地图点的深度。 　　三角测量是指，通过在两处观察同一个点的夹角，确定该点的距离。在 SLAM 中，我们主要用三角化来估计像素点的距离。以7.3.1中的图为例，理论上直线<span class="math inline">\(O_1p_1\)</span>与<span class="math inline">\(O_2p_2\)</span>会交于一个点 P，即对应的地图点在三维场景中的位置。但是由于噪声的影响，这两条直线往往无法相交，所以要用最小二乘法求解。前面知道特征点的归一化坐标 <span class="math display">\[s_1x_1=s_2Rx_2=+t\]</span> ,相机运动 <span class="math inline">\(R,t\)</span>已经估计出来了，现在要求的是两个特征点的深度。这两个深度可以分开求，要算<span class="math inline">\(s_2\)</span>，则在两侧的左边乘以<span class="math inline">\(x_1\)</span>外积可使等式归0，则右侧可看成是关于<span class="math inline">\(s_2\)</span>的方程，可以求出来。于是两个帧下的点的深度都求出来了，便可以确定空间坐标了，但是由于噪声的存在，估得的<span class="math inline">\(R,t\)</span>不一定精确使等式为零，所以更常见的做法求最小二乘解而不是零解。</p>
+<h4 id="实践三角测量">7.6 实践：三角测量</h4>
+<p>编程调用 OpenCV 提供的 triangulation 函数进行三角化。</p>
 <p>三角化的矛盾：在增大平移，会导致匹配失效；而平移太小，则三角化精度不够。</p>
-<h4 id="7-7-3D-2D-PnP"><a href="#7-7-3D-2D-PnP" class="headerlink" title="7.7 3D-2D:PnP"></a>7.7 3D-2D:PnP</h4><p>　　PnP（Perspective-n-Point）是求解 3D 到 2D 点对运动的方法，它描述了当我们知道 n 个 3D 空间点以及它们的投影位置时，如何估计相机所在的位姿。特征点的 3D 位置可以由三角化，或者由 RGB-D 相机的深度图确定。因此，在双目或 RGB-D 的视觉里程计中，我们可以直接使用 PnP 估计相机运动。而在单目视觉里程计中必须先进行初始化，然后才能使用 PnP。3D-2D 方法不需要使用对极约束，又可以在很少的匹配点中获得较好的运动估计，是最重要的一种姿态估计方法。下面介绍PnP问题的多种求解方法：</p>
-<h5 id="7-7-1-直接线性变换"><a href="#7-7-1-直接线性变换" class="headerlink" title="7.7.1  直接线性变换"></a>7.7.1  直接线性变换</h5><p>涉及数学知识的后面再补充，待续…</p>
-<h5 id="7-7-2-P3P"><a href="#7-7-2-P3P" class="headerlink" title="7.7.2  P3P"></a>7.7.2  P3P</h5><p>P3P 是 PnP 的另一种解法，它仅使用三对匹配点，对数据要求较少。下图是P3P问题示意图：<br><img src="https://img-blog.csdnimg.cn/20200501095410636.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"><br>　　它的输入数据为三对 3D-2D 匹配点，记 3D 点为 $A,B,C$（世界坐标系中），2D 点为 $a,b,c$，其中小写字母代表的点为大写字母在相机成像平面上的投影，如图 7-11 所示。此外，P3P 还需要使用一对验证点，以从可能的解出选出正确的那一 个（类似于对极几何情形）。记验证点对为 D−d，相机光心为 O。一旦 3D 点在相机坐标系 下的坐标能够算出，就得到了 3D-3D 的对应点，把 PnP 问题转换为了 ICP 问题。根据三角形之间的对应关系：<script type="math/tex">\Delta Oab-\Delta OAB, \Delta Obc-\Delta OBC, \Delta Oac-\Delta OAC</script><br>再有余弦定理以及一些变换得如下两式：<script type="math/tex">(1-u)y^2-ux^2-cos⟨b,c⟩y +2uxycos⟨a,b⟩+1=0</script> <script type="math/tex">(1-w)x^2-wy^2-cos⟨a,c⟩x +2wxycos⟨a,b⟩+1=0</script> 其中$x=\frac{AC}{OC}, y=\frac{OB}{OC}$ ,$v=\frac{AB^2}{OC^2}, uv=v=\frac{BC^2}{OC^2}, wv=\frac{AC^2}{OC^2}$。由于2D 点的图像位置已知，那么三个余弦是已知的，同时$u,w$可以通过$A,B,C$在世界坐标系下的坐标算出，变换到相机坐标系下之后，并不改变这个比值。式中的 $x,y$ 是未知的，随着相机移动会发生变化，所以该方程组是关于$x,y$的一个二元二次方程（多项式方程）。</p>
-<p>　　P3P 的原理利用了三角形相似性质，求解投影点 $a,b,c$ 在相机坐标系下的 3D 坐标，最后把问题转换成一个 3D 到 3D 的位姿估计问题。然而，P3P 也存在着一些问题：</p>
+<h4 id="d-2dpnp">7.7 3D-2D:PnP</h4>
+<p>　　PnP（Perspective-n-Point）是求解 3D 到 2D 点对运动的方法，它描述了当我们知道 n 个 3D 空间点以及它们的投影位置时，如何估计相机所在的位姿。特征点的 3D 位置可以由三角化，或者由 RGB-D 相机的深度图确定。因此，在双目或 RGB-D 的视觉里程计中，我们可以直接使用 PnP 估计相机运动。而在单目视觉里程计中必须先进行初始化，然后才能使用 PnP。3D-2D 方法不需要使用对极约束，又可以在很少的匹配点中获得较好的运动估计，是最重要的一种姿态估计方法。下面介绍PnP问题的多种求解方法：</p>
+<h5 id="直接线性变换">7.7.1 直接线性变换</h5>
+<p>涉及数学知识的后面再补充，待续...</p>
+<h5 id="p3p">7.7.2 P3P</h5>
+<p>P3P 是 PnP 的另一种解法，它仅使用三对匹配点，对数据要求较少。下图是P3P问题示意图： <img src="https://img-blog.csdnimg.cn/20200501095410636.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"> 　　它的输入数据为三对 3D-2D 匹配点，记 3D 点为 <span class="math inline">\(A,B,C\)</span>（世界坐标系中），2D 点为 <span class="math inline">\(a,b,c\)</span>，其中小写字母代表的点为大写字母在相机成像平面上的投影，如图 7-11 所示。此外，P3P 还需要使用一对验证点，以从可能的解出选出正确的那一 个（类似于对极几何情形）。记验证点对为 D−d，相机光心为 O。一旦 3D 点在相机坐标系 下的坐标能够算出，就得到了 3D-3D 的对应点，把 PnP 问题转换为了 ICP 问题。根据三角形之间的对应关系：<span class="math display">\[\Delta Oab-\Delta OAB, \Delta Obc-\Delta OBC, \Delta Oac-\Delta OAC\]</span> 再有余弦定理以及一些变换得如下两式：<span class="math display">\[(1-u)y^2-ux^2-cos⟨b,c⟩y +2uxycos⟨a,b⟩+1=0 \]</span> <span class="math display">\[(1-w)x^2-wy^2-cos⟨a,c⟩x +2wxycos⟨a,b⟩+1=0 \]</span> 其中<span class="math inline">\(x=\frac{AC}{OC}, y=\frac{OB}{OC}\)</span> ,<span class="math inline">\(v=\frac{AB^2}{OC^2}, uv=v=\frac{BC^2}{OC^2}, wv=\frac{AC^2}{OC^2}\)</span>。由于2D 点的图像位置已知，那么三个余弦是已知的，同时<span class="math inline">\(u,w\)</span>可以通过<span class="math inline">\(A,B,C\)</span>在世界坐标系下的坐标算出，变换到相机坐标系下之后，并不改变这个比值。式中的 <span class="math inline">\(x,y\)</span> 是未知的，随着相机移动会发生变化，所以该方程组是关于<span class="math inline">\(x,y\)</span>的一个二元二次方程（多项式方程）。</p>
+<p>　　P3P 的原理利用了三角形相似性质，求解投影点 <span class="math inline">\(a,b,c\)</span> 在相机坐标系下的 3D 坐标，最后把问题转换成一个 3D 到 3D 的位姿估计问题。然而，P3P 也存在着一些问题：</p>
 <p>1、 P3P 只利用三个点的信息。当给定的配对点多于 3 组时，难以利用更多的信息。</p>
 <p>2、如果 3D 点或 2D 点受噪声影响，或者存在误匹配，则算法失效。</p>
 <p>　　所以后续人们还提出了许多别的方法，利用更多的信息，而且用迭代的方式对相机位姿进行优化，以尽可能地消除噪声的影响。在 SLAM 当中，通常的做法是先使用 P3P/EPnP 等方法估计相机位姿，然后构建最小二乘优化问题对估计值进行调整（Bundle Adjustment）。接下来从非线性优化角度 来看一下 PnP 问题。</p>
-<h5 id="7-7-3-Bundle-Adjustment"><a href="#7-7-3-Bundle-Adjustment" class="headerlink" title="7.7.3  Bundle Adjustment"></a>7.7.3  Bundle Adjustment</h5><p>（这里将用到李代数上的非线性最小二乘问题，李代数还没看呢，待续…）</p>
-<h4 id="7-8-实践：求解PnP"><a href="#7-8-实践：求解PnP" class="headerlink" title="7.8 实践：求解PnP"></a>7.8 实践：求解PnP</h4><h5 id="7-8-1-使用-EPnP-求解位姿"><a href="#7-8-1-使用-EPnP-求解位姿" class="headerlink" title="7.8.1  使用 EPnP 求解位姿"></a>7.8.1  使用 EPnP 求解位姿</h5><h5 id="7-8-2-使用-BA-优化"><a href="#7-8-2-使用-BA-优化" class="headerlink" title="7.8.2  使用 BA 优化"></a>7.8.2  使用 BA 优化</h5><h4 id="7-9-3D-3D：ICP"><a href="#7-9-3D-3D：ICP" class="headerlink" title="7.9 3D-3D：ICP"></a>7.9 3D-3D：ICP</h4><p>　　假设有一组配对好的 3D 点（比如对两个 RGB-D 图像进行了匹配）：<script type="math/tex">P = {p_1,...,p_n}, P′ = {p′ _1,...,p′_n}</script> 然后想找一个欧式变换$R,t$，使得<script type="math/tex">∀i,p_i = R_{p′ _i} + t</script><br>和 PnP 类似，ICP 的求解也分为两种方式：利用线性代数的求解（主要是 SVD），以及利用非线性优化方式的求解（类似于 Bundle Adjustment）。</p>
-<h5 id="7-9-1-SVD方法"><a href="#7-9-1-SVD方法" class="headerlink" title="7.9.1  SVD方法"></a>7.9.1  SVD方法</h5><p>首先定义第 i 对点的误差项：<script type="math/tex">e_i=p_i-(R_{p'_i}+t)</script> 然后构建最小二乘问题，求使得误差项的平方和达到最小的$R,t$。推导过程省略。ICP 可以分为以下 三个步骤求解：<br>1、 计算两组点的质心位置 p,p′，然后计算每个点的去质心坐标：$q<em>i = p_i −p, q′_i = p′_i −p′$。<br>2、根据以下优化问题计算旋转矩阵：$R^∗ = arg\min</em>{R} \frac{1}{2}\sum_{i=1}^n∥q_i −Rq′_i∥^2$。<br>3、根据第二步的 R，计算 t：$t^∗ = p-Rp′$。</p>
-<h5 id="7-9-2-非线性优化方法"><a href="#7-9-2-非线性优化方法" class="headerlink" title="7.9.2  非线性优化方法"></a>7.9.2  非线性优化方法</h5><p>非线性优化方法以迭代的方式去找最优值。该方法和前面讲述的 PnP 非常相似，以李代数表达位姿时，目标函数可以写成：<script type="math/tex">\min_{ξ}=\frac{1}{2}\sum_{i=1}^n∥p_i −exp(ξ∧)p′_i)∥^2_2</script>  单个误差项关于位姿导数已经在前面推导过了，使用李代数扰动模型即可。</p>
+<h5 id="bundle-adjustment">7.7.3 Bundle Adjustment</h5>
+<p>（这里将用到李代数上的非线性最小二乘问题，李代数还没看呢，待续...）</p>
+<h4 id="实践求解pnp">7.8 实践：求解PnP</h4>
+<h5 id="使用-epnp-求解位姿">7.8.1 使用 EPnP 求解位姿</h5>
+<h5 id="使用-ba-优化">7.8.2 使用 BA 优化</h5>
+<h4 id="d-3dicp">7.9 3D-3D：ICP</h4>
+<p>　　假设有一组配对好的 3D 点（比如对两个 RGB-D 图像进行了匹配）：<span class="math display">\[P = {p_1,...,p_n}, P′ = {p′ _1,...,p′_n}\]</span> 然后想找一个欧式变换<span class="math inline">\(R,t\)</span>，使得<span class="math display">\[∀i,p_i = R_{p′ _i} + t\]</span> 和 PnP 类似，ICP 的求解也分为两种方式：利用线性代数的求解（主要是 SVD），以及利用非线性优化方式的求解（类似于 Bundle Adjustment）。</p>
+<h5 id="svd方法">7.9.1 SVD方法</h5>
+<p>首先定义第 i 对点的误差项：<span class="math display">\[e_i=p_i-(R_{p&#39;_i}+t)\]</span> 然后构建最小二乘问题，求使得误差项的平方和达到最小的<span class="math inline">\(R,t\)</span>。推导过程省略。ICP 可以分为以下 三个步骤求解： 1、 计算两组点的质心位置 p,p′，然后计算每个点的去质心坐标：<span class="math inline">\(q_i = p_i −p, q′_i = p′_i −p′\)</span>。 2、根据以下优化问题计算旋转矩阵：<span class="math inline">\(R^∗ = arg\min_{R} \frac{1}{2}\sum_{i=1}^n∥q_i −Rq′_i∥^2\)</span>。 3、根据第二步的 R，计算 t：<span class="math inline">\(t^∗ = p-Rp′\)</span>。</p>
+<h5 id="非线性优化方法">7.9.2 非线性优化方法</h5>
+<p>非线性优化方法以迭代的方式去找最优值。该方法和前面讲述的 PnP 非常相似，以李代数表达位姿时，目标函数可以写成：<span class="math display">\[\min_{ξ}=\frac{1}{2}\sum_{i=1}^n∥p_i −exp(ξ∧)p′_i)∥^2_2\]</span> 单个误差项关于位姿导数已经在前面推导过了，使用李代数扰动模型即可。</p>
 <p>　　在非线性优化中不断迭代就能找到极小值，不会遇到局部极小而非全局最小的情况，这意味着 ICP 求解可以任意选定初始值。 但这里讲的 ICP，是指<font color="teal">已经由图像特征给定了匹配的情况</font>下，进行位姿估计的问题。在匹配已知的情况下，这个最小二乘问题实际上具有解析解， 所以并没有必要进行迭代优化。不过，在 RGB-DSLAM 中，由于一个像素的深度数据可能测量不到，所以我们可以混合着使用 PnP 和 ICP 优化：对于深度已知的特征点，用建模它们的 3D-3D 误差；对于深度未知的特征点，则建模 3D-2D 的重投影误差。</p>
-<h4 id="7-10-实践：求解ICP"><a href="#7-10-实践：求解ICP" class="headerlink" title="7.10 实践：求解ICP"></a>7.10 实践：求解ICP</h4><p>待续…</p>
-<h4 id="7-10-小结"><a href="#7-10-小结" class="headerlink" title="7.10 小结"></a>7.10 小结</h4><p>本节介绍了基于特征点的视觉里程计中的几个重要的问题。包括：</p>
-<p>1、 特征点是如何提取并匹配的； </p>
+<h4 id="实践求解icp">7.10 实践：求解ICP</h4>
+<p>待续... #### 7.10 小结 本节介绍了基于特征点的视觉里程计中的几个重要的问题。包括：</p>
+<p>1、 特征点是如何提取并匹配的；</p>
 <p>2、 如何通过 2D-2D 的特征点估计相机运动；</p>
-<p>3、 如何从 2D-2D 的匹配估计一个点的空间位置； </p>
+<p>3、 如何从 2D-2D 的匹配估计一个点的空间位置；</p>
 <p>4、3D-2D 的 PnP 问题，它的线性解法和 Bundle Adjustment 解法；</p>
 <p>5、 3D-3D 的 ICP 问题，其线性解法和 Bundle Adjustment 解法。</p>
 <p>　</p>

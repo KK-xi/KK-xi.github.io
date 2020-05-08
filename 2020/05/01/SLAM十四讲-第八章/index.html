@@ -185,38 +185,40 @@
           <div class="post-content mx-auto" id="post">
             
             <div class="markdown-body">
-              <h2 id="视觉SLAM十四讲"><a href="#视觉SLAM十四讲" class="headerlink" title="视觉SLAM十四讲"></a>视觉SLAM十四讲</h2><p>作者：高翔 | 张涛</p>
-<h3 id="第八章-视觉里程计2"><a href="#第八章-视觉里程计2" class="headerlink" title="第八章  视觉里程计2"></a>第八章  视觉里程计2</h3><h4 id="8-1-直接法的引出"><a href="#8-1-直接法的引出" class="headerlink" title="8.1 直接法的引出"></a>8.1 直接法的引出</h4><p>特征点法的缺点：</p>
+              <h2 id="视觉slam十四讲">视觉SLAM十四讲</h2>
+<p>作者：高翔 | 张涛</p>
+<h3 id="第八章-视觉里程计2">第八章 视觉里程计2</h3>
+<h4 id="直接法的引出">8.1 直接法的引出</h4>
+<p>特征点法的缺点：</p>
 <ul>
-<li><p>关键点的提取与描述子的计算非常耗时。</p>
-</li>
-<li><p>使用特征点时，忽略了除特征点以外的所有信息,一张图像有几十万个像素，而特征点只有几百个。</p>
-</li>
-<li><p>相机有时会运动到特征缺失的地方，往往这些地方没有明显的纹理信息 (例如有时会面对一堵白墙，这场景下特征点数量会明显减少， 可能找不到足够的匹配点来计算相机运动) 。</p>
-<p>　　针对以上问题，有三种思路：第一是保留特征点，但只计算关键点，不计算描述子，同时，使用光流法（Optical Flow）来跟踪特征点的运动；第二是只计算关键点，不计算描述子，同时使用直接法（Direct Method）来计算特征点在下一时刻图像的位置，这同样可以跳过描述子的计算过程，而且直接法的计算更加简单；第三种既不计算关键点、也不计算描述子，而是根据像素灰度的差异，直接计算相机运动。第一种方法仍然使用特征点，只是把匹配描述子替换成了光流跟踪，估计相机运动时仍使用对极几何、PnP 或 ICP 算法。而在后两个方法中，我们会根据图像的像素灰度信息来计算相机运动，它们都称为<font color="maroon">直接法</font>。直接法根据像素的亮度信息，估计相机的运动，可以完全不用计算关键点和描述子，于是既避免了特征的计算时间，也避免了特征缺失的情况。只要场景中存在明暗变化（可以是渐变，不形成局部的图像梯度），直接法就能工作。根据使用像素的数量，直接法分为稀疏、稠密和半稠密三种，相比于特征点法只能重构稀疏特征点（稀疏地图），直接法还具有恢复稠密或半稠密结构的能力。 </p>
-</li>
+<li><p>关键点的提取与描述子的计算非常耗时。</p></li>
+<li><p>使用特征点时，忽略了除特征点以外的所有信息,一张图像有几十万个像素，而特征点只有几百个。</p></li>
+<li><p>相机有时会运动到特征缺失的地方，往往这些地方没有明显的纹理信息 (例如有时会面对一堵白墙，这场景下特征点数量会明显减少， 可能找不到足够的匹配点来计算相机运动) 。</p></li>
 </ul>
-<h4 id="8-2-光流-Optical-Flow"><a href="#8-2-光流-Optical-Flow" class="headerlink" title="8.2 光流 (Optical Flow)"></a>8.2 光流 (Optical Flow)</h4><p> 　　直接法是从光流演变而来的， 光流描述了像素在图像中的运动，而直接法则附带着一个相机运动模型。计算部分像素运动的 称为稀疏光流，计算所有像素的称为稠密光流，稀疏光流以 Lucas-Kanade 光流为代表，并 可以在 SLAM 中用于跟踪特征点位置。下图为LK光流法示意图：<br><img src="https://img-blog.csdnimg.cn/20200501231933270.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
-<h5 id="8-2-1-Lucas-Kanade-光流"><a href="#8-2-1-Lucas-Kanade-光流" class="headerlink" title="8.2.1 Lucas-Kanade 光流"></a>8.2.1 Lucas-Kanade 光流</h5><p>在 LK 光流中，图像可以看作时间的函数：$I(t)$，那么一个在 t 时刻，位于$(x,y)$处的像素，它的灰度可以写成$I(x,y,t)$。要估计图像坐标，先引入光流法的假设：</p>
+<p>　　针对以上问题，有三种思路：第一是保留特征点，但只计算关键点，不计算描述子，同时，使用光流法（Optical Flow）来跟踪特征点的运动；第二是只计算关键点，不计算描述子，同时使用直接法（Direct Method）来计算特征点在下一时刻图像的位置，这同样可以跳过描述子的计算过程，而且直接法的计算更加简单；第三种既不计算关键点、也不计算描述子，而是根据像素灰度的差异，直接计算相机运动。第一种方法仍然使用特征点，只是把匹配描述子替换成了光流跟踪，估计相机运动时仍使用对极几何、PnP 或 ICP 算法。而在后两个方法中，我们会根据图像的像素灰度信息来计算相机运动，它们都称为<font color="maroon">直接法</font>。直接法根据像素的亮度信息，估计相机的运动，可以完全不用计算关键点和描述子，于是既避免了特征的计算时间，也避免了特征缺失的情况。只要场景中存在明暗变化（可以是渐变，不形成局部的图像梯度），直接法就能工作。根据使用像素的数量，直接法分为稀疏、稠密和半稠密三种，相比于特征点法只能重构稀疏特征点（稀疏地图），直接法还具有恢复稠密或半稠密结构的能力。</p>
+<h4 id="光流-optical-flow">8.2 光流 (Optical Flow)</h4>
+<p>　　直接法是从光流演变而来的， 光流描述了像素在图像中的运动，而直接法则附带着一个相机运动模型。计算部分像素运动的 称为稀疏光流，计算所有像素的称为稠密光流，稀疏光流以 Lucas-Kanade 光流为代表，并 可以在 SLAM 中用于跟踪特征点位置。下图为LK光流法示意图： <img src="https://img-blog.csdnimg.cn/20200501231933270.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" width="70%"></p>
+<h5 id="lucas-kanade-光流">8.2.1 Lucas-Kanade 光流</h5>
+<p>在 LK 光流中，图像可以看作时间的函数：<span class="math inline">\(I(t)\)</span>，那么一个在 t 时刻，位于<span class="math inline">\((x,y)\)</span>处的像素，它的灰度可以写成<span class="math inline">\(I(x,y,t)\)</span>。要估计图像坐标，先引入光流法的假设： * 灰度不变假设：同一个空间点的像素灰度值，在各个图像中是固定不变的。（实际中这一假设可能不成立） * 在 LK 光流中，我们假设某一个窗口内的像素具有相同的运动。 　　对于t 时刻位于<span class="math inline">\((x,y)\)</span>处的像素，我们设<span class="math inline">\(t +d_t\)</span>时刻，它运动到<span class="math inline">\((x +d_x,y +d_y)\)</span>处。 由于灰度不变，有: <span class="math display">\[I(x+d_x,y+d_y,t+d_t)=I(x,y,t)\]</span> 左边进行泰勒展开保留一阶项，并由灰度不变得：<span class="math display">\[\frac{∂I}{∂x}dx + \frac{∂I}{∂y}dy + \frac{∂I}{∂t}dt = 0\]</span> 两边同除以<span class="math inline">\(dt\)</span>得：<span class="math display">\[\frac{∂I}{∂x}\frac{dx}{dt} + \frac{∂I}{∂y}\frac{dy}{dt} =- \frac{∂I}{∂t}\]</span> 其中 <span class="math inline">\(dx/dt\)</span> 为像素在 x 轴上运动速度，而 <span class="math inline">\(dy/dt\)</span> 为 y 轴速度，把它们记为<span class="math inline">\(u,v\)</span>，<span class="math inline">\(∂I/∂x\)</span>为图像在该点处 x 方向的梯度，另一项则是在 y 方向的梯度，记为<span class="math inline">\(Ix,Iy\)</span>。上式写为矩阵形式有：<span class="math display">\[ \begin{bmatrix} I_x &amp; I_y  \\ \end{bmatrix} \begin{bmatrix} u \\ v \\ \end{bmatrix}=-I_t\]</span> 其中<span class="math inline">\(u,v\)</span>就是想要计算的运动，考虑在一个<span class="math inline">\(w×w\)</span>得窗口中，像素量为 <span class="math inline">\(w^2\)</span> 。由于该窗口内像素具有同样的运动，所以共有 <span class="math inline">\(w^2\)</span> 个方程： <span class="math display">\[ \begin{bmatrix} I_x &amp; I_y  \\ \end{bmatrix}_k \begin{bmatrix} u \\ v \\ \end{bmatrix}=-I_{tk}, k=1,...,w^2\]</span> 记 <span class="math display">\[A= \begin{bmatrix}  \begin{bmatrix} I_x , I_y  \\ \end{bmatrix}_1 \\ \vdots \\  \begin{bmatrix} I_x , I_y  \\ \end{bmatrix}_k  \\ \end{bmatrix} , b= \begin{bmatrix} I_{t1} \\ \vdots \\ I_{tk} \\ \end{bmatrix}\]</span><br>
+于是整个方程为： <span class="math display">\[ A\begin{bmatrix} u\\ v  \\ \end{bmatrix}=-b\]</span> 对以上方程用最小二乘解： <span class="math display">\[\begin{bmatrix} u\\ v  \\ \end{bmatrix}^*=-(A^TA)^{-1}A^Tb\]</span> 由于像素梯度仅在局部有效，所以如果一次迭代不够好的话，会多迭代几次这个方程，在 SLAM 中，LK 光流常被用来跟踪角点的运动。</p>
+<h4 id="实践光流">8.3 实践：光流</h4>
+<h5 id="使用-tum-公开数据集">8.3.1 使用 TUM 公开数据集</h5>
+<p>数据集来自于慕尼黑工业大学（TUM）提供的公开 RGB-D 数据集，它含有许 多个 RGB-D 视频，可以作为 RGB-D 或单目 SLAM 的实验数据。它还提供了用运动捕捉系统测量的精确轨迹，可以作为标准轨迹以校准 SLAM 系统。</p>
+<h5 id="使用-lk-光流">8.3.2 使用 LK 光流</h5>
+<p>编写程序使用 OpenCV 中的 LK 光流，使用 LK 的目的是跟踪特征点，对第一张图像提取 FAST 角点，然后用 LK 光流跟踪它们。</p>
+<p>　　 #### 8.4 直接法（Direct Methods）</p>
+<h5 id="直接法推导">8.4.1 直接法推导</h5>
+<p>涉及李导数的扰动模型，待续...</p>
+<h5 id="直接法的讨论">8.4.2 直接法的讨论</h5>
+<p>　　在上面的推导中，P 是一个已知位置的空间点，在 RGB-D 相 机下，可以把任意像素反投影到三维空间，然后投影到下一个图像中。如果在单目相机中，这件事情要更为困难，因为还需考虑由 P 的深度带来的不确定性。现在先来考 P 深度已知的情况，根据 P 的来源，可以把直接法进行分类：</p>
 <ul>
-<li>灰度不变假设：同一个空间点的像素灰度值，在各个图像中是固定不变的。（实际中这一假设可能不成立）</li>
-<li>在 LK 光流中，我们假设某一个窗口内的像素具有相同的运动。<br>　　对于t 时刻位于$(x,y)$处的像素，我们设$t +d_t$时刻，它运动到$(x +d_x,y +d_y)$处。 由于灰度不变，有: <script type="math/tex">I(x+d_x,y+d_y,t+d_t)=I(x,y,t)</script> 左边进行泰勒展开保留一阶项，并由灰度不变得：<script type="math/tex">\frac{∂I}{∂x}dx + \frac{∂I}{∂y}dy + \frac{∂I}{∂t}dt = 0</script> 两边同除以$dt$得：<script type="math/tex">\frac{∂I}{∂x}\frac{dx}{dt} + \frac{∂I}{∂y}\frac{dy}{dt} =- \frac{∂I}{∂t}</script> 其中 $dx/dt$ 为像素在 x 轴上运动速度，而 $dy/dt$ 为 y 轴速度，把它们记为$u,v$，$∂I/∂x$为图像在该点处 x 方向的梯度，另一项则是在 y 方向的梯度，记为$Ix,Iy$。上式写为矩阵形式有：<script type="math/tex">\begin{bmatrix} I_x & I_y  \\ \end{bmatrix} \begin{bmatrix} u \\ v \\ \end{bmatrix}=-I_t</script> 其中$u,v$就是想要计算的运动，考虑在一个$w×w$得窗口中，像素量为 $w^2$ 。由于该窗口内像素具有同样的运动，所以共有 $w^2$ 个方程：<script type="math/tex; mode=display">\begin{bmatrix} I_x & I_y  \\ \end{bmatrix}_k \begin{bmatrix} u \\ v \\ \end{bmatrix}=-I_{tk}, k=1,...,w^2</script>记 <script type="math/tex">A= \begin{bmatrix}  \begin{bmatrix} I_x , I_y  \\ \end{bmatrix}_1 \\ \vdots \\  \begin{bmatrix} I_x , I_y  \\ \end{bmatrix}_k  \\ \end{bmatrix} , b= \begin{bmatrix} I_{t1} \\ \vdots \\ I_{tk} \\ \end{bmatrix}</script><br>于是整个方程为：<script type="math/tex; mode=display">A\begin{bmatrix} u\\ v  \\ \end{bmatrix}=-b</script>对以上方程用最小二乘解： <script type="math/tex; mode=display">\begin{bmatrix} u\\ v  \\ \end{bmatrix}^*=-(A^TA)^{-1}A^Tb</script>由于像素梯度仅在局部有效，所以如果一次迭代不够好的话，会多迭代几次这个方程，在 SLAM 中，LK 光流常被用来跟踪角点的运动。</li>
-</ul>
-<h4 id="8-3-实践：光流"><a href="#8-3-实践：光流" class="headerlink" title="8.3 实践：光流"></a>8.3 实践：光流</h4><h5 id="8-3-1-使用-TUM-公开数据集"><a href="#8-3-1-使用-TUM-公开数据集" class="headerlink" title="8.3.1 使用 TUM 公开数据集"></a>8.3.1 使用 TUM 公开数据集</h5><p>数据集来自于慕尼黑工业大学（TUM）提供的公开 RGB-D 数据集，它含有许 多个 RGB-D 视频，可以作为 RGB-D 或单目 SLAM 的实验数据。它还提供了用运动捕捉系统测量的精确轨迹，可以作为标准轨迹以校准 SLAM 系统。</p>
-<h5 id="8-3-2-使用-LK-光流"><a href="#8-3-2-使用-LK-光流" class="headerlink" title="8.3.2 使用 LK 光流"></a>8.3.2 使用 LK 光流</h5><p>编写程序使用 OpenCV 中的 LK 光流，使用 LK 的目的是跟踪特征点，对第一张图像提取 FAST 角点，然后用 LK 光流跟踪它们。</p>
-<p>　　</p>
-<h4 id="8-4-直接法（Direct-Methods）"><a href="#8-4-直接法（Direct-Methods）" class="headerlink" title="8.4 直接法（Direct Methods）"></a>8.4 直接法（Direct Methods）</h4><h5 id="8-4-1-直接法推导"><a href="#8-4-1-直接法推导" class="headerlink" title="8.4.1 直接法推导"></a>8.4.1 直接法推导</h5><p>涉及李导数的扰动模型，待续…</p>
-<h5 id="8-4-2-直接法的讨论"><a href="#8-4-2-直接法的讨论" class="headerlink" title="8.4.2 直接法的讨论"></a>8.4.2 直接法的讨论</h5><p>　　在上面的推导中，P 是一个已知位置的空间点，在 RGB-D 相 机下，可以把任意像素反投影到三维空间，然后投影到下一个图像中。如果在单目相机中，这件事情要更为困难，因为还需考虑由 P 的深度带来的不确定性。现在先来考 P 深度已知的情况，根据 P 的来源，可以把直接法进行分类：</p>
-<ul>
-<li><p>P 来自于稀疏关键点，我们称之为<font color="maroon">稀疏直接法</font>。通常我们使用数百个至上千个关键 点，并且像 L-K 光流那样，假设它周围像素也是不变的。这种稀疏直接法不必计算描述子，并且只使用数百个像素，因此速度最快，但<font color="maroon">只能计算稀疏的重构</font>。</p>
-</li>
-<li><p>P 来自部分像素。考虑只使用带有梯度的像素点，舍弃像素梯度不明显的地方（这些地方的雅可比为零，不会对计算运动增量有任何贡献）。这称之为半稠密（Semi-Dense）的直接法，可以<font color="maroon">重构一个半稠密结构</font>。</p>
-</li>
-<li><p>P 为所有像素，称为稠密直接法。稠密重构需要计算所有像素，因此需要 GPU 的加速，但是度不明显的点，在运动估计中不会有太大贡献，在重构时也会难以估计位置。</p>
-</li>
+<li><p>P 来自于稀疏关键点，我们称之为<font color="maroon">稀疏直接法</font>。通常我们使用数百个至上千个关键 点，并且像 L-K 光流那样，假设它周围像素也是不变的。这种稀疏直接法不必计算描述子，并且只使用数百个像素，因此速度最快，但<font color="maroon">只能计算稀疏的重构</font>。</p></li>
+<li><p>P 来自部分像素。考虑只使用带有梯度的像素点，舍弃像素梯度不明显的地方（这些地方的雅可比为零，不会对计算运动增量有任何贡献）。这称之为半稠密（Semi-Dense）的直接法，可以<font color="maroon">重构一个半稠密结构</font>。</p></li>
+<li><p>P 为所有像素，称为稠密直接法。稠密重构需要计算所有像素，因此需要 GPU 的加速，但是度不明显的点，在运动估计中不会有太大贡献，在重构时也会难以估计位置。</p></li>
 </ul>
 <p>　　可以看到，从稀疏到稠密重构，都可以用直接法来计算。 稀疏方法可以快速地求解相机位姿，而稠密方法可以建立完整地图。在低端的计算平台上，稀疏直接法可以做到非常快速的效果，适用于实时性较高且计算资源有限的场合 。</p>
-<h4 id="8-5-实践：RGB-D-的直接法"><a href="#8-5-实践：RGB-D-的直接法" class="headerlink" title="8.5 实践：RGB-D 的直接法"></a>8.5 实践：RGB-D 的直接法</h4><p>待续…</p>
+<h4 id="实践rgb-d-的直接法">8.5 实践：RGB-D 的直接法</h4>
+<p>待续...</p>
 
             </div>
             <hr>
