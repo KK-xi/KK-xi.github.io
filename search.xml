@@ -55,9 +55,6 @@
 <h4 id="6-6-Discussion"><a href="#6-6-Discussion" class="headerlink" title="6.6 Discussion　"></a>6.6 Discussion　</h4><p>　　　可靠的跟踪检测只能通过使用非常精确的目标检测来实现。检测系统的影响可以对比 KITTI中有星号和没有星号的方法(表四，表五)。在 MOT16的 leader board中，当比较使用表一中的公共检测和表二中的专用对象检测器的方法的表时，可以观察到这一点。于对象检测一样，行人的跟踪具有挑战，因为行人的复杂运动很难预测，这与汽车的刚性运动相反，因为汽车运动会受道路区域约束并由于其较大的质量和动力学约束而遵循较少不稳定行为。3D 推理可以通过根据几何关系识别合理的解决方案来帮助改善跟踪性能，尤其是对于汽车。</p>
 <p>　　　在交通场景中，检测器经常会对部分或完全遮挡的对象失效，在这些情况下，跟踪系统需要在之后的时间重新识别被跟踪的对象，但是由于光照条件的变化或与附近其他对象的相似性，这可能会很困难。这些问题会导致轨迹重新初始化，这在体现在 MOT 和 KITTI 基准测试中的FRAG 和 ID开关（IDS）值比较高。此外，大多数跟踪系统包含复杂的 pipeline，并且在文献中很少提出端到端的多目标跟踪算法。 以通用和端到端可训练模型为目标，缩小从检测到跟踪的差距，将是该领域未来研究的重要方向。</p>
 <p>　　　总的说来，未来的发展方向，网络需具有的功能：端到端的训练网络，多目标跟踪，泛化能力强，减小从检测到跟踪时由于检测的失效而带来的对跟踪的影响。</p>
-<p>　　</p>
-<p>　
-　</p>
 ]]></content>
       <categories>
         <category>work</category>
@@ -72,10 +69,10 @@
     <url>/2020/05/06/omputer-Vision-for-Autonomous-Vehicles-Chapter-14-Scene-Understanding/</url>
     <content><![CDATA[<h2 id="《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》"><a href="#《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》" class="headerlink" title="《Computer Vision for Autonomous Vehicles Problems, Datasets and State of the Art》"></a>《Computer Vision for Autonomous Vehicles Problems, Datasets and State of the Art》</h2><p>Author：Joel Janai, Fatma Guney, Aseem Behl, Andreas Geiger</p>
 <p>Date：December 18, 2019</p>
-<font color="navy">**声明：**这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> 
+<font color="navy">** 声明：**这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> 
 <br>
 
-<font color="navy">**Disclaimer:** This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just record the reading notes here for future reference, if there is any infringement, it will be deleted immediately.</font>
+<font color="navy">** Disclaimer:** This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just record the reading notes here for future reference, if there is any infringement, it will be deleted immediately.</font>
 
 
 <h3 id="Chapter-14-Scene-Understanding"><a href="#Chapter-14-Scene-Understanding" class="headerlink" title="Chapter 14 Scene Understanding"></a>Chapter 14 Scene Understanding</h3><h4 id="14-1-Problem-Definition"><a href="#14-1-Problem-Definition" class="headerlink" title="14.1 Problem Definition"></a>14.1 Problem Definition</h4><p>　　在室外场景理解中的任务一般有深度估计、场景分类、目标检测和跟踪，以及事件分类等，这些人物都是场景的一个特定的方面，所以为了对场景更全面的理解，同时获取到这些任务中的互补的场景线索（布局、交通参与者以及它们之间的关系）是有益的。3D 场景比 2D 场景更容易进行几何场景的理解，其结果可以得到 3D 物体模型、布局以及遮挡关系，所以这一章节关注自动驾驶任务中 3D 场景理解的技术，包括场景图估计和图像标注即道路存在可变性，并且模糊的视觉特征、遮挡，和挑战性的照明条件也是难点。</p>
@@ -196,7 +193,6 @@
       <categories>
         <category>work</category>
         <category>视觉SLAM十四讲</category>
-        <category>第十三章</category>
       </categories>
       <tags>
         <tag>视觉SLAM</tag>
@@ -326,10 +322,10 @@
     <title>Computer Vision for Autonomous Vehicles | Chapter 1 Introduction</title>
     <url>/2020/04/30/mputer-Vision-for-Autonomous-Vehicles-Chapter-1-Introduction/</url>
     <content><![CDATA[<h2 id="《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》"><a href="#《Computer-Vision-for-Autonomous-Vehicles-Problems-Datasets-and-State-of-the-Art》" class="headerlink" title="《Computer Vision for Autonomous Vehicles: Problems, Datasets and State of the Art》"></a>《Computer Vision for Autonomous Vehicles: Problems, Datasets and State of the Art》</h2><p>Author：Joel Janai | Fatma Gu ney |  Aseem Behl | Andreas Geiger<br>Date：December 18, 2019</p>
-<font color="navy">**声明：**这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> 
+<font color="navy">** 声明：**这是以上作者的关于自动驾驶的综述文章，写得非常好，里面涉及的方法也几乎是近几年比较流行比较好的。我这里只是阅读笔记，方便以后查阅，如有侵权会立即删除。</font> 
 <br>
 
-<font color="navy">**Disclaimer:** This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just record the reading notes here for future reference, if there is any infringement, it will be deleted immediately.</font>
+<font color="navy">** Disclaimer:** This is a review article by the above authors on autonomous driving. It is very well written, and the methods involved are almost popular and better in recent years. I just record the reading notes here for future reference, if there is any infringement, it will be deleted immediately.</font>
 
 
 

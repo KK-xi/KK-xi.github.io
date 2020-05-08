@@ -2,23 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yoursite.com/2020/05/07/Computer-Vision-for-Autonomous-Vehicles-Chapter-6-Object-Tracking/</loc>
+    <loc>http://yoursite.com/2020/05/03/%E8%A7%89SlAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0/</loc>
     
-    <lastmod>2020-05-08T08:42:41.203Z</lastmod>
+    <lastmod>2020-05-08T08:47:07.130Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/04/30/mputer-Vision-for-Autonomous-Vehicles-Chapter-1-Introduction/</loc>
     
-    <lastmod>2020-05-08T00:38:22.347Z</lastmod>
+    <lastmod>2020-05-08T08:46:58.903Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2020/05/07/Computer-Vision-for-Autonomous-Vehicles-Chapter-6-Object-Tracking/</loc>
+    
+    <lastmod>2020-05-08T08:46:48.999Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/05/06/omputer-Vision-for-Autonomous-Vehicles-Chapter-14-Scene-Understanding/</loc>
     
-    <lastmod>2020-05-08T00:38:06.882Z</lastmod>
+    <lastmod>2020-05-08T08:46:39.200Z</lastmod>
     
   </url>
   
@@ -117,13 +124,6 @@
     <loc>http://yoursite.com/2020/05/04/%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E8%AE%BA%E6%96%87%E8%AF%A5%E6%80%8E%E4%B9%88%E8%AF%BB%EF%BC%9F/</loc>
     
     <lastmod>2020-05-04T08:04:14.621Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/05/03/%E8%A7%89SlAM%E5%8D%81%E5%9B%9B%E8%AE%B2-%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0/</loc>
-    
-    <lastmod>2020-05-04T07:46:47.180Z</lastmod>
     
   </url>
   
