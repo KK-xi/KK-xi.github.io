@@ -225,19 +225,20 @@
 <p>以上是针对光流估计说的，下面是可以泛化到其他任务的通用框架。</p>
 <p>如图3b所示，好的轨迹是对齐相应事件的轨迹，因此提出的目标函数可衡量事件沿候选轨迹的对齐程度。框架有两个辅助输出：（i）估计的点轨迹隐式地建立了事件之间的对应关系（即数据关联，判断是否为相同轨迹的对应事件），（ii）轨迹可用于校正边缘的运动。</p>
 <ul>
-<li><p><strong>步骤</strong></p>
+<li><strong>步骤</strong></li>
+</ul>
 <ol type="1">
 <li>根据上述几何模型(2)和候选参数θ定义的点轨迹将事件扭曲成图像H：</li>
-</ol></li>
-</ul>
+</ol>
 <p>扭曲（如（1）中的W）将每个事件沿着通过它的点轨迹传输，直到达到参考时间（例如第一个事件的时间）：<span class="math inline">\(e_k=(x_k, y_k, t_k,p_k) |→(x&#39;_k，y&#39;_k，t_{ref}，p_k)= e&#39;_k\)</span>。</p>
-<pre><code>2)    根据扭曲事件的图像计算分数f：
-
-创建扭曲事件H（ℇ&#39;）的图像或直方图（使用它们的极性pk或它们的事件数），然后计算目标函数(色散的度量) f(H(ℇ&#39;))。使用H的方差作为色散度量，其在图像处理术语中被称为&lt;font color=red&gt;对比度&lt;/font&gt;，并且我们力求使其最大化。目标函数根据候选模型参数θ表示扭曲事件ℇ&#39;的统计量f，因此它衡量$θ_t$对事件数据ℇ的拟合度。
-
-3) 相对于模型参数优化得分或目标函数：
-
-用如梯度上升或牛顿法之类的优化算法来获得最佳模型参数(光流估计、深度估计结果)，&lt;font color=red&gt;即最能解释事件数据的图像平面上的点轨迹&lt;/font&gt;。（该框架不依赖于任何特定的优化器）</code></pre>
+<ol start="2" type="1">
+<li>根据扭曲事件的图像计算分数f：</li>
+</ol>
+<p>创建扭曲事件H（ℇ'）的图像或直方图（使用它们的极性pk或它们的事件数），然后计算目标函数(色散的度量) f(H(ℇ'))。使用H的方差作为色散度量，其在图像处理术语中被称为<font color="red">对比度</font>，并且我们力求使其最大化。目标函数根据候选模型参数θ表示扭曲事件ℇ'的统计量f，因此它衡量<span class="math inline">\(θ_t\)</span>对事件数据ℇ的拟合度。</p>
+<ol start="3" type="1">
+<li>相对于模型参数优化得分或目标函数：</li>
+</ol>
+<p>用如梯度上升或牛顿法之类的优化算法来获得最佳模型参数(光流估计、深度估计结果)，<font color="red">即最能解释事件数据的图像平面上的点轨迹</font>。（该框架不依赖于任何特定的优化器）</p>
 <ul>
 <li><strong>最大化对比度</strong></li>
 </ul>
@@ -263,7 +264,11 @@
 <ul>
 <li><strong>结果</strong></li>
 </ul>
-<p>如下图，是一个灰度图(a)中不同的patch(对应真实depth分别为1.1m、1.8m)，及其patch的H方差随深度参数的变化而变化的曲线(b)（可以看出：在准确深度处的方差最大），还有不同深度处对应的扭曲事件图H(c)（扭曲事件图恢复了patch中引起事件的边缘图近似值）。 <img src="https://img-blog.csdnimg.cn/2020053115344390.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 上述过程在参考视图中生成patch中心的深度值。对参考像机中有存在边缘的每个像素重复这一过程，生成一个半密度深度图。类似下图： <img src="https://img-blog.csdnimg.cn/20200531153505905.png" srcset="/img/loading.gif" alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/20200531153511168.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> ## 2.4 旋转运动估计 - <strong>问题假设</strong></p>
+<p>如下图，是一个灰度图(a)中不同的patch(对应真实depth分别为1.1m、1.8m)，及其patch的H方差随深度参数的变化而变化的曲线(b)（可以看出：在准确深度处的方差最大），还有不同深度处对应的扭曲事件图H(c)（扭曲事件图恢复了patch中引起事件的边缘图近似值）。 <img src="https://img-blog.csdnimg.cn/2020053115344390.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 上述过程在参考视图中生成patch中心的深度值。对参考像机中有存在边缘的每个像素重复这一过程，生成一个半密度深度图。类似下图： <img src="https://img-blog.csdnimg.cn/20200531153505905.png" srcset="/img/loading.gif" alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/20200531153511168.png" srcset="/img/loading.gif" alt="在这里插入图片描述"></p>
+<h2 id="旋转运动估计">2.4 旋转运动估计</h2>
+<ul>
+<li><strong>问题假设</strong></li>
+</ul>
 <p>假设相机经过校准(已知本征参数，无镜头畸变)。</p>
 <ul>
 <li><p><strong>问题提法</strong></p>
@@ -295,7 +300,7 @@
 </ol>
 <ul>
 <li><p><strong>结果</strong></p>
-<p>在图10a中，Ne＝50000，每个像素表示其内事件的数量，即在(2)中使用扭曲<span class="math inline">\((x′_k＝x_k)\)</span>。图10b是对比度最大化的结果：对于最优参数θ，扭曲事件有最佳对齐，从而图像(2)具有比图10a中更高的对比度。该过程会产生运动校正图像，其纹理边缘特明显：在图10a(无运动校正)中边缘模糊，而在10b中边缘清晰。<img src="https://img-blog.csdnimg.cn/20200531155159575.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中(b)使用<font color="red">使图像对比度最大化的平面单应性参数θ= {ω，v / d，n}扭曲事件</font>：<span class="math inline">\(ω=(0.086,0.679,0.439)^⊤\)</span>，<span class="math inline">\(v / d =(0.613, −0.1,0.333)^⊤\)</span> ，<span class="math inline">\(n＝(0.07, 0.075, -0.995)^⊤\)</span>。</p>
+<p>在图10a中，Ne＝50000，每个像素表示其内事件的数量，即在(2)中使用扭曲<span class="math inline">\((x′_k＝x_k)\)</span>。图10b是对比度最大化的结果：对于最优参数θ，扭曲事件有最佳对齐，从而图像(2)具有比图10a中更高的对比度。该过程会产生运动校正图像，其纹理边缘特明显：在图10a(无运动校正)中边缘模糊，而在10b中边缘清晰。<img src="https://img-blog.csdnimg.cn/20200531155159575.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中(b)使用<font color="red">使图像对比度最大化的平面单应性参数θ= {ω，v / d，n}扭曲事件</font>：<span class="math inline">\(ω=(0.086,0.679,0.439)^⊤\)</span>，<span class="math inline">\(v / d =(0.613, −0.1,0.333)^⊤\)</span>，<span class="math inline">\(n＝(0.07, 0.075, -0.995)^⊤\)</span>。</p>
 <p>手持事件摄像机，当一个人在砖石地面上行走时，向下看。由单应性估计得出的经过运动校正的图像（参见图10b）产生更好的结果，这可以通过代表场景中地面的更多平点云看到。 <img src="https://img-blog.csdnimg.cn/20200531155355739.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图11：平面场景中的运动估计。通过视觉惯性算法获得的<font color="red">场景结构(黑点)</font>和摄像机运动(绿色轨迹)，带有和不带有经过运动校正的事件图像。</p></li>
 </ul>
 <h1 id="三优点和缺点">三、优点和缺点</h1>
@@ -303,8 +308,6 @@
 <p>　　优点就是：第一次有人这么做，一个统一的框架完成了多个估计任务，寻找使得事件轨迹与产生事件的边缘最佳对齐的估计参数，在这过程中对事件进行了数据关联，最后得到的某些效果还不错。</p>
 <p>　　其缺点：对事件的处理方式(事件计数/汇总)，忽略了大部分时间信息；用的是传统的方法，并且不能进行end-to-end的计算，方法上相比19年的无监督集成估计那篇文章，没用到深度网络来求解；而且没有与其他文章的估计结果对比，也没有定量的结果，是好是坏或许还需要进一步评估。</p>
 <p>　　用无监督的end-to-end的深度网络完成对这几个任务的集成估计的工作，还是可以进一步进行。</p>
-<p>　　</p>
-<p>　</p>
 
             </div>
             <hr>
