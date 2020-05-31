@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpg">
+  <link rel="icon" type="image/png" href="/img/avatar.jpg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="记录生活">
+  <meta name="author" content="kiki">
+  <meta name="keywords" content="CV">
+  <title>paper reading 2| A Unifying Contrast Maximization Framework for Event Cameras, with Applications to Motion, Depth, and Optical Flow Estimation - KK&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Welcome to here.</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/work/">工作</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/life/">生活</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <p class="mt-3 post-meta">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                  星期日, 五月 31日 2020, 4:06 下午
+                </p>
+              
+
+              <p class="mt-1">
+                
+                  
+                  <span class="post-meta">
+                    <i class="far fa-chart-bar"></i>
+                    5.1k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta">
+                      <i class="far fa-clock"></i>
+                      18 分钟
+                  </span>
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="a-unifying-contrast-maximization-framework-for-event-cameras-with-applications-to-motion-depth-and-optical-flow-estimation-2018">A Unifying Contrast Maximization Framework for Event Cameras, with Applications to Motion, Depth, and Optical Flow Estimation (2018)</h1>
+<p>Guillermo Gallego, Henri Rebecq, Davide Scaramuzza Dept. of Informatics and Neuroinformatics, University of Zurich and ETH Zurich(苏黎世大学和苏黎世联邦理工)</p>
+<p><strong>Abstract：</strong>　本文提出了一个<font color="red">统一的框架</font>来解决事件摄像机的几种计算机视觉问题：运动，深度和光流估计。框架的主要思想是<font color="red">通过最大化目标函数：扭曲事件图像的对比度，在图像平面上找到与事件数据最佳对齐的点轨迹。</font>我们的方法隐式处理事件之间的数据关联，因此，它不依赖于有关场景的其他外观信息。除了准确地恢复问题的运动参数之外，我们的框架还可以生成具有高动态范围的<font color="red">运动校正边缘样图像</font>，可将其用于进一步的场景分析。所提出的方法不仅简单，而且更重要的是，这是第一种方法，可以成功地将事件摄像机应用于如此多样化的重要视觉任务集。</p>
+<h1 id="一文章思路">一、文章思路</h1>
+<p><strong>Motivation：</strong></p>
+<p>（1）事件相机相比于传统相机的优点，但是需要技术方法来开发其优点；用group-of-events的方法，而不是event-by-event，因为每个事件所带的信息很少，并且有噪声，因此必须一起处理多个事件以产生足够的信噪比来解决所考虑的问题。</p>
+<p>（2）Event-by-event：主要是基于扩展的卡尔曼滤波器框架；group-of-events：一般是针对特定的问题提出解决方案。（所以本文提出了一个统一的框架来处理事件组，同时利用它们的时间信息）。</p>
+<p><strong>主要思想：</strong></p>
+<p>　　本文的框架<font color="red">寻找图像平面上最适合事件数据的点轨迹，并通过这样做，能够恢复描述相机和场景之间的相对运动的参数。</font>对于事件的处理，是group-of-events的方式，<font color="red">利用时空和极性的信息。</font>不像逐事件处理的方法一样要依赖于其他的外观信息(可用灰度图像或场景光度图形式，这些数据可以从过去的事件中构建，也可以由其他传感器提供)，它既可以用于特征时间很短的估计问题(光流)，也可以用于估计时间较长的问题(单目深度估计)。处理了<font color="red">数据关联问题</font>，框架还生成运动校正的事件图像（近似于导致事件的图像梯度）。</p>
+<h1 id="二-对比最大化网络构架">二、 对比最大化网络构架</h1>
+<ul>
+<li><strong>问题假设</strong>：光照恒定。</li>
+<li><p><strong>问题提法：</strong>　在没有与产生事件相关的场景外观的附加信息（纹理信息）的情况下，从事件中提取信息的问题就变成了<font color="red">在事件之间建立对应关系的问题</font>（即数据关联：确定哪些事件是由同一场景的边缘触发的）。由于移动边缘反应图像平面上的点轨迹（轨迹为局部直线），因此希望沿着这些轨迹触发相应的事件。图1是一个简单的例子说明了这个想法，其中点的轨迹几乎是直线。 <img src="https://img-blog.csdnimg.cn/20200531145716377.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70)" srcset="/img/loading.gif" width="８0%"></p>
+<p>图 1：（a）由运动边缘图案和图像平面的时空区域中的点轨迹引起的事件（点），根据事件极性进行着色（蓝色：正事件即亮度增加；红色：负事件即亮度降低）。（b）沿（a）中突出的点轨迹方向对事件进行可视化；相应的事件排成一行，得到了产生事件的边缘图案。我们的方法类似于（b）通过最大化扭曲事件图像的对比度来工作。</p>
+<p>本文提议找到最适合事件数据的点轨迹，如图1b所示。下面用一个简单但重要的示例（光学流量估计）来描述本文的框架，然后将其泛化到其他估计问题。</p></li>
+</ul>
+<h2 id="例子光流估计">2.1 例子：光流估计</h2>
+<ul>
+<li><p><strong>符号</strong></p>
+<p>ℇ={<span class="math inline">\(e_k\)</span>}<span class="math inline">\(_{k=1}^{N_e}\)</span>：如图1(a)，即假设的一系列事件（它们在在一个像素的时空邻域内）；</p>
+<p>ek=(xk,yk,tk,pk)：每个事件，预先定义的亮度变化的时空坐标；</p>
+<p>pk∈{−1，+1}：极性 (即亮度变化的标志)。</p>
+<p>x(t) = x(0)+vt：位移近似的点的轨迹(局部笔直)，其中<span class="math inline">\(x=(x,y)^T\)</span>，v是点的速度即光流。<font color="red">因此希望对应的事件(由相同的边缘触发)位于这样的轨迹上(图1b)</font>；</p></li>
+<li><p><strong>框架</strong></p>
+<p>框架在图2中进行了概述，包括对事件进行计数或沿候选光流给出的直线轨迹对它们的极性求和，并计算所得和（H）的方差（f），该f测量了事件与候选者的吻合程度轨迹。 　　<img src="https://img-blog.csdnimg.cn/20200531150603364.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图 2：根据运动参数θ描述的点轨迹使事件变形，从而生成扭曲事件H(x;θ)的图像(即上述相关事件点沿候选光流给出的轨迹求和后的图像)。H的对比衡量了事件与候选点轨迹的吻合程度。</p>
+<p><font color="red">具体计算步骤：</font></p>
+<ol type="1">
+<li><p>根据局部光流常数假说[28]，假设光流在事件所跨越的时空邻域中是恒定的，并且使事件扭曲，即ek |→e′k，即： <img src="https://img-blog.csdnimg.cn/20200531150718836.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中，θ= v是候选速度。</p></li>
+<li><p>然后构建扭曲事件的图像patch： <img src="https://img-blog.csdnimg.cn/20200531150758112.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中，每个像素x总和落入其中的扭曲事件<span class="math inline">\(x&#39;_k\)</span>的值bk（由狄拉克δ表示）,且<span class="math inline">\(δ(x-x&#39;_k)\)</span>体现了数据关联。如果bk = pk，则沿轨迹的事件的极性相加；而如果bk = 1，则计算沿轨迹的事件数。经过运动校正的图像斑块H，表示沿候选轨迹的亮度增量。</p></li>
+<li><p>最后计算H的方差f，它是θ的函数： <img src="https://img-blog.csdnimg.cn/2020053115090760.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中NP是<span class="math inline">\(H=(h_{ij})\)</span>的像素数量，<span class="math inline">\(μ_H=(1/NP)∑_{i,j} h_{ij}\)</span>为H的均值。</p></li>
+</ol>
+<p>在图3b中显示了与图3a中的三个不同运动矢量<span class="math inline">\(θ_i\)</span>相对应的扭曲事件的图像（以伪彩色表示，从蓝色（很少事件）到红色（很多事件））。 　　<img src="https://img-blog.csdnimg.cn/20200531150944212.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图3：光流（基于patch）估计。正确的光流是使扭曲事件图像（图3b）的对比度（图3a）最大化的一种。(a). f(θ)作为光流θ≡v的函数，在(b)中显示了三个候选速度的扭曲事件H的相关图像加以说明；(b). 扭曲事件H(x;θ), 其<span class="math inline">\(θ_i\)</span>, i = 0,1,2 是(a)里的光流。</p>
+<p>可以看出，扭曲事件在图像H中<font color="red">最佳对齐</font>时(指运动的方向，垂直于边缘的运动才会有事件产生，即水平方向的运动)，H有最大的方差，即b中最高的对比度(和清晰度)，达到<span class="math inline">\(θ∗= argmax(θ) ≈(−40,0)^⊤\)</span>pixel / s。因此，<font color="red">光流估计策略就是寻找最大化方差f的参数θ</font>。</p></li>
+<li><p><strong>数据关联</strong></p>
+<p>架还隐式定义了事件之间的数据关联。用平滑近似δ(x)≈δε(x)，例如高斯δε(x− µ)代替(2)中的增量。可以看到每个扭曲事件<span class="math inline">\(e&#39;_k\)</span>对每个其他事件<span class="math inline">\(e&#39;_n\)</span>都有影响，并且影响量由<span class="math inline">\(δε(x&#39;_n− x&#39;_k)\)</span>在高斯情况下，与欧几里得距离<span class="math inline">\(||x&#39;_n-x&#39;_k||\)</span>有关。这个内置的软数据关联，由它们之间的距离的函数隐式给出：扭曲事件越远，对应事件的可能性就越小。（<font color="fuchsia">重点：为了找出对应事件，数据关联</font>）</p></li>
+</ul>
+<h2 id="框架概述">2.2 框架概述</h2>
+<p>以上是针对光流估计说的，下面是可以泛化到其他任务的通用框架。</p>
+<p>如图3b所示，好的轨迹是对齐相应事件的轨迹，因此提出的目标函数可衡量事件沿候选轨迹的对齐程度。框架有两个辅助输出：（i）估计的点轨迹隐式地建立了事件之间的对应关系（即数据关联，判断是否为相同轨迹的对应事件），（ii）轨迹可用于校正边缘的运动。</p>
+<ul>
+<li><p><strong>步骤</strong></p>
+<ol type="1">
+<li>根据上述几何模型(2)和候选参数θ定义的点轨迹将事件扭曲成图像H：</li>
+</ol></li>
+</ul>
+<p>扭曲（如（1）中的W）将每个事件沿着通过它的点轨迹传输，直到达到参考时间（例如第一个事件的时间）：<span class="math inline">\(e_k=(x_k, y_k, t_k,p_k) |→(x&#39;_k，y&#39;_k，t_{ref}，p_k)= e&#39;_k\)</span>。</p>
+<pre><code>2)    根据扭曲事件的图像计算分数f：
+
+创建扭曲事件H（ℇ&#39;）的图像或直方图（使用它们的极性pk或它们的事件数），然后计算目标函数(色散的度量) f(H(ℇ&#39;))。使用H的方差作为色散度量，其在图像处理术语中被称为&lt;font color=red&gt;对比度&lt;/font&gt;，并且我们力求使其最大化。目标函数根据候选模型参数θ表示扭曲事件ℇ&#39;的统计量f，因此它衡量$θ_t$对事件数据ℇ的拟合度。
+
+3) 相对于模型参数优化得分或目标函数：
+
+用如梯度上升或牛顿法之类的优化算法来获得最佳模型参数(光流估计、深度估计结果)，&lt;font color=red&gt;即最能解释事件数据的图像平面上的点轨迹&lt;/font&gt;。（该框架不依赖于任何特定的优化器）</code></pre>
+<ul>
+<li><strong>最大化对比度</strong></li>
+</ul>
+<p>　　最大化扭曲事件H的图像方差，文章倾向于在图像平面上累积（即对齐）扭曲事件的点轨迹。在某些区域中扭曲事件会累积，则在其他区域中事件会分散（因为事件的总数N是恒定的），这样会产生较大范围的图像H，因此具有较高的对比度。从本质上讲，优化框架的目标是以类似于[30]中的分割方法的方式，“拉开”具有和不具有事件的区域的统计信息（例如，极性）。</p>
+<ul>
+<li><strong>计算复杂度</strong></li>
+</ul>
+<p>核心是扭曲事件图像的计算（2），其计算复杂度与要扭曲事件的数量呈线性关系。对比度（3）的计算通常可以忽略不计。该方法还取决于用于最大化对比度的算法的选择，这取决于应用程序。</p>
+<h2 id="深度估计">2.3 深度估计</h2>
+<ul>
+<li><p><strong>问题假设：</strong></p>
+<p>假设存在问题，则每次时间 t 已知事件相机P(t)的姿势，其中P表示相机的投影矩阵；假设相机的固有参数也是已知的，并且镜头失真已被消除。</p></li>
+<li><p><strong>问题提法：</strong></p></li>
+</ul>
+<p>　　在这种情况下，通过3D点投影获得的图像点的轨迹通过摄像机的已知6自由度运动和3D点相对于参考视图的深度进行参数化。这将在图像平面中生成一维曲线系列，并按深度进行参数化。每个深度值都会给出不同的曲线，然后是图像平面中的点，如图4所示。 <img src="https://img-blog.csdnimg.cn/20200531153036656.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图4：深度估计。左：相对于相机的3D点（鸟瞰）的轨迹。离摄像机较近的点具有较大的视在运动，因此通常在像平面上描述较长的轨迹。右：相机进行6自由度运动时，相对于参考视图的不同深度值的图像点的轨迹（图像中心，黑色）。每个深度值都会产生不同的点轨迹，产生一维曲线系列(深度值越小，场景离相机越近，所以运动轨迹的范围看起来更大，但是都会经过同一个中心点)。这是来自事件摄像机数据集的2s段的示例。</p>
+<p>　　与[21]的“空间扫描”方法一样，文章考虑虚拟摄像机在某个位置（例如，沿事件摄像机轨迹的一点）提供的参考视图（参见图5）。 　　<img src="https://img-blog.csdnimg.cn/20200531153116629.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图5：深度估计。对于相对于参考视图（RV）测量的不同深度值θ≡Z，扭曲事件<span class="math inline">\(x&#39;_k(θ)\)</span>的对准。在(b)中，扭曲事件patch用伪彩色表示，从对齐的几个事件(蓝色)到很多事件(红色)。 在正确的深度，色块具有最高的方差（即图像对比度大）。{图5说明：在图5a中，具有光学中心C(t)的事件相机在带有物体(灰色框)的场景前移动。使用三个候选深度值通过扭曲(4)将两个事件<span class="math inline">\(e_i =(x_i，t_i，p_i)\)</span>，i = {1,2}从事件相机传输到参考视图（RV）}。</p>
+<p>在参考视图中为一个patch制定问题，为简单起见，假设面片内的所有点都具有相同的深度，即某些候选值θ=Z。方法的三个主要步骤如下：</p>
+<ol type="1">
+<li><p>（a）使用候选深度参数将事件传输到参考视图上，如图5所示，使用扭曲（W）将事件ek传输到参考视图上。事件<span class="math inline">\(e&#39;_k =（x&#39;_k，t_{ref}，p_k）\)</span>其中<img src="https://img-blog.csdnimg.cn/2020053115325957.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中P（t）是事件摄像机在时间t的姿态和<span class="math inline">\(Pv= P(t_{ref})\)</span>是虚拟摄像机的姿态。扭曲与空间扫描多视图立体图中的扭曲相同：点是使用平面单应性传输的。由平行于参考视图像平面并在给定深度处的平面所诱导（见图5）;（b）计算沿候选点轨迹(例如图4)的事件数，创建扭曲事件(2)的图像(patch)。</p></li>
+<li><p>通过扭曲事件图像的平均软方差（即对比度）测量事件与深度值θ之间的拟合优度（3）;</p></li>
+<li><p>通过更改深度参数θ来最大化对比度。</p></li>
+</ol>
+<ul>
+<li><strong>结果</strong></li>
+</ul>
+<p>如下图，是一个灰度图(a)中不同的patch(对应真实depth分别为1.1m、1.8m)，及其patch的H方差随深度参数的变化而变化的曲线(b)（可以看出：在准确深度处的方差最大），还有不同深度处对应的扭曲事件图H(c)（扭曲事件图恢复了patch中引起事件的边缘图近似值）。 <img src="https://img-blog.csdnimg.cn/2020053115344390.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 上述过程在参考视图中生成patch中心的深度值。对参考像机中有存在边缘的每个像素重复这一过程，生成一个半密度深度图。类似下图： <img src="https://img-blog.csdnimg.cn/20200531153505905.png" srcset="/img/loading.gif" alt="在这里插入图片描述"><img src="https://img-blog.csdnimg.cn/20200531153511168.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> ## 2.4 旋转运动估计 - <strong>问题假设</strong></p>
+<p>假设相机经过校准(已知本征参数，无镜头畸变)。</p>
+<ul>
+<li><p><strong>问题提法</strong></p>
+<p>事件相机在静态场景中旋转，则目标是：使用事件估计相机的自运动。本文的框架通过最大程度地允许一组轨迹上的对比度来对齐事件：这些轨迹与旋转运动兼容。</p></li>
+<li><p><strong>步骤</strong></p>
+<p>考虑一个较小的时间窗口[0，∆t]上的所有事件ℇ，在足够小的时间窗口内，<font color="red">角速度ω可以认为是恒定的</font>，并且令<span class="math inline">\(t_{ref}\)</span> =0。在校准坐标中，图像点根据<span class="math inline">\(\tilde{x}\)</span>(t)∝ R(t)<span class="math inline">\(\tilde{x}\)</span>(0)进行变换，其中<span class="math inline">\(\tilde{x}\)</span>∝(x⊤，1)⊤是齐次坐标，R(t)= exp<span class="math inline">\(\hat{ω}\)</span>(t)是（3D）运动的旋转矩阵：exp是旋转群SO(3)的指数图，<span class="math inline">\(\hat{ω}\)</span>是与ω相关的叉积矩阵。</p></li>
+</ul>
+<ol type="1">
+<li>根据点轨迹模型将事件扭曲到<span class="math inline">\(t_{ref}：x&#39;_k = W(x_k, t_k;θ)\)</span>，其中θ=ω的角速度为 <img src="https://img-blog.csdnimg.cn/20200531154316812.png" srcset="/img/loading.gif" alt="在这里插入图片描述"></li>
+<li><p>计算(2)中的扭曲事件图（不需要极性）；</p></li>
+<li><p>使用标准优化算法（例如非线性共轭梯度）将目标函数（3）最大化。</p></li>
+</ol>
+<ul>
+<li><p><strong>结果</strong></p>
+<p>图8显示了文章的方法对一组Ne = 30000的事件ℇ进行处理的结果，该事件是在相机围绕其光轴旋转时捕获的。可以看到，本文的方法会从扭曲的事件图像中估计出消除运动模糊的运动参数，从而提供最清晰的图像。 <img src="https://img-blog.csdnimg.cn/20200531154413839.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图9a显示了估计的和ground truth，几乎没有差别。图9b分析了在15s的四个子间隔中，随着角速度的增加，它们之间的误差（因此误差也增加了）。本文的方法非常精确，相对于670º/s的峰值偏移，RMS误差约为20o/s，这意味着3％的误差。而且不需要场景估计运动的全景图，它也不需要在拟合3D运动之前估计光流。 <img src="https://img-blog.csdnimg.cn/20200531154436446.png" srcset="/img/loading.gif" alt="在这里插入图片描述"></p></li>
+</ul>
+<h2 id="平面场景中的运动估计">2.5 平面场景中的运动估计</h2>
+<ul>
+<li><p><strong>问题提法</strong></p>
+<p>在这一节中，假设为<font color="red">平面场景下的运动估计问题(平面单应性估计)</font>，它要获取摄像机的自运动参数(<font color="red">旋转和平移</font>)以及包含场景结构的平面参数。</p>
+<p>图像点根据<span class="math inline">\(\tilde{x}\)</span>(t)∝ H(t)(0)进行变换，其中<span class="math inline">\(\tilde{x}∝(x^⊤，1)^⊤\)</span>是齐次坐标，H(t)是3×3单应性矩阵。为简单起见，令<span class="math inline">\(t_{ref}\)</span>= 0，因此<span class="math inline">\(H(0)= I_d\)</span>是恒等式。x(t)描述的点轨迹具有与H(t)相同的DOF数量，在短时间内，认为H为常数，DOF的数量为8-DOF。沿由候选单应性H（t）定义的点轨迹x（t）聚集事件，<font color="red">并最大化扭曲事件的结果图像的对比度，以恢复能最好地解释事件数据的单应性</font>。</p></li>
+<li><p><strong>步骤</strong></p>
+<p>在<span class="math inline">\(π=(n^⊤，d）^⊤\)</span>坐标平面引起的单应性的情况下，有<span class="math inline">\(H(t)∝ R(t)− (1 /d)t(t)n^⊤\)</span>。在短时间间隔内的t∈[0，∆t]，假设v和ω在t内是恒定的：R(t)= exp(<span class="math inline">\(\hat{ω}\)</span>t)和t(t)= vt，所以可以通过<span class="math inline">\(θ=(ω^⊤，v^⊤/ d，φ，ψ)^⊤∈R^8\)</span>来参数化H(t)≡H(t;θ)（<font color="fuchsia">即通过参数扭曲事件</font>），其中2个自由度(φ，ψ)参数化了平面n。参数v / d解释了在没有其他信息的情况下，存在尺度模糊性：平面单应性的分解仅提供了平移的方向，<font color="red">但没有提供其大小</font>。</p></li>
+</ul>
+<ol type="1">
+<li>虑短时间间隔[0，Δt]中的事件ℇ，并使用在校准坐标中指定的扭曲将它们映射到参考视图的图像平面上： <img src="https://img-blog.csdnimg.cn/2020053115504859.png" srcset="/img/loading.gif" alt="在这里插入图片描述"></li>
+<li><p>通过(2)求得扭曲事件图；</p></li>
+<li><p>求取方差即对比度，以评估事件对齐时参数θ的质量。</p></li>
+</ol>
+<ul>
+<li><p><strong>结果</strong></p>
+<p>在图10a中，Ne＝50000，每个像素表示其内事件的数量，即在(2)中使用扭曲<span class="math inline">\((x′_k＝x_k)\)</span>。图10b是对比度最大化的结果：对于最优参数θ，扭曲事件有最佳对齐，从而图像(2)具有比图10a中更高的对比度。该过程会产生运动校正图像，其纹理边缘特明显：在图10a(无运动校正)中边缘模糊，而在10b中边缘清晰。<img src="https://img-blog.csdnimg.cn/20200531155159575.png?type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQxNjM5MDc3,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"> 其中(b)使用<font color="red">使图像对比度最大化的平面单应性参数θ= {ω，v / d，n}扭曲事件</font>：<span class="math inline">\(ω=(0.086,0.679,0.439)^⊤\)</span>，<span class="math inline">\(v / d =(0.613, −0.1,0.333)^⊤\)</span> ，<span class="math inline">\(n＝(0.07, 0.075, -0.995)^⊤\)</span>。</p>
+<p>手持事件摄像机，当一个人在砖石地面上行走时，向下看。由单应性估计得出的经过运动校正的图像（参见图10b）产生更好的结果，这可以通过代表场景中地面的更多平点云看到。 <img src="https://img-blog.csdnimg.cn/20200531155355739.png" srcset="/img/loading.gif" alt="在这里插入图片描述"> 图11：平面场景中的运动估计。通过视觉惯性算法获得的<font color="red">场景结构(黑点)</font>和摄像机运动(绿色轨迹)，带有和不带有经过运动校正的事件图像。</p></li>
+</ul>
+<h1 id="三优点和缺点">三、优点和缺点</h1>
+<p>　　这篇文章是第一次对任务用统一的框架进行集成估计，是18年发表的。</p>
+<p>　　优点就是：第一次有人这么做，一个统一的框架完成了多个估计任务，寻找使得事件轨迹与产生事件的边缘最佳对齐的估计参数，在这过程中对事件进行了数据关联，最后得到的某些效果还不错。</p>
+<p>　　其缺点：对事件的处理方式(事件计数/汇总)，忽略了大部分时间信息；用的是传统的方法，并且不能进行end-to-end的计算，方法上相比19年的无监督集成估计那篇文章，没用到深度网络来求解；而且没有与其他文章的估计结果对比，也没有定量的结果，是好是坏或许还需要进一步评估。</p>
+<p>　　用无监督的end-to-end的深度网络完成对这几个任务的集成估计的工作，还是可以进一步进行。</p>
+<p>　　</p>
+<p>　</p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/work/">work</a>
+                      &nbsp;
+                    
+                      <a class="hover-with-bg" href="/categories/work/event-based-camera/">event-based camera</a>
+                      &nbsp;
+                    
+                      <a class="hover-with-bg" href="/categories/work/event-based-camera/paper-reading/">paper reading</a>
+                      &nbsp;
+                    
+                      <a class="hover-with-bg" href="/categories/work/event-based-camera/paper-reading/%E4%BB%BB%E5%8A%A1%E9%9B%86%E6%88%90/">任务集成</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/event-camera/">event-camera</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/30/aper-reading-1-Unsupervised-Event-based-Learning-of-Optical-Flow-Depth-and-Egomotion/">
+                        <span class="hidden-mobile">paper reading 1| Unsupervised Event-based Learning of Optical Flow, Depth, and Egomotion</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+  <div class="col-lg-7 mx-auto nopadding-md">
+    <div class="container custom post-content mx-auto">
+                   我在你身边，等着你回答
+    </div>
+  </div>
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "paper reading 2| A Unifying Contrast Maximization Framework for Event Cameras, with Applications to Motion, Depth, and Optical Flow Estimation&nbsp;",
+      ],
+      cursorChar: "|",
+      typeSpeed: 80,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
